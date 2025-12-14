@@ -320,6 +320,25 @@
                                 </button>
                             </div>
 
+                            <!-- STEP 4: DAFTAR OUTPUT -->
+                            <div class="mb-4">
+                                <label class="form-label">
+                                    <i class="bi bi-toggle-on me-1"></i> Konfigurasi Output (Opsional)
+                                    <span class="badge-count ms-2" id="outputCount">0 output</span>
+                                </label>
+                                <div class="alert alert-info-custom py-2 mb-3">
+                                    <small><i class="bi bi-info-circle me-1"></i>
+                                        Output adalah aktuator yang dapat dikontrol via MQTT (relay, pompa, kipas, dll).
+                                    </small>
+                                </div>
+
+                                <div id="outputContainer"></div>
+
+                                <button type="button" class="btn btn-outline-add w-100" onclick="addOutputRow()">
+                                    <i class="bi bi-plus-circle me-1"></i> Tambah Output
+                                </button>
+                            </div>
+
                             <div class="alert alert-warning-custom">
                                 <strong><i class="bi bi-exclamation-triangle me-1"></i> Perhatian:</strong>
                                 Sistem akan otomatis membuatkan <b>Token Unik</b> dan <b>Tabel Database Baru</b>.
@@ -342,14 +361,27 @@
 
     <script>
         const availableSensors = @json($availableSensors);
+        const availableOutputs = @json($availableOutputs);
         const defaultSensors = @json($defaultSensors);
+        const defaultOutputs = @json($defaultOutputs);
         let sensorCounter = 0;
+        let outputCounter = 0;
 
         function getSensorOptions(selectedKey = '') {
             let options = '<option value="">-- Pilih Jenis Sensor --</option>';
             for (const [key, info] of Object.entries(availableSensors)) {
                 const selected = key === selectedKey ? 'selected' : '';
                 options += `<option value="${key}" ${selected}>${info.label} ${info.unit ? '(' + info.unit + ')' : ''}</option>`;
+            }
+            return options;
+        }
+
+        function getOutputOptions(selectedKey = '') {
+            let options = '<option value="">-- Pilih Jenis Output --</option>';
+            for (const [key, info] of Object.entries(availableOutputs)) {
+                const selected = key === selectedKey ? 'selected' : '';
+                const typeLabel = info.type === 'boolean' ? 'ON/OFF' : (info.type === 'percentage' ? '0-100%' : 'Angka');
+                options += `<option value="${key}" ${selected}>${info.label} (${typeLabel})</option>`;
             }
             return options;
         }
@@ -383,19 +415,57 @@
             updateSubmitButton();
         }
 
+        function addOutputRow(outputKey = '', customLabel = '') {
+            outputCounter++;
+            const container = document.getElementById('outputContainer');
+            const row = document.createElement('div');
+            row.className = 'sensor-row output-row';
+            row.id = `outputRow_${outputCounter}`;
+            row.innerHTML = `
+            <div class="row align-items-center g-2">
+                <div class="col-md-5">
+                    <select class="form-select output-select" name="outputs[${outputCounter}][type]" onchange="updateSubmitButton()">
+                        ${getOutputOptions(outputKey)}
+                    </select>
+                </div>
+                <div class="col-md-5">
+                    <input type="text" class="form-control output-label-input" name="outputs[${outputCounter}][label]" 
+                           placeholder="Label custom (opsional)" value="${customLabel}">
+                </div>
+                <div class="col-md-2 text-end">
+                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeOutputRow(${outputCounter})" style="border-radius: 50%;">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </div>
+            </div>
+        `;
+            container.appendChild(row);
+            updateOutputCount();
+        }
+
         function removeSensorRow(id) {
             const row = document.getElementById(`sensorRow_${id}`);
             if (row) { row.remove(); updateSensorCount(); updateSubmitButton(); }
         }
 
+        function removeOutputRow(id) {
+            const row = document.getElementById(`outputRow_${id}`);
+            if (row) { row.remove(); updateOutputCount(); }
+        }
+
         function updateSensorCount() {
-            const count = document.querySelectorAll('.sensor-row').length;
+            const count = document.querySelectorAll('.sensor-row:not(.output-row)').length;
             document.getElementById('sensorCount').textContent = count + ' sensor';
+        }
+
+        function updateOutputCount() {
+            const count = document.querySelectorAll('.output-row').length;
+            document.getElementById('outputCount').textContent = count + ' output';
         }
 
         function updateSubmitButton() {
             const typeSelected = document.getElementById('deviceType').value !== '';
-            const sensorCount = document.querySelectorAll('.sensor-row').length;
+            const sensorCount = document.querySelectorAll('.sensor-row:not(.output-row)').length;
             const allSensorsSelected = Array.from(document.querySelectorAll('.sensor-select')).every(s => s.value !== '');
             document.getElementById('submitBtn').disabled = !(typeSelected && sensorCount > 0 && allSensorsSelected);
         }
@@ -404,9 +474,16 @@
             document.querySelectorAll('.type-card').forEach(card => card.classList.remove('selected'));
             document.querySelector(`[data-type="${type}"]`).classList.add('selected');
             document.getElementById('deviceType').value = type;
+            
+            // Reset sensors
             document.getElementById('sensorContainer').innerHTML = '';
             sensorCounter = 0;
 
+            // Reset outputs
+            document.getElementById('outputContainer').innerHTML = '';
+            outputCounter = 0;
+
+            // Add default sensors
             if (defaultSensors[type]) {
                 for (const [sensorKey, count] of Object.entries(defaultSensors[type])) {
                     for (let i = 0; i < count; i++) {
@@ -415,12 +492,23 @@
                     }
                 }
             }
+
+            // Add default outputs
+            if (defaultOutputs[type]) {
+                for (const [outputKey, count] of Object.entries(defaultOutputs[type])) {
+                    for (let i = 0; i < count; i++) {
+                        const label = count > 1 ? `${availableOutputs[outputKey].label} ${i + 1}` : '';
+                        addOutputRow(outputKey, label);
+                    }
+                }
+            }
+
             updateSubmitButton();
         }
 
         document.getElementById('deviceForm').addEventListener('submit', function (e) {
             const type = document.getElementById('deviceType').value;
-            const sensors = document.querySelectorAll('.sensor-row').length;
+            const sensors = document.querySelectorAll('.sensor-row:not(.output-row)').length;
             if (!type) { e.preventDefault(); alert('Pilih tipe alat terlebih dahulu!'); return false; }
             if (sensors === 0) { e.preventDefault(); alert('Tambahkan minimal 1 sensor!'); return false; }
         });

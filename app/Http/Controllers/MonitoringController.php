@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Device;
 use App\Models\UserDevice;
+use App\Models\DeviceOutput;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
@@ -76,13 +77,14 @@ class MonitoringController extends Controller
     public function show(Request $request, $id)
     {
         // Pastikan user punya akses ke device ini
-        $userDevice = UserDevice::with(['device.sensors'])
+        $userDevice = UserDevice::with(['device.sensors', 'device.outputs'])
             ->where('user_id', Auth::id())
             ->where('id', $id)
             ->firstOrFail();
 
         $device = $userDevice->device;
         $sensors = $device->sensors;
+        $outputs = $device->outputs;
 
         // Default values
         $logData = collect();
@@ -112,7 +114,7 @@ class MonitoringController extends Controller
             $logData = new \Illuminate\Pagination\LengthAwarePaginator([], 0, 20);
         }
 
-        return view('monitoring.show', compact('userDevice', 'device', 'sensors', 'logData', 'chartData', 'latestData'));
+        return view('monitoring.show', compact('userDevice', 'device', 'sensors', 'outputs', 'logData', 'chartData', 'latestData'));
     }
 
     /**
@@ -200,5 +202,50 @@ class MonitoringController extends Controller
         };
 
         return response()->stream($callback, 200, $headers);
+    }
+
+    /**
+     * Toggle output state (AJAX endpoint)
+     */
+    public function toggleOutput(Request $request, $userDeviceId, $outputId)
+    {
+        // Validasi user punya akses ke device ini
+        $userDevice = UserDevice::where('user_id', Auth::id())
+            ->where('id', $userDeviceId)
+            ->firstOrFail();
+
+        // Ambil output dari device ini
+        $output = DeviceOutput::where('id', $outputId)
+            ->where('device_id', $userDevice->device_id)
+            ->firstOrFail();
+
+        // Validasi request
+        $request->validate([
+            'value' => 'required',
+        ]);
+
+        $newValue = $request->value;
+
+        // Untuk boolean, konversi ke 0 atau 1
+        if ($output->output_type === 'boolean') {
+            $newValue = filter_var($newValue, FILTER_VALIDATE_BOOLEAN) ? 1 : 0;
+        } else {
+            $newValue = (float) $newValue;
+        }
+
+        // Update current_value di database
+        $output->current_value = $newValue;
+        $output->save();
+
+        // TODO: Di sini bisa ditambahkan MQTT publish ke device
+        // Untuk sekarang, hanya update database
+
+        return response()->json([
+            'success' => true,
+            'output_id' => $output->id,
+            'output_name' => $output->output_name,
+            'new_value' => $newValue,
+            'message' => "Output {$output->output_label} berhasil diupdate!",
+        ]);
     }
 }

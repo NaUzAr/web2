@@ -33,6 +33,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/device/{id}', [MonitoringController::class, 'show'])->name('show');
         Route::delete('/device/{id}', [MonitoringController::class, 'destroy'])->name('destroy');
         Route::post('/device/{id}/export', [MonitoringController::class, 'exportCsv'])->name('export');
+        Route::post('/device/{id}/output/{outputId}/toggle', [MonitoringController::class, 'toggleOutput'])->name('output.toggle');
     });
 
 });

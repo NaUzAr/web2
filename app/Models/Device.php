@@ -21,6 +21,14 @@ class Device extends Model
     }
 
     /**
+     * Relasi ke DeviceOutput (satu device punya banyak output)
+     */
+    public function outputs()
+    {
+        return $this->hasMany(DeviceOutput::class);
+    }
+
+    /**
      * =====================================================
      * KONFIGURASI TIPE ALAT DAN SENSOR
      * Mudah diedit: Tambahkan tipe alat baru di sini
@@ -92,6 +100,56 @@ class Device extends Model
             ],
             // Tambahkan default sensor untuk tipe baru:
             // 'water_quality' => ['water_level' => 1, 'ph' => 1, 'temperature' => 1],
+        ];
+
+        return $defaults[$type] ?? [];
+    }
+
+    /**
+     * =====================================================
+     * KONFIGURASI OUTPUT DEVICE
+     * =====================================================
+     */
+
+    /**
+     * Daftar Preset Output yang Tersedia
+     * Format: 'output_key' => ['label' => 'Label', 'type' => 'tipe', 'unit' => 'satuan', 'icon' => 'bi-icon']
+     * Tipe: boolean (on/off), number (angka), percentage (0-100%)
+     */
+    public static function getAvailableOutputs(): array
+    {
+        return [
+            'relay' => ['label' => 'Relay', 'type' => 'boolean', 'unit' => '', 'icon' => 'bi-toggle-on'],
+            'pump' => ['label' => 'Pompa Air', 'type' => 'boolean', 'unit' => '', 'icon' => 'bi-droplet-fill'],
+            'fan' => ['label' => 'Kipas/Fan', 'type' => 'boolean', 'unit' => '', 'icon' => 'bi-fan'],
+            'valve' => ['label' => 'Katup/Valve', 'type' => 'boolean', 'unit' => '', 'icon' => 'bi-moisture'],
+            'motor' => ['label' => 'Motor Speed', 'type' => 'percentage', 'unit' => '%', 'icon' => 'bi-gear'],
+            'led' => ['label' => 'LED', 'type' => 'boolean', 'unit' => '', 'icon' => 'bi-lightbulb'],
+            'buzzer' => ['label' => 'Buzzer', 'type' => 'boolean', 'unit' => '', 'icon' => 'bi-bell'],
+            'servo' => ['label' => 'Servo Motor', 'type' => 'number', 'unit' => '°', 'icon' => 'bi-arrow-repeat'],
+            'heater' => ['label' => 'Pemanas/Heater', 'type' => 'boolean', 'unit' => '', 'icon' => 'bi-thermometer-high'],
+            'sprinkler' => ['label' => 'Sprinkler', 'type' => 'boolean', 'unit' => '', 'icon' => 'bi-cloud-drizzle'],
+            // Tambahkan output baru di sini
+        ];
+    }
+
+    /**
+     * Output Default untuk Setiap Tipe Alat
+     * Format: ['output_key' => jumlah_default]
+     */
+    public static function getDefaultOutputsForType(string $type): array
+    {
+        $defaults = [
+            'aws' => [
+                // AWS biasanya tidak punya output, hanya monitoring
+            ],
+            'smart_gh' => [
+                'pump' => 1,      // 1 pompa air
+                'fan' => 1,       // 1 kipas
+                'valve' => 1,     // 1 valve
+                'led' => 1,       // 1 LED grow light
+            ],
+            // Tambahkan default output untuk tipe baru:
         ];
 
         return $defaults[$type] ?? [];

@@ -201,6 +201,28 @@
             padding: 0.35rem 0.75rem;
             border-radius: 20px;
         }
+
+        .badge-output {
+            background: rgba(250, 204, 21, 0.2);
+            color: #fde047;
+            font-weight: 500;
+            padding: 0.5rem 0.75rem;
+            border-radius: 10px;
+            margin: 4px;
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .badge-output-name {
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .badge-output-type {
+            font-size: 0.7rem;
+            color: rgba(255, 255, 255, 0.5);
+        }
     </style>
 </head>
 
@@ -279,6 +301,35 @@
                                 <div class="alert alert-info-custom mt-2 mb-0 py-2">
                                     <small><i class="bi bi-info-circle me-1"></i>
                                         Sensor tidak dapat diubah karena sudah terikat dengan struktur tabel database.
+                                    </small>
+                                </div>
+                            </div>
+
+                            <!-- Outputs Info -->
+                            <div class="mb-4">
+                                <label class="form-label" style="color: #fde047;">
+                                    <i class="bi bi-toggle-on me-1"></i> Outputs ({{ $device->outputs->count() }}
+                                    output)
+                                </label>
+                                <div class="sensors-container">
+                                    @if($device->outputs->count() > 0)
+                                        @foreach($device->outputs as $output)
+                                            <span class="badge-output">
+                                                <span class="badge-output-name"><i
+                                                        class="bi bi-toggle-on me-1"></i>{{ $output->output_label }}</span>
+                                                <span class="badge-output-type">{{ $output->output_name }}
+                                                    ({{ $output->output_type }})</span>
+                                            </span>
+                                        @endforeach
+                                    @else
+                                        <span class="text-white-50">Tidak ada output</span>
+                                    @endif
+                                </div>
+                                <div class="alert alert-info-custom mt-2 mb-0 py-2"
+                                    style="background: rgba(250, 204, 21, 0.15); border-color: rgba(250, 204, 21, 0.3);">
+                                    <small style="color: #fde047;"><i class="bi bi-info-circle me-1"></i>
+                                        Output dapat dikontrol melalui MQTT topic:
+                                        <code>{{ $device->mqtt_topic }}/control</code>
                                     </small>
                                 </div>
                             </div>

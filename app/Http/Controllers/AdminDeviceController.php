@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Device;
 use App\Models\DeviceSensor;
+use App\Models\DeviceOutput;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
@@ -27,7 +28,7 @@ class AdminDeviceController extends Controller
     public function index()
     {
         $this->checkAdmin();
-        $devices = Device::with('sensors')->get();
+        $devices = Device::with(['sensors', 'outputs'])->get();
         return view('admin.index', compact('devices'));
     }
 
@@ -39,12 +40,15 @@ class AdminDeviceController extends Controller
         // Kirim data konfigurasi ke view
         $deviceTypes = Device::getDeviceTypes();
         $availableSensors = Device::getAvailableSensors();
+        $availableOutputs = Device::getAvailableOutputs();
         $defaultSensors = [];
+        $defaultOutputs = [];
         foreach (Device::getDeviceTypes() as $type => $label) {
             $defaultSensors[$type] = Device::getDefaultSensorsForType($type);
+            $defaultOutputs[$type] = Device::getDefaultOutputsForType($type);
         }
 
-        return view('admin.create_device', compact('deviceTypes', 'availableSensors', 'defaultSensors'));
+        return view('admin.create_device', compact('deviceTypes', 'availableSensors', 'availableOutputs', 'defaultSensors', 'defaultOutputs'));
     }
 
     // 3. PROSES SIMPAN DEVICE BARU (STORE)
@@ -141,9 +145,69 @@ class AdminDeviceController extends Controller
             ]);
         }
 
-        // G. Redirect ke Halaman List Device
+        // G. Proses & Simpan Output (jika ada)
+        $outputData = $request->outputs ?? [];
+        $availableOutputs = Device::getAvailableOutputs();
+        $outputCounts = [];
+        $processedOutputs = [];
+
+        foreach ($outputData as $output) {
+            if (empty($output['type']))
+                continue;
+
+            $outputType = $output['type'];
+            $customLabel = $output['label'] ?? '';
+
+            // Increment counter untuk tipe ini
+            if (!isset($outputCounts[$outputType])) {
+                $outputCounts[$outputType] = 0;
+            }
+            $outputCounts[$outputType]++;
+
+            // Buat nama output unik
+            $outputName = $outputType;
+            if ($outputCounts[$outputType] > 1 || $this->countOutputType($outputData, $outputType) > 1) {
+                $outputName = $outputType . '_' . $outputCounts[$outputType];
+            }
+
+            // Buat label
+            $outputInfo = $availableOutputs[$outputType] ?? ['label' => $outputType, 'type' => 'boolean', 'unit' => ''];
+            $label = $customLabel ?: $outputInfo['label'];
+            if ($this->countOutputType($outputData, $outputType) > 1 && empty($customLabel)) {
+                $label = $outputInfo['label'] . ' ' . $outputCounts[$outputType];
+            }
+
+            $processedOutputs[] = [
+                'output_name' => $outputName,
+                'output_type' => $outputInfo['type'],
+                'label' => $label,
+                'unit' => $outputInfo['unit'] ?? '',
+            ];
+        }
+
+        // Simpan Konfigurasi Output ke Tabel device_outputs
+        foreach ($processedOutputs as $output) {
+            DeviceOutput::create([
+                'device_id' => $device->id,
+                'output_name' => $output['output_name'],
+                'output_label' => $output['label'],
+                'output_type' => $output['output_type'],
+                'unit' => $output['unit'],
+                'default_value' => 0,
+                'current_value' => 0,
+            ]);
+        }
+
+        // H. Redirect ke Halaman List Device
+        $outputCount = count($processedOutputs);
+        $message = "Sukses! Device '$request->name' berhasil dibuat dengan " . count($processedSensors) . " sensor";
+        if ($outputCount > 0) {
+            $message .= " dan {$outputCount} output";
+        }
+        $message .= ".";
+
         return redirect()->route('admin.devices.index')
-            ->with('success', "Sukses! Device '$request->name' berhasil dibuat dengan " . count($processedSensors) . " sensor.");
+            ->with('success', $message);
     }
 
     // Helper: Hitung berapa kali sensor type muncul dalam array
@@ -158,17 +222,30 @@ class AdminDeviceController extends Controller
         return $count;
     }
 
+    // Helper: Hitung berapa kali output type muncul dalam array
+    private function countOutputType($outputs, $type)
+    {
+        $count = 0;
+        foreach ($outputs as $output) {
+            if (isset($output['type']) && $output['type'] === $type) {
+                $count++;
+            }
+        }
+        return $count;
+    }
+
     // 4. HALAMAN FORM EDIT
     public function edit($id)
     {
         $this->checkAdmin();
-        $device = Device::with('sensors')->findOrFail($id);
+        $device = Device::with(['sensors', 'outputs'])->findOrFail($id);
 
         // Kirim data konfigurasi ke view
         $deviceTypes = Device::getDeviceTypes();
         $availableSensors = Device::getAvailableSensors();
+        $availableOutputs = Device::getAvailableOutputs();
 
-        return view('admin.edit', compact('device', 'deviceTypes', 'availableSensors'));
+        return view('admin.edit', compact('device', 'deviceTypes', 'availableSensors', 'availableOutputs'));
     }
 
     // 5. PROSES UPDATE DEVICE
