@@ -13,10 +13,10 @@ return new class extends Migration
     {
         Schema::create('devices', function (Blueprint $table) {
             $table->id();
-            $table->string('name');          // Nama Device
-            $table->string('mqtt_topic');    // Topik MQTT
-            $table->string('token')->unique(); // Token Unik
-            $table->string('table_name');    // Nama Tabel Log khusus device ini
+            $table->string('name');          // <--- Pastikan ada ini
+            $table->string('mqtt_topic');    // <--- Pastikan ada ini
+            $table->string('token')->unique(); // <--- Pastikan ada ini
+            $table->string('table_name');    // <--- Pastikan ada ini
             $table->timestamps();
         });
     }
