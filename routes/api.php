@@ -25,7 +25,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/devices', function () {
         return response()->json([
             'success' => true,
-            'data' => auth()->user()->userDevices()->with('device')->get()
+            'data' => auth()->user()->userDevices()->with(['device.sensors', 'device.outputs'])->get()
         ]);
     });
 
@@ -162,6 +162,56 @@ Route::middleware('auth:sanctum')->group(function () {
             'sensors' => $device->sensors,
             'latest_data' => $latestData,
             'chart_data' => $chartData
+        ]);
+    });
+
+    // POST - Kontrol output device (relay, pump, etc)
+    Route::post('/devices/{id}/outputs', function (\Illuminate\Http\Request $request, $id) {
+        $request->validate([
+            'output_name' => 'required|string',
+            'value' => 'required',
+        ]);
+
+        $userDevice = \App\Models\UserDevice::with(['device.outputs'])
+            ->where('user_id', auth()->id())
+            ->where('id', $id)
+            ->first();
+
+        if (!$userDevice) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Device tidak ditemukan.'
+            ], 404);
+        }
+
+        $device = $userDevice->device;
+        $output = $device->outputs()->where('output_name', $request->output_name)->first();
+
+        if (!$output) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Output tidak ditemukan.'
+            ], 404);
+        }
+
+        // Update nilai output
+        $newValue = $output->output_type === 'boolean'
+            ? (filter_var($request->value, FILTER_VALIDATE_BOOLEAN) ? 1 : 0)
+            : (float) $request->value;
+
+        $output->current_value = $newValue;
+        $output->save();
+
+        // TODO: Publish ke MQTT untuk kirim ke device fisik
+
+        return response()->json([
+            'success' => true,
+            'message' => "Output {$output->output_label} berhasil diupdate!",
+            'output' => [
+                'name' => $output->output_name,
+                'label' => $output->output_label,
+                'value' => $newValue
+            ]
         ]);
     });
 });
