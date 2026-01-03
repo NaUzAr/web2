@@ -28,6 +28,71 @@ Route::middleware('auth:sanctum')->group(function () {
             'data' => auth()->user()->userDevices()->with('device')->get()
         ]);
     });
+
+    // POST - Tambah device via token
+    Route::post('/devices', function (\Illuminate\Http\Request $request) {
+        $request->validate([
+            'token' => 'required|string|size:16',
+            'custom_name' => 'nullable|string|max:100',
+        ]);
+
+        // Cari device berdasarkan token
+        $device = \App\Models\Device::where('token', $request->token)->first();
+
+        if (!$device) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Token tidak ditemukan! Pastikan token benar.'
+            ], 404);
+        }
+
+        // Cek apakah user sudah punya device ini
+        $exists = \App\Models\UserDevice::where('user_id', auth()->id())
+            ->where('device_id', $device->id)
+            ->exists();
+
+        if ($exists) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Device ini sudah ada di daftar monitoring Anda.'
+            ], 409);
+        }
+
+        // Simpan ke user_devices
+        $userDevice = \App\Models\UserDevice::create([
+            'user_id' => auth()->id(),
+            'device_id' => $device->id,
+            'custom_name' => $request->custom_name ?: $device->name,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => "Device '{$device->name}' berhasil ditambahkan!",
+            'data' => $userDevice->load('device')
+        ], 201);
+    });
+
+    // DELETE - Hapus device dari monitoring
+    Route::delete('/devices/{id}', function ($id) {
+        $userDevice = \App\Models\UserDevice::where('user_id', auth()->id())
+            ->where('id', $id)
+            ->first();
+
+        if (!$userDevice) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Device tidak ditemukan.'
+            ], 404);
+        }
+
+        $deviceName = $userDevice->custom_name;
+        $userDevice->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => "Device '{$deviceName}' berhasil dihapus."
+        ]);
+    });
 });
 
 // ==================== SENSOR DATA ROUTES (IoT Device) ====================
