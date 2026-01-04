@@ -234,8 +234,8 @@ Route::middleware('auth:sanctum')->group(function () {
         return response()->json([
             'success' => true,
             'mqtt' => [
-                'broker' => config('mqtt.host', env('MQTT_HOST', 'smartagri.web.id')),
-                'port' => config('mqtt.port', env('MQTT_PORT', 1883)),
+                'broker' => 'smartagri.web.id',
+                'port' => 1883,
                 'websocket_port' => 9001,
                 'topic_data' => $device->mqtt_topic,
                 'topic_control' => $device->mqtt_topic . '/control',
