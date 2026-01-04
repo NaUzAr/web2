@@ -148,10 +148,10 @@ Route::middleware('auth:sanctum')->group(function () {
             ->orderBy('recorded_at', 'desc')
             ->first();
 
-        // Ambil 50 data terakhir untuk chart
+        // Ambil 40 data terakhir untuk chart
         $chartData = \Illuminate\Support\Facades\DB::table($tableName)
             ->orderBy('recorded_at', 'desc')
-            ->limit(50)
+            ->limit(40)
             ->get()
             ->reverse()
             ->values();
