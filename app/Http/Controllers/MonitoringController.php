@@ -244,11 +244,8 @@ class MonitoringController extends Controller
             $topic = $device->mqtt_topic . '/control';
 
             $message = [
-                'type' => 'set_output',
-                'token' => $device->token,
                 'output' => $output->output_name,
                 'value' => $newValue,
-                'timestamp' => now()->toIso8601String(),
             ];
 
             // MQTT Connection
