@@ -18,7 +18,7 @@ from datetime import datetime
 # KONFIGURASI
 # ============================================
 
-MQTT_BROKER = "broker.hivemq.com"
+MQTT_BROKER = "smartagri.web.id"
 MQTT_PORT = 1883
 
 # Topic MQTT - HARUS SAMA dengan mqtt_topic device di database!

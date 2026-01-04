@@ -20,7 +20,7 @@ from datetime import datetime
 # ============================================
 
 # HiveMQ Public Broker (gratis untuk testing)
-MQTT_BROKER = "broker.hivemq.com"
+MQTT_BROKER = "smartagri.web.id"
 MQTT_PORT = 1883
 
 # Topic MQTT untuk menerima perintah output

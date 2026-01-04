@@ -15,7 +15,7 @@ class MqttAutomationService
 
     public function __construct()
     {
-        $this->host = config('mqtt.host', env('MQTT_HOST', 'broker.hivemq.com'));
+        $this->host = config('mqtt.host', env('MQTT_HOST', 'smartagri.web.id'));
         $this->port = config('mqtt.port', env('MQTT_PORT', 1883));
         $this->username = config('mqtt.username', env('MQTT_USERNAME'));
         $this->password = config('mqtt.password', env('MQTT_PASSWORD'));

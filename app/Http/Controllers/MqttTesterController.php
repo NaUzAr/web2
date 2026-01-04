@@ -276,7 +276,7 @@ class MqttTesterController extends Controller
 
     private function connect(): MqttClient
     {
-        $host = config('mqtt.host', env('MQTT_HOST', 'broker.hivemq.com'));
+        $host = config('mqtt.host', env('MQTT_HOST', 'smartagri.web.id'));
         $port = config('mqtt.port', env('MQTT_PORT', 1883));
         $username = config('mqtt.username', env('MQTT_USERNAME'));
         $password = config('mqtt.password', env('MQTT_PASSWORD'));

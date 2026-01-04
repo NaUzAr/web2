@@ -21,7 +21,7 @@ from datetime import datetime
 # KONFIGURASI - GANTI SESUAI KEBUTUHAN
 # ============================================
 
-MQTT_BROKER = "broker.hivemq.com"
+MQTT_BROKER = "smartagri.web.id"
 MQTT_PORT = 1883
 
 # Token device (dapatkan dari admin panel)
