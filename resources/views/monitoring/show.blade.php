@@ -478,7 +478,7 @@
             </div>
         @endif
 
-        @if($outputs->count() > 0 && !($isAdminView ?? false))
+        @if($outputs->count() > 0)
             <!-- Output Control Panel -->
             <div class="glass-card"
                 style="background: rgba(250, 204, 21, 0.05); border-color: rgba(250, 204, 21, 0.2); margin-top: 1.5rem;">
@@ -530,9 +530,9 @@
                                     </div>
                                 @endif
 
-                                {{-- Always reserve space for button to maintain consistent card height --}}
+                                {{-- Schedule button - only for user view --}}
                                 <div class="mt-2">
-                                    @if($output->automation_mode !== 'none')
+                                    @if(!($isAdminView ?? false) && $output->automation_mode !== 'none')
                                         <a href="{{ route('schedule.index', [$userDevice->id, $output->id]) }}"
                                             class="btn btn-sm btn-outline-light w-100" style="font-size: 0.75rem;">
                                             <i class="bi bi-calendar-check"></i> Schedule
@@ -917,6 +917,101 @@
 
                 document.querySelector('input[name="start_date"]').value = startDate.toISOString().split('T')[0];
                 document.querySelector('input[name="end_date"]').value = endDate.toISOString().split('T')[0];
+            }
+        </script>
+    @endif
+
+    @if($isAdminView ?? false)
+        <script>
+            // Admin Output Control JavaScript
+            const csrfToken = '{{ csrf_token() }}';
+            const deviceId = {{ $device->id }};
+
+            // Set output ON/OFF (for buttons)
+            function setOutput(outputId, isOn) {
+                const url = `/admin/device/${deviceId}/output/${outputId}/toggle`;
+
+                fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken
+                    },
+                    body: JSON.stringify({ value: isOn })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            const btnOn = document.getElementById(`btn-on-${outputId}`);
+                            const btnOff = document.getElementById(`btn-off-${outputId}`);
+                            const statusEl = document.getElementById(`output-status-${outputId}`);
+
+                            if (isOn) {
+                                btnOn.className = 'btn btn-sm btn-success';
+                                btnOff.className = 'btn btn-sm btn-outline-danger';
+                            } else {
+                                btnOn.className = 'btn btn-sm btn-outline-success';
+                                btnOff.className = 'btn btn-sm btn-danger';
+                            }
+
+                            if (statusEl) {
+                                statusEl.textContent = isOn ? 'ON' : 'OFF';
+                                statusEl.className = isOn ? 'output-status on' : 'output-status off';
+                            }
+
+                            const card = document.getElementById(`output-card-${outputId}`);
+                            if (card) {
+                                card.style.borderColor = '#22c55e';
+                                setTimeout(() => {
+                                    card.style.borderColor = 'rgba(250, 204, 21, 0.3)';
+                                }, 500);
+                            }
+                        } else {
+                            alert('Gagal mengupdate output.');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Terjadi kesalahan saat mengupdate output.');
+                    });
+            }
+
+            function toggleOutput(outputId, value) {
+                const url = `/admin/device/${deviceId}/output/${outputId}/toggle`;
+
+                fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken
+                    },
+                    body: JSON.stringify({ value: value })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            const card = document.getElementById(`output-card-${outputId}`);
+                            if (card) {
+                                card.style.borderColor = '#22c55e';
+                                setTimeout(() => {
+                                    card.style.borderColor = 'rgba(250, 204, 21, 0.3)';
+                                }, 500);
+                            }
+                        } else {
+                            alert('Gagal mengupdate output.');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Terjadi kesalahan saat mengupdate output.');
+                    });
+            }
+
+            function updateRangeValue(outputId, value, unit) {
+                const valueEl = document.getElementById(`output-value-${outputId}`);
+                if (valueEl) {
+                    valueEl.textContent = value + unit;
+                }
             }
         </script>
     @endif

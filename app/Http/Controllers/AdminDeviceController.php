@@ -165,4 +165,76 @@ class AdminDeviceController extends Controller
 
         return view('monitoring.show', compact('device', 'sensors', 'outputs', 'logData', 'chartData', 'latestData', 'isAdminView'));
     }
+
+    // 8. TOGGLE OUTPUT (ADMIN - uses device_id directly)
+    public function toggleOutput(Request $request, $deviceId, $outputId)
+    {
+        $this->checkAdmin();
+
+        $device = Device::findOrFail($deviceId);
+
+        // Ambil output dari device ini
+        $output = \App\Models\DeviceOutput::where('id', $outputId)
+            ->where('device_id', $device->id)
+            ->firstOrFail();
+
+        // Validasi request
+        $request->validate([
+            'value' => 'required',
+        ]);
+
+        $newValue = $request->value;
+
+        // Untuk boolean, konversi ke 0 atau 1
+        if ($output->output_type === 'boolean') {
+            $newValue = filter_var($newValue, FILTER_VALIDATE_BOOLEAN) ? 1 : 0;
+        } else {
+            $newValue = (float) $newValue;
+        }
+
+        // Update current_value di database
+        $output->current_value = $newValue;
+        $output->save();
+
+        // Publish ke MQTT untuk kirim perintah ke device
+        try {
+            $topic = $device->mqtt_topic . '/control';
+
+            // Format simpel: <output#value>
+            $message = sprintf('<%s#%s>', $output->output_name, $newValue);
+
+            // MQTT Connection
+            $host = config('mqtt.host', env('MQTT_HOST', 'smartagri.web.id'));
+            $port = config('mqtt.port', env('MQTT_PORT', 1883));
+            $username = config('mqtt.username', env('MQTT_USERNAME'));
+            $password = config('mqtt.password', env('MQTT_PASSWORD'));
+
+            $connectionSettings = new \PhpMqtt\Client\ConnectionSettings();
+            if ($username && $password) {
+                $connectionSettings = $connectionSettings
+                    ->setUsername($username)
+                    ->setPassword($password);
+            }
+            $connectionSettings = $connectionSettings
+                ->setKeepAliveInterval(60)
+                ->setConnectTimeout(10);
+
+            $mqtt = new \PhpMqtt\Client\MqttClient($host, $port, 'laravel-admin-control-' . uniqid());
+            $mqtt->connect($connectionSettings, true);
+            $mqtt->publish($topic, $message, 1);
+            $mqtt->disconnect();
+
+            \Log::info("MQTT Admin Output Control sent", ['topic' => $topic, 'message' => $message]);
+        } catch (\Exception $e) {
+            \Log::error("MQTT Admin Output Control failed: " . $e->getMessage());
+        }
+
+        return response()->json([
+            'success' => true,
+            'output_id' => $output->id,
+            'output_name' => $output->output_name,
+            'new_value' => $newValue,
+            'message' => "Output {$output->output_label} berhasil diupdate!",
+        ]);
+    }
 }

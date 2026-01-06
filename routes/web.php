@@ -32,6 +32,9 @@ Route::middleware(['auth'])->group(function () {
         // Monitoring Device (Admin View)
         Route::get('/device/{id}/monitoring', [AdminDeviceController::class, 'showMonitoring'])->name('device.monitoring');
 
+        // Toggle Output (Admin)
+        Route::post('/device/{deviceId}/output/{outputId}/toggle', [AdminDeviceController::class, 'toggleOutput'])->name('device.output.toggle');
+
         // MQTT Tester
         Route::get('/mqtt-tester', [MqttTesterController::class, 'index'])->name('mqtt-tester.index');
         Route::get('/mqtt-tester/device/{id}', [MqttTesterController::class, 'getDeviceDetails'])->name('mqtt-tester.device');
