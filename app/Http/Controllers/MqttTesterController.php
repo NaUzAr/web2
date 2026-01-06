@@ -100,6 +100,7 @@ class MqttTesterController extends Controller
 
     /**
      * Send test output control command to MQTT
+     * Format: <output_name#value>
      */
     public function sendOutputControl(Request $request)
     {
@@ -115,23 +116,28 @@ class MqttTesterController extends Controller
             // Control topic is mqtt_topic/control
             $topic = $request->mqtt_topic . '/control';
 
-            $message = [
-                'token' => $request->token,
-                'action' => 'set_output',
-                'outputs' => $request->outputs,
-                'timestamp' => now()->toIso8601String(),
-            ];
+            // Send each output as simple format: <output_name#value>
+            $sentOutputs = [];
+            foreach ($request->outputs as $outputName => $value) {
+                // Convert boolean to 1/0
+                if (is_bool($value)) {
+                    $value = $value ? 1 : 0;
+                }
 
-            $mqtt->publish($topic, json_encode($message), 1);
+                $message = sprintf('<%s#%s>', $outputName, $value);
+                $mqtt->publish($topic, $message, 1);
+                $sentOutputs[] = $message;
+            }
+
             $mqtt->disconnect();
 
-            Log::info("MQTT Test: Output control sent to {$topic}", $message);
+            Log::info("MQTT Test: Output control sent to {$topic}", ['outputs' => $sentOutputs]);
 
             return response()->json([
                 'success' => true,
                 'message' => 'Perintah output berhasil dikirim!',
                 'topic' => $topic,
-                'payload' => $message,
+                'payload' => $sentOutputs,
             ]);
 
         } catch (\Exception $e) {
