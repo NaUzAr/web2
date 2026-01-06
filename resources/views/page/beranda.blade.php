@@ -669,115 +669,14 @@
                     </div>
     </section>
 
-    <!-- Contact Us Section -->
-    <section class="py-5" id="contact">
-        <div class="container">
-            <div class="row g-4 align-items-center">
-                <div class="col-lg-5">
-                    <h2 class="text-white fw-bold mb-3">
-                        <i class="bi bi-envelope-heart me-2"></i>Hubungi Kami
-                    </h2>
-                    <p class="text-white-50 mb-4">
-                        Tertarik dengan produk monitoring IoT kami? Hubungi tim kami untuk konsultasi gratis
-                        dan penawaran terbaik.
-                    </p>
-
-                    <div class="glass-card p-4 mb-3">
-                        <div class="d-flex align-items-center gap-3">
-                            <div class="feature-icon-box rain" style="width: 50px; height: 50px;">
-                                <i class="bi bi-whatsapp text-white"></i>
-                            </div>
-                            <div>
-                                <h6 class="text-white mb-0">WhatsApp</h6>
-                                <p class="text-white-50 small mb-0">xxx</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="glass-card p-4 mb-3">
-                        <div class="d-flex align-items-center gap-3">
-                            <div class="feature-icon-box wifi" style="width: 50px; height: 50px;">
-                                <i class="bi bi-envelope text-white"></i>
-                            </div>
-                            <div>
-                                <h6 class="text-white mb-0">Email</h6>
-                                <p class="text-white-50 small mb-0">xxx</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="glass-card p-4">
-                        <div class="d-flex align-items-center gap-3">
-                            <div class="feature-icon-box temp" style="width: 50px; height: 50px;">
-                                <i class="bi bi-geo-alt text-white"></i>
-                            </div>
-                            <div>
-                                <h6 class="text-white mb-0">Lokasi</h6>
-                                <p class="text-white-50 small mb-0">xxx</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-lg-7">
-                    <div class="glass-card p-4">
-                        <h5 class="text-white mb-4"><i class="bi bi-chat-dots me-2"></i>Kirim Pesan</h5>
-                        <form action="#" method="POST">
-                            <div class="row g-3">
-                                <div class="col-md-6">
-                                    <label class="form-label text-white-50 small">Nama Lengkap</label>
-                                    <input type="text" class="form-control bg-dark text-white border-secondary"
-                                        placeholder="Nama Anda" required>
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label text-white-50 small">Email</label>
-                                    <input type="email" class="form-control bg-dark text-white border-secondary"
-                                        placeholder="email@example.com" required>
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label text-white-50 small">No. WhatsApp</label>
-                                    <input type="tel" class="form-control bg-dark text-white border-secondary"
-                                        placeholder="08xxxxxxxxxx" required>
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label text-white-50 small">Produk yang Diminati</label>
-                                    <select class="form-select bg-dark text-white border-secondary">
-                                        <option value="AWS">AWS (Automatic Weather Station)</option>
-                                        <option value="Smart GH">Smart GH (Smart Greenhouse)</option>
-                                        <option value="Keduanya">Keduanya</option>
-                                    </select>
-                                </div>
-                                <div class="col-12">
-                                    <label class="form-label text-white-50 small">Pesan</label>
-                                    <textarea class="form-control bg-dark text-white border-secondary" rows="4"
-                                        placeholder="Tuliskan kebutuhan Anda..."></textarea>
-                                </div>
-                                <div class="col-12">
-                                    <button type="submit" class="btn btn-gradient w-100">
-                                        <i class="bi bi-send me-2"></i>Kirim Pesan
-                                    </button>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
     <!-- Footer -->
     <footer class="footer-glass">
         <div class="container">
             <div class="row align-items-center">
-                <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
+                <div class="col-12 text-center">
                     <p class="footer-text mb-0">
                         © 2025 <a href="#" class="footer-link">Smart Agriculture</a> - Tim Engineering IoT Pertanian
                     </p>
-                </div>
-                <div class="col-md-6 text-center text-md-end">
-                    <a href="#contact" class="btn btn-sm btn-outline-light">
-                        <i class="bi bi-envelope me-1"></i> Contact Us
-                    </a>
                 </div>
             </div>
         </div>
