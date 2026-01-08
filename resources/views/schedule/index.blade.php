@@ -187,10 +187,6 @@
                             <i class="bi bi-send me-1"></i> Kirim ke Device
                         </button>
                     </form>
-                    <div class="alert alert-info mt-3 mb-0">
-                        <i class="bi bi-info-circle me-1"></i> Format:
-                        <code>&lt;set#{{ $output->output_name }}#operator#threshold&gt;</code>
-                    </div>
                 </div>
             @endif
         </div>
