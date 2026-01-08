@@ -99,23 +99,17 @@ class ScheduleController extends Controller
         $output = DeviceOutput::findOrFail($outputId);
 
         $validated = $request->validate([
+            'sensor' => 'required|string',
             'operator' => 'required|in:>,<,>=,<=,==',
             'threshold' => 'required|numeric',
-            'hysteresis' => 'nullable|numeric',
             'action_on' => 'required|numeric',
             'action_off' => 'required|numeric',
         ]);
 
-        // Check if sensor is configured
-        if (!$output->automationSensor) {
-            return back()->with('error', 'Sensor belum dikonfigurasi untuk output ini. Silakan pilih sensor di halaman settings.');
-        }
-
         $rule = [
-            'sensor' => $output->automationSensor->sensor_name,
+            'sensor' => $validated['sensor'],
             'operator' => $validated['operator'],
             'threshold' => (float) $validated['threshold'],
-            'hysteresis' => (float) ($validated['hysteresis'] ?? 2),
             'action_on' => (float) $validated['action_on'],
             'action_off' => (float) $validated['action_off'],
         ];

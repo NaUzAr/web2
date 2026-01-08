@@ -162,17 +162,21 @@
                 <!-- SENSOR-BASED AUTOMATION -->
                 <div class="glass-card">
                     <h5 class="mb-3"><i class="bi bi-speedometer me-2"></i>Sensor Automation</h5>
-                    @if($output->automationSensor)
-                        <p class="text-white-50">Sensor: <strong>{{ $output->automationSensor->sensor_label }}</strong></p>
-                    @else
-                        <p class="text-warning"><i class="bi bi-exclamation-triangle me-1"></i>Sensor belum dikonfigurasi.
-                            Silakan pilih sensor di halaman output settings.</p>
-                    @endif
 
                     <form action="{{ route('schedule.sensor.store', [$userDevice->id, $output->id]) }}" method="POST">
                         @csrf
                         <div class="row g-3">
-                            <div class="col-md-3">
+                            <div class="col-md-4">
+                                <label class="form-label">Pilih Sensor</label>
+                                <select name="sensor" class="form-select" required>
+                                    <option value="">-- Pilih Sensor --</option>
+                                    @foreach($device->sensors as $sensor)
+                                        <option value="{{ $sensor->sensor_name }}">{{ $sensor->sensor_label }}
+                                            ({{ $sensor->unit }})</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-md-4">
                                 <label class="form-label">Operator</label>
                                 <select name="operator" class="form-select" required>
                                     <option value=">">Greater Than (>)</option>
@@ -182,15 +186,10 @@
                                     <option value="==">Equal (==)</option>
                                 </select>
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-4">
                                 <label class="form-label">Threshold</label>
                                 <input type="number" name="threshold" class="form-control" step="0.01" placeholder="30.5"
                                     required>
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label">Hysteresis</label>
-                                <input type="number" name="hysteresis" class="form-control" step="0.01" value="2"
-                                    placeholder="2">
                             </div>
                         </div>
 
