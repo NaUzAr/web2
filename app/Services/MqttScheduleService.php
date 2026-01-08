@@ -111,8 +111,8 @@ class MqttScheduleService
 
     /**
      * Send sensor-based rule to device
-     * Format: <set,output,operator.threshold>
-     * Contoh: <set,pump,>.30>
+     * Format: <set#output#operator#threshold>
+     * Contoh: <set#pump#>#30>
      * 
      * @param string $mqttTopic MQTT topic dari device (dari Admin Panel)
      * @param string $deviceToken Token device untuk identifikasi
@@ -125,9 +125,9 @@ class MqttScheduleService
             $mqtt = $this->connect();
             $topic = "{$mqttTopic}/control";
 
-            // Format simple: <set,output,operator.threshold>
+            // Format simple: <set#output#operator#threshold>
             $message = sprintf(
-                '<set,%s,%s.%s>',
+                '<set#%s#%s#%s>',
                 $outputName,
                 $rule['operator'],
                 $rule['threshold']
