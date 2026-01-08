@@ -662,10 +662,8 @@
                         <div class="stat-label">Uptime Server</div>
                     </div>
                     <div class="col-md-3 stat-item">
-                        <div class="stat-number">
-                            <1s< /div>
-                                <div class="stat-label">Response Time</div>
-                        </div>
+                        <div class="stat-number">&lt;1s</div>
+                        <div class="stat-label">Response Time</div>
                     </div>
     </section>
 
