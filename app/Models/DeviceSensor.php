@@ -9,7 +9,7 @@ class DeviceSensor extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['device_id', 'sensor_name', 'sensor_label', 'unit'];
+    protected $fillable = ['device_id', 'sensor_name', 'mqtt_key', 'sensor_label', 'unit'];
 
     /**
      * Relasi ke Device

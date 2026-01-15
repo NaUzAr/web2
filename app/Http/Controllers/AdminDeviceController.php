@@ -114,11 +114,16 @@ class AdminDeviceController extends Controller
                 $label .= " {$sensorCounter[$type]}";
             }
 
+            // mqtt_key: key yang dikirim dari ESP32 (contoh: ni_PH, ni_SUHU)
+            // Jika user tidak mengisi, gunakan column name sebagai default
+            $mqttKey = !empty($sensor['mqtt_key']) ? $sensor['mqtt_key'] : $columnName;
+
             $sensorColumns[] = [
                 'name' => $columnName,
                 'type' => $type,
                 'label' => $label,
                 'unit' => $availableSensors[$type]['unit'],
+                'mqtt_key' => $mqttKey,
             ];
         }
 
@@ -147,6 +152,7 @@ class AdminDeviceController extends Controller
             \App\Models\DeviceSensor::create([
                 'device_id' => $device->id,
                 'sensor_name' => $sensor['name'],
+                'mqtt_key' => $sensor['mqtt_key'],
                 'sensor_label' => $sensor['label'],
                 'unit' => $sensor['unit'],
             ]);

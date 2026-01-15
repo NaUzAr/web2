@@ -40,13 +40,21 @@
 
         h1,
         h2,
-        h3 {
+        h3,
+        h4,
+        h5 {
             color: #fff;
         }
 
         h2 {
             color: var(--primary-green);
             margin-top: 1.5rem;
+        }
+
+        h4 {
+            color: #86efac;
+            margin-top: 1.5rem;
+            margin-bottom: 1rem;
         }
 
         .table {
@@ -80,6 +88,30 @@
             color: #7dd3fc;
             border-radius: 12px;
         }
+
+        .alert-success-custom {
+            background: rgba(34, 197, 94, 0.2);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            color: #86efac;
+            border-radius: 12px;
+        }
+
+        .badge-counter {
+            background: var(--primary-green);
+            color: #000;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-weight: bold;
+            margin-right: 0.5rem;
+        }
+
+        .data-type-card {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid var(--primary-green);
+        }
     </style>
 </head>
 
@@ -87,148 +119,463 @@
     <div class="container">
         <div class="glass-card">
             <h1><i class="bi bi-wifi me-2"></i>MQTT Protocol Documentation</h1>
-            <p class="text-white-50">SmartAgri IoT - Cara Kerja MQTT di Web Application</p>
+            <p class="text-white-50">SmartAgri IoT - Format Data ESP32 ke Web Application</p>
         </div>
 
-        <!-- How Web Identifies Device -->
+        <!-- Format Wrapper -->
         <div class="glass-card">
-            <h2><i class="bi bi-search me-2"></i>Cara Web Mengenali Device</h2>
+            <h2><i class="bi bi-code-slash me-2"></i>Format Wrapper Data</h2>
 
             <div class="alert alert-warning-custom mb-4">
-                <h5><i class="bi bi-exclamation-triangle me-2"></i>PENTING!</h5>
-                <p class="mb-0">Web mengenali device berdasarkan <strong>MQTT Topic</strong>, BUKAN token!</p>
+                <h5><i class="bi bi-exclamation-triangle me-2"></i>FORMAT PENTING!</h5>
+                <p class="mb-0">Semua data dari ESP32 dikirim dengan wrapper: <code>&lt;dat|{JSON}|&gt;</code></p>
             </div>
 
-            <p class="text-white-50">Urutan identifikasi device oleh MqttListener:</p>
-            <ol class="text-white">
-                <li><strong>Pertama:</strong> Cari device berdasarkan <code>mqtt_topic</code> yang di-publish</li>
-                <li><strong>Kedua (fallback):</strong> Jika tidak ketemu, cari berdasarkan <code>token</code> di payload
-                    JSON</li>
-            </ol>
+            <pre><code class="language-cpp">// Format pengiriman dari ESP32
+payload1 = ("<dat|" + payload + "|");</code></pre>
 
-            <pre><code class="language-php">// MqttListener.php - processMessage()
-$device = Device::where('mqtt_topic', $topic)->first();  // PRIMARY
-
-if (!$device && isset($data['token'])) {
-    $device = Device::where('token', $data['token'])->first();  // FALLBACK
-}</code></pre>
+            <p class="text-white-50 mt-3">Contoh payload lengkap:</p>
+            <pre><code class="language-text">&lt;dat|{"ni_PH":6.8,"ni_EC":1200,"ni_TDS":850,"ni_LUX":1500,"ni_SUHU":28.5,"ni_KELEM":65}|&gt;</code></pre>
         </div>
 
-        <!-- Topics Reference -->
+        <!-- Data Types Overview -->
         <div class="glass-card">
-            <h2><i class="bi bi-diagram-3 me-2"></i>MQTT Topics</h2>
+            <h2><i class="bi bi-list-ol me-2"></i>7 Jenis Data (Counter Send)</h2>
+            <p class="text-white-50">ESP32 mengirim data secara bergantian berdasarkan counter:</p>
+
             <table class="table">
                 <thead>
                     <tr>
-                        <th>Direction</th>
-                        <th>Topic Pattern</th>
-                        <th>Description</th>
+                        <th>Counter</th>
+                        <th>Jenis Data</th>
+                        <th>Deskripsi</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
-                        <td><span class="badge bg-info">Device → Web</span></td>
-                        <td><code>{mqtt_topic}</code><br><small class="text-white-50">Contoh:
-                                ngangngong/bopal/aws1</small></td>
-                        <td>Device mengirim data sensor ke topic yang diset di Admin Panel</td>
+                        <td><span class="badge-counter">1</span></td>
+                        <td>Sensor Data</td>
+                        <td>PH, EC, TDS, LUX, Suhu, Kelembaban</td>
                     </tr>
                     <tr>
-                        <td><span class="badge bg-success">Web → Device</span></td>
-                        <td><code>{mqtt_topic}/control</code><br><small class="text-white-50">Contoh:
-                                ngangngong/bopal/aws1/control</small></td>
-                        <td>Web mengirim perintah kontrol output ke device</td>
+                        <td><span class="badge-counter">2</span></td>
+                        <td>Schedule 1-7</td>
+                        <td>Jadwal 1 sampai 7</td>
                     </tr>
                     <tr>
-                        <td><span class="badge bg-info">Device → Web</span></td>
-                        <td><code>devices/{token}/status</code></td>
-                        <td>Device mengirim status output + jadwal (device-as-master)</td>
+                        <td><span class="badge-counter">3</span></td>
+                        <td>Schedule 8-14</td>
+                        <td>Jadwal 8 sampai 14</td>
+                    </tr>
+                    <tr>
+                        <td><span class="badge-counter">4</span></td>
+                        <td>Threshold/Batas</td>
+                        <td>Batas atas & bawah sensor untuk automation</td>
+                    </tr>
+                    <tr>
+                        <td><span class="badge-counter">5</span></td>
+                        <td>Mode</td>
+                        <td>Mode dosing & climate control</td>
+                    </tr>
+                    <tr>
+                        <td><span class="badge-counter">6</span></td>
+                        <td>Status Output</td>
+                        <td>Status semua relay/output</td>
+                    </tr>
+                    <tr>
+                        <td><span class="badge-counter">7</span></td>
+                        <td>Waktu</td>
+                        <td>Timestamp dari device</td>
                     </tr>
                 </tbody>
             </table>
         </div>
 
-        <!-- Sensor Data Format -->
+        <!-- Counter 1: Sensor Data -->
         <div class="glass-card">
-            <h2><i class="bi bi-thermometer-half me-2"></i>Format Data Sensor (Device → Web)</h2>
-            <p class="text-white-50">Device mengirim JSON ke topic yang diset di Admin (contoh:
-                <code>ngangngong/bopal/aws1</code>)</p>
+            <h2><i class="bi bi-thermometer-half me-2"></i><span class="badge-counter">1</span> Data Sensor</h2>
+            <p class="text-white-50">Pembacaan sensor real-time</p>
 
-            <pre><code class="language-json">{
-    "temperature_1": 28.5,
-    "temperature_2": 29.0,
-    "humidity_1": 65.0,
-    "humidity_2": 68.0,
-    "soil_moisture": 45.0,
-    "light_intensity": 800.0
+            <div class="data-type-card">
+                <pre><code class="language-json">{
+    "ni_PH": 6.8,
+    "ni_EC": 1200,
+    "ni_TDS": 850,
+    "ni_LUX": 1500,
+    "ni_SUHU": 28.5,
+    "ni_KELEM": 65
 }</code></pre>
+            </div>
+
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Key</th>
+                        <th>Deskripsi</th>
+                        <th>Satuan</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>ni_PH</code></td>
+                        <td>Nilai pH air</td>
+                        <td>pH (0-14)</td>
+                    </tr>
+                    <tr>
+                        <td><code>ni_EC</code></td>
+                        <td>Electrical Conductivity</td>
+                        <td>µS/cm</td>
+                    </tr>
+                    <tr>
+                        <td><code>ni_TDS</code></td>
+                        <td>Total Dissolved Solids</td>
+                        <td>ppm</td>
+                    </tr>
+                    <tr>
+                        <td><code>ni_LUX</code></td>
+                        <td>Intensitas cahaya</td>
+                        <td>lux</td>
+                    </tr>
+                    <tr>
+                        <td><code>ni_SUHU</code></td>
+                        <td>Suhu udara</td>
+                        <td>°C</td>
+                    </tr>
+                    <tr>
+                        <td><code>ni_KELEM</code></td>
+                        <td>Kelembaban udara</td>
+                        <td>%</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Counter 2 & 3: Schedule -->
+        <div class="glass-card">
+            <h2><i class="bi bi-calendar-check me-2"></i><span class="badge-counter">2</span><span
+                    class="badge-counter">3</span> Data Jadwal (Schedule)</h2>
+            <p class="text-white-50">Konfigurasi 14 jadwal output</p>
+
+            <h4>Counter 2 - Jadwal 1-7</h4>
+            <div class="data-type-card">
+                <pre><code class="language-json">{
+    "sch1": 60600,
+    "sch2": 61800,
+    "sch3": 63000,
+    "sch4": 64200,
+    "sch5": 65400,
+    "sch6": 66600,
+    "sch7": 67800
+}</code></pre>
+            </div>
+
+            <h4>Counter 3 - Jadwal 8-14</h4>
+            <div class="data-type-card">
+                <pre><code class="language-json">{
+    "sch8": 69000,
+    "sch9": 70200,
+    "sch10": 71400,
+    "sch11": 72600,
+    "sch12": 73800,
+    "sch13": 75000,
+    "sch14": 76200
+}</code></pre>
+            </div>
 
             <div class="alert alert-info-custom mt-3">
                 <i class="bi bi-info-circle me-1"></i>
-                <strong>Catatan:</strong>
-                <ul class="mb-0 mt-2">
-                    <li>Nama sensor (key) harus sama persis dengan yang dikonfigurasi di Admin Panel</li>
-                    <li>Token TIDAK diperlukan jika topic sudah sesuai</li>
-                    <li>Data akan disimpan ke tabel database device secara otomatis</li>
-                </ul>
+                <strong>Format Jadwal:</strong> Nilai jadwal dalam format encoded (biasanya detik dari midnight atau
+                format custom)
             </div>
         </div>
 
-        <!-- Output Control Format -->
+        <!-- Counter 4: Threshold -->
         <div class="glass-card">
-            <h2><i class="bi bi-toggle-on me-2"></i>Format Kontrol Output (Web → Device)</h2>
+            <h2><i class="bi bi-sliders me-2"></i><span class="badge-counter">4</span> Batas Threshold (Automation)</h2>
+            <p class="text-white-50">Batas atas & bawah untuk automation sensor</p>
+
+            <div class="data-type-card">
+                <pre><code class="language-json">{
+    "bts_ats_suhu": 35,
+    "bts_bwh_suhu": 20,
+    "bts_ats_kelem": 80,
+    "bts_bwh_kelem": 40,
+    "bts_ats_ph": 7.5,
+    "bts_bwh_ph": 5.5,
+    "bts_ats_tds": 1500,
+    "bts_bwh_tds": 500
+}</code></pre>
+            </div>
+
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Key</th>
+                        <th>Deskripsi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>bts_ats_suhu</code></td>
+                        <td>Batas ATAS suhu (trigger kipas ON)</td>
+                    </tr>
+                    <tr>
+                        <td><code>bts_bwh_suhu</code></td>
+                        <td>Batas BAWAH suhu (trigger pemanas ON)</td>
+                    </tr>
+                    <tr>
+                        <td><code>bts_ats_kelem</code></td>
+                        <td>Batas ATAS kelembaban</td>
+                    </tr>
+                    <tr>
+                        <td><code>bts_bwh_kelem</code></td>
+                        <td>Batas BAWAH kelembaban (trigger misting)</td>
+                    </tr>
+                    <tr>
+                        <td><code>bts_ats_ph</code></td>
+                        <td>Batas ATAS pH (trigger pH down)</td>
+                    </tr>
+                    <tr>
+                        <td><code>bts_bwh_ph</code></td>
+                        <td>Batas BAWAH pH (trigger pH up)</td>
+                    </tr>
+                    <tr>
+                        <td><code>bts_ats_tds</code></td>
+                        <td>Batas ATAS TDS</td>
+                    </tr>
+                    <tr>
+                        <td><code>bts_bwh_tds</code></td>
+                        <td>Batas BAWAH TDS (trigger dosing)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Counter 5: Mode -->
+        <div class="glass-card">
+            <h2><i class="bi bi-gear me-2"></i><span class="badge-counter">5</span> Mode Operasi</h2>
+            <p class="text-white-50">Mode dosing dan climate control</p>
+
+            <div class="data-type-card">
+                <pre><code class="language-json">{
+    "mode_dos": 1,
+    "mode_clim": 1
+}</code></pre>
+            </div>
+
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Key</th>
+                        <th>Nilai</th>
+                        <th>Deskripsi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>mode_dos</code></td>
+                        <td>0 = OFF, 1 = ON</td>
+                        <td>Mode Dosing (nutrisi otomatis)</td>
+                    </tr>
+                    <tr>
+                        <td><code>mode_clim</code></td>
+                        <td>0 = OFF, 1 = ON</td>
+                        <td>Mode Climate Control (suhu/kelembaban)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Counter 6: Status Output -->
+        <div class="glass-card">
+            <h2><i class="bi bi-toggles me-2"></i><span class="badge-counter">6</span> Status Output</h2>
+            <p class="text-white-50">Status semua relay/output device</p>
+
+            <div class="data-type-card">
+                <pre><code class="language-json">{
+    "sts_air_input": 0,
+    "sts_mixing": 1,
+    "sts_pompa": 1,
+    "sts_fan": 0,
+    "sts_misting": 0,
+    "sts_lampu": 1,
+    "sts_dosing": 0,
+    "sts_ph_up": 0,
+    "sts_air_baku": 1,
+    "sts_air_pupuk": 0,
+    "sts_ph_down": 0
+}</code></pre>
+            </div>
+
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Key</th>
+                        <th>Deskripsi</th>
+                        <th>Nilai</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>sts_air_input</code></td>
+                        <td>Valve air masuk</td>
+                        <td>0=OFF, 1=ON</td>
+                    </tr>
+                    <tr>
+                        <td><code>sts_mixing</code></td>
+                        <td>Mixer nutrisi</td>
+                        <td>0=OFF, 1=ON</td>
+                    </tr>
+                    <tr>
+                        <td><code>sts_pompa</code></td>
+                        <td>Pompa utama</td>
+                        <td>0=OFF, 1=ON</td>
+                    </tr>
+                    <tr>
+                        <td><code>sts_fan</code></td>
+                        <td>Kipas/exhaust</td>
+                        <td>0=OFF, 1=ON</td>
+                    </tr>
+                    <tr>
+                        <td><code>sts_misting</code></td>
+                        <td>Sistem misting</td>
+                        <td>0=OFF, 1=ON</td>
+                    </tr>
+                    <tr>
+                        <td><code>sts_lampu</code></td>
+                        <td>Lampu grow light</td>
+                        <td>0=OFF, 1=ON</td>
+                    </tr>
+                    <tr>
+                        <td><code>sts_dosing</code></td>
+                        <td>Pompa dosing nutrisi</td>
+                        <td>0=OFF, 1=ON</td>
+                    </tr>
+                    <tr>
+                        <td><code>sts_ph_up</code></td>
+                        <td>Pompa pH Up</td>
+                        <td>0=OFF, 1=ON</td>
+                    </tr>
+                    <tr>
+                        <td><code>sts_air_baku</code></td>
+                        <td>Sensor air baku</td>
+                        <td>0=KOSONG, 1=ADA</td>
+                    </tr>
+                    <tr>
+                        <td><code>sts_air_pupuk</code></td>
+                        <td>Sensor air pupuk</td>
+                        <td>0=KOSONG, 1=ADA</td>
+                    </tr>
+                    <tr>
+                        <td><code>sts_ph_down</code></td>
+                        <td>Pompa pH Down</td>
+                        <td>0=OFF, 1=ON</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Counter 7: Time -->
+        <div class="glass-card">
+            <h2><i class="bi bi-clock me-2"></i><span class="badge-counter">7</span> Waktu Device</h2>
+            <p class="text-white-50">Timestamp dari RTC device</p>
+
+            <div class="data-type-card">
+                <pre><code class="language-json">{
+    "waktu": 1705296000
+}</code></pre>
+            </div>
+
+            <div class="alert alert-info-custom">
+                <i class="bi bi-info-circle me-1"></i>
+                <strong>Format:</strong> Unix timestamp (detik sejak 1 Jan 1970) atau format custom sesuai kebutuhan
+            </div>
+        </div>
+
+        <!-- ESP32 Code Example -->
+        <div class="glass-card">
+            <h2><i class="bi bi-cpu me-2"></i>Contoh Kode ESP32</h2>
+            <p class="text-white-50">Fungsi untuk mengirim data sensor:</p>
+
+            <pre><code class="language-cpp">void sendSensorData() {
+    String payload = "{";
+    payload += "\"ni_PH\":"; payload += PH1_; payload += ",";
+    payload += "\"ni_EC\":"; payload += EC1; payload += ",";
+    payload += "\"ni_TDS\":"; payload += TDS1; payload += ",";
+    payload += "\"ni_LUX\":"; payload += luxAve; payload += ",";
+    payload += "\"ni_SUHU\":"; payload += suhuAve; payload += ",";
+    payload += "\"ni_KELEM\":"; payload += kelemAve;
+    payload += "}";
+    
+    String payload1 = "&lt;dat|" + payload + "|&gt;";
+    
+    // Kirim via MQTT
+    mqttClient.publish(mqtt_topic, payload1.c_str());
+}</code></pre>
+        </div>
+
+        <!-- Web Processing -->
+        <div class="glass-card">
+            <h2><i class="bi bi-server me-2"></i>Pemrosesan di Web (Laravel)</h2>
+            <p class="text-white-50">MqttListener memproses data dengan format wrapper</p>
+
+            <pre><code class="language-php">// MqttListener.php
+public function processMessage($topic, $message)
+{
+    // Extract JSON dari wrapper &lt;dat|{...}|&gt;
+    if (preg_match('/&lt;dat\|(.*?)\|&gt;/', $message, $matches)) {
+        $jsonData = $matches[1];
+        $data = json_decode($jsonData, true);
+        
+        // Process based on data type
+        if (isset($data['ni_PH'])) {
+            // Sensor data
+            $this->saveSensorData($data);
+        } elseif (isset($data['sch1'])) {
+            // Schedule data
+            $this->saveScheduleData($data);
+        } elseif (isset($data['bts_ats_suhu'])) {
+            // Threshold data
+            $this->saveThresholdData($data);
+        } elseif (isset($data['sts_pompa'])) {
+            // Status output
+            $this->updateOutputStatus($data);
+        }
+    }
+}</code></pre>
+        </div>
+
+        <!-- Control Format (Web to Device) -->
+        <div class="glass-card">
+            <h2><i class="bi bi-arrow-right-circle me-2"></i>Format Kontrol (Web → Device)</h2>
             <p class="text-white-50">Web mengirim perintah ke topic <code>{mqtt_topic}/control</code></p>
 
-            <h5 class="mt-4">Manual Control</h5>
-            <pre><code class="language-json">{
+            <h4>Manual Control Output</h4>
+            <div class="data-type-card">
+                <pre><code class="language-json">{
     "type": "manual_control",
-    "output_name": "pump_1",
-    "value": 1,
-    "token": "pmGQfWN4WyjK2eu1",
-    "timestamp": "2025-12-14T12:00:00+07:00"
-}</code></pre>
-
-            <h5 class="mt-4">Automation Config</h5>
-            <pre><code class="language-json">{
-    "type": "automation_config",
-    "output_name": "fan_1",
-    "automation_type": "time",
-    "enabled": true,
-    "days": [1, 2, 3, 4, 5],
-    "on_time": "06:00",
-    "off_time": "18:00",
+    "output": "sts_pompa",
     "value": 1
 }</code></pre>
-        </div>
-
-        <!-- Device Status Format -->
-        <div class="glass-card">
-            <h2><i class="bi bi-broadcast me-2"></i>Format Device Status (Device-as-Master)</h2>
-            <p class="text-white-50">Device mengirim status ke topic <code>devices/{token}/status</code></p>
-
-            <div class="alert alert-warning-custom mb-3">
-                <i class="bi bi-robot me-1"></i>
-                <strong>Device-as-Master:</strong> Device menyimpan semua jadwal dan state. Web hanya menampilkan!
             </div>
 
-            <pre><code class="language-json">{
-    "token": "pmGQfWN4WyjK2eu1",
-    "outputs": {
-        "pump_1": {"value": 0, "label": "Pompa Air"},
-        "fan_1": {"value": 1, "label": "Kipas"},
-        "valve_1": {"value": 0, "label": "Valve"}
-    },
-    "schedules": [
-        {"id": 1, "output": "fan_1", "type": "time", "on": "06:00", "off": "18:00", "enabled": true}
-    ],
-    "sensors": {
-        "temperature_1": 28.5,
-        "humidity_1": 65.0
-    },
-    "timestamp": "2025-12-14T12:00:00+07:00"
+            <h4>Update Threshold</h4>
+            <div class="data-type-card">
+                <pre><code class="language-json">{
+    "type": "threshold",
+    "bts_ats_suhu": 35,
+    "bts_bwh_suhu": 20
 }</code></pre>
+            </div>
 
-            <p class="text-white-50 mt-3"><em>⚠️ Status data TIDAK disimpan ke database, hanya ditampilkan real-time di
-                    console.</em></p>
+            <h4>Update Schedule</h4>
+            <div class="data-type-card">
+                <pre><code class="language-json">{
+    "type": "schedule",
+    "sch1": 60600,
+    "sch2": 61800
+}</code></pre>
+            </div>
         </div>
 
         <!-- Testing -->
@@ -238,11 +585,19 @@ if (!$device && isset($data['token'])) {
             <h5>1. Jalankan MQTT Listener</h5>
             <pre><code class="language-bash">php artisan mqtt:listen --host=broker.hivemq.com</code></pre>
 
-            <h5 class="mt-3">2. Kirim Data Sensor (Python)</h5>
-            <pre><code class="language-bash">python dummy_sender_mqtt.py</code></pre>
+            <h5 class="mt-3">2. Kirim Data Test (Python)</h5>
+            <pre><code class="language-python">import paho.mqtt.client as mqtt
+import json
 
-            <h5 class="mt-3">3. Kirim Device Status (Python)</h5>
-            <pre><code class="language-bash">python dummy_device_status_mqtt.py</code></pre>
+client = mqtt.Client()
+client.connect("broker.hivemq.com", 1883)
+
+# Format data sensor
+data = {"ni_PH": 6.8, "ni_EC": 1200, "ni_TDS": 850, "ni_LUX": 1500, "ni_SUHU": 28.5, "ni_KELEM": 65}
+payload = "&lt;dat|" + json.dumps(data) + "|&gt;"
+
+client.publish("smartagri/device1", payload)
+print("Sent:", payload)</code></pre>
         </div>
 
         <div class="d-flex justify-content-between mt-4">

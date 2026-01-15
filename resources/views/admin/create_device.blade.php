@@ -386,7 +386,7 @@
             return options;
         }
 
-        function addSensorRow(sensorKey = '', customLabel = '') {
+        function addSensorRow(sensorKey = '', customLabel = '', mqttKey = '') {
             sensorCounter++;
             const container = document.getElementById('sensorContainer');
             const row = document.createElement('div');
@@ -394,14 +394,18 @@
             row.id = `sensorRow_${sensorCounter}`;
             row.innerHTML = `
             <div class="row align-items-center g-2">
-                <div class="col-md-5">
+                <div class="col-md-4">
                     <select class="form-select sensor-select" name="sensors[${sensorCounter}][type]" required onchange="updateSubmitButton()">
                         ${getSensorOptions(sensorKey)}
                     </select>
                 </div>
-                <div class="col-md-5">
+                <div class="col-md-3">
                     <input type="text" class="form-control sensor-label-input" name="sensors[${sensorCounter}][label]" 
-                           placeholder="Label custom (opsional)" value="${customLabel}">
+                           placeholder="Label (opsional)" value="${customLabel}">
+                </div>
+                <div class="col-md-3">
+                    <input type="text" class="form-control" name="sensors[${sensorCounter}][mqtt_key]" 
+                           placeholder="MQTT Key (misal: ni_PH)" value="${mqttKey}">
                 </div>
                 <div class="col-md-2 text-end">
                     <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeSensorRow(${sensorCounter})" style="border-radius: 50%;">

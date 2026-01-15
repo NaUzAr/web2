@@ -117,6 +117,8 @@ class Device extends Model
             'water_level' => ['label' => 'Level Air', 'unit' => 'cm', 'icon' => 'bi-water'],
             'co2' => ['label' => 'CO2', 'unit' => 'ppm', 'icon' => 'bi-cloud'],
             'ec' => ['label' => 'EC (Electrical Conductivity)', 'unit' => 'mS/cm', 'icon' => 'bi-lightning'],
+            'tds' => ['label' => 'TDS (Total Dissolved Solids)', 'unit' => 'ppm', 'icon' => 'bi-water'],
+            'ph' => ['label' => 'pH Air', 'unit' => '', 'icon' => 'bi-droplet-half'],
             // Tambahkan sensor baru di sini:
             // 'pm25' => ['label' => 'PM2.5', 'unit' => 'µg/m³', 'icon' => 'bi-cloud-haze'],
         ];
