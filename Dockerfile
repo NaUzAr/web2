@@ -42,9 +42,13 @@ RUN mkdir -p /var/www/storage/logs \
     && chown -R www-data:www-data /var/www/storage \
     && chmod -R 775 /var/www/storage
 
+# Copy PHP-FPM config (port 9999)
+COPY docker/php-fpm.conf /usr/local/etc/php-fpm.d/www.conf
+
 # Copy supervisor config
 COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
-EXPOSE 9000
+# Only expose port 9999 (not 9000)
+EXPOSE 9999
 
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
