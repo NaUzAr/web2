@@ -24,21 +24,23 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 # Set working directory
 WORKDIR /var/www
 
-# Copy composer files first
-COPY composer.json composer.lock ./
-
-# Install ALL dependencies (including sanctum)
-RUN composer install --optimize-autoloader --no-scripts --no-autoloader
-
-# Copy rest of project files
+# Copy all project files first
 COPY . /var/www
 
-# Generate autoload and run scripts
-RUN composer dump-autoload --optimize --no-scripts
+# Remove vendor if exists and reinstall fresh
+RUN rm -rf vendor && composer install --optimize-autoloader
 
-# Set permissions
+# Set permissions for storage and cache
 RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
 RUN chmod -R 775 /var/www/storage /var/www/bootstrap/cache
+
+# Create storage directories if not exist
+RUN mkdir -p /var/www/storage/logs \
+    /var/www/storage/framework/cache \
+    /var/www/storage/framework/sessions \
+    /var/www/storage/framework/views \
+    && chown -R www-data:www-data /var/www/storage \
+    && chmod -R 775 /var/www/storage
 
 # Copy supervisor config
 COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
