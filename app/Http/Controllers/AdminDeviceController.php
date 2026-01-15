@@ -141,6 +141,9 @@ class AdminDeviceController extends Controller
         // E. Simpan Device ke database
         $device = Device::create([
             'name' => $request->name,
+            'location' => $request->location,
+            'latitude' => $request->latitude,
+            'longitude' => $request->longitude,
             'mqtt_topic' => $request->mqtt_topic,
             'token' => $token,
             'table_name' => $tableName,
@@ -218,6 +221,9 @@ class AdminDeviceController extends Controller
 
         $request->validate([
             'name' => 'required|string|max:100',
+            'location' => 'nullable|string|max:255',
+            'latitude' => 'nullable|numeric|between:-90,90',
+            'longitude' => 'nullable|numeric|between:-180,180',
             'mqtt_topic' => 'required|string|max:100',
         ]);
 
@@ -225,6 +231,9 @@ class AdminDeviceController extends Controller
 
         $device->update([
             'name' => $request->name,
+            'location' => $request->location,
+            'latitude' => $request->latitude,
+            'longitude' => $request->longitude,
             'mqtt_topic' => $request->mqtt_topic,
             // Token & table_name JANGAN diupdate agar koneksi database aman
         ]);

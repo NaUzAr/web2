@@ -9,6 +9,8 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
+    <!-- Leaflet CSS for Map -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
     <style>
         :root {
@@ -343,6 +345,33 @@
                                     required>
                             </div>
 
+                            <div class="mb-3">
+                                <label class="form-label"><i class="bi bi-geo-alt me-1"></i> Lokasi Alat</label>
+                                <input type="text" name="location" id="locationInput" class="form-control" 
+                                    value="{{ $device->location }}"
+                                    placeholder="Contoh: Greenhouse A, Kebun Teh Blok 3">
+                            </div>
+
+                            <!-- Map Picker -->
+                            <div class="mb-3">
+                                <label class="form-label"><i class="bi bi-map me-1"></i> Pilih Titik Lokasi di Map</label>
+                                <div id="mapPicker" style="height: 250px; border-radius: 12px; border: 1px solid var(--glass-border);"></div>
+                                <div class="form-text">Klik pada map untuk mengubah koordinat lokasi device.</div>
+                            </div>
+
+                            <div class="row mb-4">
+                                <div class="col-md-6">
+                                    <label class="form-label"><i class="bi bi-geo me-1"></i> Latitude</label>
+                                    <input type="number" step="any" name="latitude" id="latitudeInput" class="form-control"
+                                        value="{{ $device->latitude }}" placeholder="-6.9175" readonly>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label"><i class="bi bi-geo me-1"></i> Longitude</label>
+                                    <input type="number" step="any" name="longitude" id="longitudeInput" class="form-control"
+                                        value="{{ $device->longitude }}" placeholder="107.6191" readonly>
+                                </div>
+                            </div>
+
                             <div class="mb-4">
                                 <label class="form-label"><i class="bi bi-broadcast me-1"></i> MQTT Topic</label>
                                 <input type="text" name="mqtt_topic" class="form-control"
@@ -365,6 +394,59 @@
         </div>
     </div>
 
+    <!-- Leaflet JS for Map Picker -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get existing coordinates or use default
+            const existingLat = {{ $device->latitude ?? -6.9175 }};
+            const existingLng = {{ $device->longitude ?? 107.6191 }};
+            const hasExistingCoords = {{ ($device->latitude && $device->longitude) ? 'true' : 'false' }};
+            
+            const map = L.map('mapPicker').setView([existingLat, existingLng], 13);
+            
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+            }).addTo(map);
+            
+            let marker = null;
+            
+            // Add existing marker if coordinates exist
+            if (hasExistingCoords) {
+                marker = L.marker([existingLat, existingLng], { draggable: true }).addTo(map);
+                marker.bindPopup('<b>📍 Lokasi Device</b><br>Lat: ' + existingLat + '<br>Lng: ' + existingLng);
+                
+                marker.on('dragend', function(event) {
+                    const position = marker.getLatLng();
+                    document.getElementById('latitudeInput').value = position.lat.toFixed(7);
+                    document.getElementById('longitudeInput').value = position.lng.toFixed(7);
+                });
+            }
+            
+            map.on('click', function(e) {
+                const lat = e.latlng.lat.toFixed(7);
+                const lng = e.latlng.lng.toFixed(7);
+                
+                document.getElementById('latitudeInput').value = lat;
+                document.getElementById('longitudeInput').value = lng;
+                
+                if (marker) {
+                    marker.setLatLng(e.latlng);
+                } else {
+                    marker = L.marker(e.latlng, { draggable: true }).addTo(map);
+                    marker.on('dragend', function(event) {
+                        const position = marker.getLatLng();
+                        document.getElementById('latitudeInput').value = position.lat.toFixed(7);
+                        document.getElementById('longitudeInput').value = position.lng.toFixed(7);
+                    });
+                }
+                
+                marker.bindPopup('<b>📍 Lokasi Device</b><br>Lat: ' + lat + '<br>Lng: ' + lng).openPopup();
+            });
+            
+            setTimeout(function() { map.invalidateSize(); }, 100);
+        });
+    </script>
 </body>
 
 </html>

@@ -9,6 +9,8 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
+    <!-- Leaflet CSS for Map -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
     <style>
         :root {
@@ -289,9 +291,35 @@
 
                             <!-- STEP 2: INFO DEVICE -->
                             <div class="mb-3">
-                                <label class="form-label"><i class="bi bi-tag me-1"></i> Nama Device / Lokasi</label>
-                                <input type="text" name="name" class="form-control"
-                                    placeholder="Contoh: Sensor Kebun Teh 01" required>
+                                <label class="form-label"><i class="bi bi-tag me-1"></i> Nama Device</label>
+                                <input type="text" name="name" class="form-control" placeholder="Contoh: Sensor GH-01"
+                                    required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label"><i class="bi bi-geo-alt me-1"></i> Lokasi Alat</label>
+                                <input type="text" name="location" id="locationInput" class="form-control"
+                                    placeholder="Contoh: Greenhouse A, Kebun Teh Blok 3">
+                            </div>
+
+                            <!-- Map Picker -->
+                            <div class="mb-3">
+                                <label class="form-label"><i class="bi bi-map me-1"></i> Pilih Titik Lokasi di Map</label>
+                                <div id="mapPicker" style="height: 250px; border-radius: 12px; border: 1px solid var(--glass-border);"></div>
+                                <div class="form-text">Klik pada map untuk menentukan koordinat lokasi device.</div>
+                            </div>
+
+                            <div class="row mb-4">
+                                <div class="col-md-6">
+                                    <label class="form-label"><i class="bi bi-geo me-1"></i> Latitude</label>
+                                    <input type="number" step="any" name="latitude" id="latitudeInput" class="form-control"
+                                        placeholder="-6.9175" readonly>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label"><i class="bi bi-geo me-1"></i> Longitude</label>
+                                    <input type="number" step="any" name="longitude" id="longitudeInput" class="form-control"
+                                        placeholder="107.6191" readonly>
+                                </div>
                             </div>
 
                             <div class="mb-4">
@@ -386,7 +414,7 @@
             return options;
         }
 
-        function addSensorRow(sensorKey = '', customLabel = '', mqttKey = '') {
+        function addSensorRow(sensorKey = '', customLabel = '') {
             sensorCounter++;
             const container = document.getElementById('sensorContainer');
             const row = document.createElement('div');
@@ -394,18 +422,14 @@
             row.id = `sensorRow_${sensorCounter}`;
             row.innerHTML = `
             <div class="row align-items-center g-2">
-                <div class="col-md-4">
+                <div class="col-md-5">
                     <select class="form-select sensor-select" name="sensors[${sensorCounter}][type]" required onchange="updateSubmitButton()">
                         ${getSensorOptions(sensorKey)}
                     </select>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-5">
                     <input type="text" class="form-control sensor-label-input" name="sensors[${sensorCounter}][label]" 
-                           placeholder="Label (opsional)" value="${customLabel}">
-                </div>
-                <div class="col-md-3">
-                    <input type="text" class="form-control" name="sensors[${sensorCounter}][mqtt_key]" 
-                           placeholder="MQTT Key (misal: ni_PH)" value="${mqttKey}">
+                           placeholder="Label custom (opsional)" value="${customLabel}">
                 </div>
                 <div class="col-md-2 text-end">
                     <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeSensorRow(${sensorCounter})" style="border-radius: 50%;">
@@ -605,6 +629,59 @@
             const sensors = document.querySelectorAll('.sensor-row:not(.output-row)').length;
             if (!type) { e.preventDefault(); alert('Pilih tipe alat terlebih dahulu!'); return false; }
             if (sensors === 0) { e.preventDefault(); alert('Tambahkan minimal 1 sensor!'); return false; }
+    });
+    </script>
+
+    <!-- Leaflet JS for Map Picker -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        // Initialize Map Picker
+        document.addEventListener('DOMContentLoaded', function() {
+            // Default center: Indonesia
+            const defaultLat = -6.9175;
+            const defaultLng = 107.6191;
+            
+            const map = L.map('mapPicker').setView([defaultLat, defaultLng], 13);
+            
+            // Add OpenStreetMap tile layer
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+            }).addTo(map);
+            
+            let marker = null;
+            
+            // Click event to place marker
+            map.on('click', function(e) {
+                const lat = e.latlng.lat.toFixed(7);
+                const lng = e.latlng.lng.toFixed(7);
+                
+                // Update input fields
+                document.getElementById('latitudeInput').value = lat;
+                document.getElementById('longitudeInput').value = lng;
+                
+                // Add or move marker
+                if (marker) {
+                    marker.setLatLng(e.latlng);
+                } else {
+                    marker = L.marker(e.latlng, {
+                        draggable: true
+                    }).addTo(map);
+                    
+                    // Drag event for marker
+                    marker.on('dragend', function(event) {
+                        const position = marker.getLatLng();
+                        document.getElementById('latitudeInput').value = position.lat.toFixed(7);
+                        document.getElementById('longitudeInput').value = position.lng.toFixed(7);
+                    });
+                }
+                
+                marker.bindPopup('<b>📍 Lokasi Device</b><br>Lat: ' + lat + '<br>Lng: ' + lng).openPopup();
+            });
+            
+            // Fix map display issue when in tabs/hidden containers
+            setTimeout(function() {
+                map.invalidateSize();
+            }, 100);
         });
     </script>
 </body>

@@ -263,9 +263,6 @@
                 <i class="bi bi-cpu-fill me-2"></i>Device Management
             </h2>
             <div class="d-flex gap-2">
-                <a href="{{ route('admin.mqtt-tester.index') }}" class="btn btn-glass">
-                    <i class="bi bi-broadcast me-1"></i> MQTT Tester
-                </a>
                 <a href="{{ route('admin.device.create') }}" class="btn btn-gradient">
                     <i class="bi bi-plus-lg me-1"></i> Tambah Device
                 </a>
@@ -377,136 +374,7 @@
             </div>
         </div>
 
-        <!-- MQTT DOCUMENTATION SECTION -->
-        <div class="glass-card mt-4 p-4">
-            <h4 class="text-white mb-4">
-                <i class="bi bi-book me-2" style="color: #86efac;"></i>Dokumentasi MQTT
-            </h4>
-
-            <div class="row g-4">
-                <!-- Input Format -->
-                <div class="col-lg-6">
-                    <div class="p-3 rounded" style="background: rgba(0,0,0,0.2);">
-                        <h6 class="text-info mb-3"><i class="bi bi-arrow-up-circle me-2"></i>Format JSON untuk Input
-                            (Sensor Data)</h6>
-                        <p class="text-white-50 small mb-2">Device mengirim data sensor ke server dengan format:</p>
-                        <pre class="text-white mb-0 p-3 rounded"
-                            style="background: rgba(0,0,0,0.3); font-size: 0.8rem; overflow-x: auto;"><code>{
-    "token": "YOUR_DEVICE_TOKEN",
-    "temperature": 28.5,
-    "humidity": 65.2,
-    "sensor_name": value
-}</code></pre>
-                        <div class="mt-2 small text-white-50">
-                            <i class="bi bi-info-circle me-1"></i>
-                            <strong>token</strong> wajib ada untuk autentikasi device.
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Output Format -->
-                <div class="col-lg-6">
-                    <div class="p-3 rounded" style="background: rgba(0,0,0,0.2);">
-                        <h6 style="color: #fde047;" class="mb-3"><i class="bi bi-arrow-down-circle me-2"></i>Format JSON
-                            untuk Output (Control Commands)</h6>
-                        <p class="text-white-50 small mb-2">Server mengirim perintah kontrol ke device dengan format:
-                        </p>
-                        <pre class="text-white mb-0 p-3 rounded"
-                            style="background: rgba(0,0,0,0.3); font-size: 0.8rem; overflow-x: auto;"><code>{
-    "token": "YOUR_DEVICE_TOKEN",
-    "action": "set_output",
-    "outputs": {
-        "relay_1": true,
-        "pump": false,
-        "motor": 75
-    }
-}</code></pre>
-                        <div class="mt-2 small text-white-50">
-                            <i class="bi bi-info-circle me-1"></i>
-                            Boolean: <code>true/false</code>, Number: <code>0-100</code> atau sesuai range.
-                        </div>
-                    </div>
-                </div>
-
-                <!-- MQTT Configuration -->
-                <div class="col-lg-6">
-                    <div class="p-3 rounded" style="background: rgba(0,0,0,0.2);">
-                        <h6 class="text-success mb-3"><i class="bi bi-gear me-2"></i>Konfigurasi MQTT Broker</h6>
-                        <table class="table table-sm mb-0" style="color: rgba(255,255,255,0.8);">
-                            <tr>
-                                <td class="border-0 py-1"><strong>Broker (Public):</strong></td>
-                                <td class="border-0 py-1"><code class="text-info">broker.hivemq.com</code></td>
-                            </tr>
-                            <tr>
-                                <td class="border-0 py-1"><strong>Port:</strong></td>
-                                <td class="border-0 py-1"><code>1883</code> (normal) / <code>8883</code> (SSL)</td>
-                            </tr>
-                            <tr>
-                                <td class="border-0 py-1"><strong>Topic Input:</strong></td>
-                                <td class="border-0 py-1"><code class="text-info">[mqtt_topic dari device]</code></td>
-                            </tr>
-                            <tr>
-                                <td class="border-0 py-1"><strong>Topic Output:</strong></td>
-                                <td class="border-0 py-1"><code class="text-warning">[mqtt_topic]/control</code></td>
-                            </tr>
-                            <tr>
-                                <td class="border-0 py-1"><strong>QoS:</strong></td>
-                                <td class="border-0 py-1"><code>1</code> (at least once)</td>
-                            </tr>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- Python Example -->
-                <div class="col-lg-6">
-                    <div class="p-3 rounded" style="background: rgba(0,0,0,0.2);">
-                        <h6 style="color: #a78bfa;" class="mb-3"><i class="bi bi-filetype-py me-2"></i>Contoh Python
-                            (paho-mqtt)</h6>
-                        <pre class="text-white mb-0 p-3 rounded"
-                            style="background: rgba(0,0,0,0.3); font-size: 0.75rem; overflow-x: auto;"><code>import paho.mqtt.client as mqtt
-import json
-
-client = mqtt.Client()
-client.connect("broker.hivemq.com", 1883)
-
-# Kirim data sensor
-data = {
-    "token": "YOUR_TOKEN",
-    "temperature": 28.5,
-    "humidity": 65
-}
-client.publish("sensor/device/data", json.dumps(data))</code></pre>
-                        <div class="mt-2 small text-white-50">
-                            <i class="bi bi-terminal me-1"></i>
-                            Install: <code>pip install paho-mqtt</code>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Tips -->
-            <div class="alert mt-4 mb-0"
-                style="background: rgba(14, 165, 233, 0.2); border: 1px solid rgba(14, 165, 233, 0.3); border-radius: 12px;">
-                <h6 class="text-info mb-2"><i class="bi bi-lightbulb me-2"></i>Tips</h6>
-                <ul class="mb-0 small text-white" style="padding-left: 1.5rem;">
-                    <li>Gunakan file <code>dummy_sender_mqtt.py</code> di root project untuk testing</li>
-                    <li>Jalankan <code>php artisan mqtt:listen --host=broker.hivemq.com</code> untuk menerima data</li>
-                    <li>Pastikan <strong>token</strong> device sudah benar agar data tersimpan ke database</li>
-                    <li>Nama sensor/output di JSON harus sama persis dengan yang dikonfigurasi di device</li>
-                </ul>
-
-                <div class="mt-3 d-flex gap-2">
-                    <a href="{{ route('documentation.esp32') }}" class="btn btn-sm btn-outline-light">
-                        <i class="bi bi-cpu me-1"></i> Panduan ESP32
-                    </a>
-                    <a href="{{ route('documentation.mqtt') }}" class="btn btn-sm btn-outline-light">
-                        <i class="bi bi-book me-1"></i> MQTT Protocol Docs
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-
+      
 </body>
 
 </html>

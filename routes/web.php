@@ -5,9 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminDeviceController;
 use App\Http\Controllers\MonitoringController;
 use App\Http\Controllers\AutomationConfigController;
-use App\Http\Controllers\DocumentationController;
 use App\Http\Controllers\ScheduleController;
-use App\Http\Controllers\MqttTesterController;
 
 
 Route::middleware(['auth'])->group(function () {
@@ -34,15 +32,6 @@ Route::middleware(['auth'])->group(function () {
 
         // Toggle Output (Admin)
         Route::post('/device/{deviceId}/output/{outputId}/toggle', [AdminDeviceController::class, 'toggleOutput'])->name('device.output.toggle');
-
-        // MQTT Tester
-        Route::get('/mqtt-tester', [MqttTesterController::class, 'index'])->name('mqtt-tester.index');
-        Route::get('/mqtt-tester/device/{id}', [MqttTesterController::class, 'getDeviceDetails'])->name('mqtt-tester.device');
-        Route::post('/mqtt-tester/send-sensor', [MqttTesterController::class, 'sendSensorData'])->name('mqtt-tester.send-sensor');
-        Route::post('/mqtt-tester/send-output', [MqttTesterController::class, 'sendOutputControl'])->name('mqtt-tester.send-output');
-        Route::post('/mqtt-tester/send-schedule', [MqttTesterController::class, 'sendSchedule'])->name('mqtt-tester.send-schedule');
-        Route::post('/mqtt-tester/request-status', [MqttTesterController::class, 'requestStatus'])->name('mqtt-tester.request-status');
-        Route::post('/mqtt-tester/send-custom', [MqttTesterController::class, 'sendCustom'])->name('mqtt-tester.send-custom');
     });
 
     // === MONITORING ROUTES (untuk semua user yang login) ===
@@ -77,10 +66,6 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/time', [ScheduleController::class, 'storeTimeSchedules'])->name('time.store');
         Route::post('/sensor', [ScheduleController::class, 'storeSensorRule'])->name('sensor.store');
     });
-    // Documentation (admin only for now, can adjust middleware later)
-    Route::get('/documentation/mqtt', [DocumentationController::class, 'mqtt'])->name('documentation.mqtt');
-    Route::get('/documentation/esp32', [DocumentationController::class, 'esp32'])->name('documentation.esp32');
-
 });
 
 // Beranda (public)

@@ -12,6 +12,9 @@ class Device extends Model
     // Izinkan kolom ini diisi
     protected $fillable = [
         'name',
+        'location',
+        'latitude',
+        'longitude',
         'type',
         'mqtt_topic',
         'token',
@@ -103,22 +106,22 @@ class Device extends Model
     public static function getAvailableSensors(): array
     {
         return [
-            'temperature' => ['label' => 'Suhu (Temperature)', 'unit' => '°C', 'icon' => 'bi-thermometer-half'],
-            'humidity' => ['label' => 'Kelembaban (Humidity)', 'unit' => '%', 'icon' => 'bi-droplet'],
+            'ni_SUHU' => ['label' => 'Suhu (Temperature)', 'unit' => '°C', 'icon' => 'bi-thermometer-half'],
+            'ni_KELEM' => ['label' => 'Kelembaban (Humidity)', 'unit' => '%', 'icon' => 'bi-droplet'],
             'rainfall' => ['label' => 'Curah Hujan (Rainfall)', 'unit' => 'mm', 'icon' => 'bi-cloud-rain'],
             'wind_speed' => ['label' => 'Kecepatan Angin', 'unit' => 'km/h', 'icon' => 'bi-wind'],
             'wind_direction' => ['label' => 'Arah Angin', 'unit' => '°', 'icon' => 'bi-compass'],
             'pressure' => ['label' => 'Tekanan Udara', 'unit' => 'hPa', 'icon' => 'bi-speedometer'],
             'uv_index' => ['label' => 'Indeks UV', 'unit' => '', 'icon' => 'bi-sun'],
-            'light_intensity' => ['label' => 'Intensitas Cahaya', 'unit' => 'lux', 'icon' => 'bi-brightness-high'],
+            'ni_LUX' => ['label' => 'Intensitas Cahaya', 'unit' => 'lux', 'icon' => 'bi-brightness-high'],
             'soil_moisture' => ['label' => 'Kelembaban Tanah', 'unit' => '%', 'icon' => 'bi-moisture'],
-            'soil_ph' => ['label' => 'pH Tanah', 'unit' => '', 'icon' => 'bi-droplet-half'],
+            // 'soil_ph' => ['label' => 'pH Tanah', 'unit' => '', 'icon' => 'bi-droplet-half'],
             'soil_temperature' => ['label' => 'Suhu Tanah', 'unit' => '°C', 'icon' => 'bi-thermometer'],
             'water_level' => ['label' => 'Level Air', 'unit' => 'cm', 'icon' => 'bi-water'],
             'co2' => ['label' => 'CO2', 'unit' => 'ppm', 'icon' => 'bi-cloud'],
-            'ec' => ['label' => 'EC (Electrical Conductivity)', 'unit' => 'mS/cm', 'icon' => 'bi-lightning'],
-            'tds' => ['label' => 'TDS (Total Dissolved Solids)', 'unit' => 'ppm', 'icon' => 'bi-water'],
-            'ph' => ['label' => 'pH Air', 'unit' => '', 'icon' => 'bi-droplet-half'],
+            'ni_EC' => ['label' => 'EC (Electrical Conductivity)', 'unit' => 'mS/cm', 'icon' => 'bi-lightning'],
+            'ni_TDS' => ['label' => 'TDS (Total Dissolved Solids)', 'unit' => 'ppm', 'icon' => 'bi-water'],
+            'ni_PH' => ['label' => 'pH', 'unit' => '', 'icon' => 'bi-droplet-half'],
             // Tambahkan sensor baru di sini:
             // 'pm25' => ['label' => 'PM2.5', 'unit' => 'µg/m³', 'icon' => 'bi-cloud-haze'],
         ];
@@ -133,17 +136,17 @@ class Device extends Model
     {
         $defaults = [
             'aws' => [
-                'temperature' => 1,
-                'humidity' => 1,
-                'rainfall' => 1,
-                'wind_speed' => 1,
-                'pressure' => 1
+                // 'ni_SUHU' => 1,
+                // 'ni_KELEM' => 1,
+                // 'rainfall' => 1,
+                // 'wind_speed' => 1,
+                // 'pressure' => 1
             ],
             'smart_gh' => [
-                'temperature' => 2,  // 2 sensor suhu
-                'humidity' => 2,     // 2 sensor kelembaban
-                'soil_moisture' => 1,
-                'light_intensity' => 1,
+                // 'ni_SUHU' => 2,  // 2 sensor suhu
+                // 'ni_KELEM' => 2,     // 2 sensor kelembaban
+                // 'soil_moisture' => 1,
+                // 'ni_LUX' => 1,
             ],
             // Tambahkan default sensor untuk tipe baru:
             // 'water_quality' => ['water_level' => 1, 'ph' => 1, 'temperature' => 1],
@@ -191,10 +194,10 @@ class Device extends Model
                 // AWS biasanya tidak punya output, hanya monitoring
             ],
             'smart_gh' => [
-                'pump' => 1,      // 1 pompa air
-                'fan' => 1,       // 1 kipas
-                'valve' => 1,     // 1 valve
-                'led' => 1,       // 1 LED grow light
+                // 'pump' => 1,      // 1 pompa air
+                // 'fan' => 1,       // 1 kipas
+                // 'valve' => 1,     // 1 valve
+                // 'led' => 1,       // 1 LED grow light
             ],
             // Tambahkan default output untuk tipe baru:
         ];
