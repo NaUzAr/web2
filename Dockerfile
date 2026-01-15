@@ -24,11 +24,20 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 # Set working directory
 WORKDIR /var/www
 
-# Copy project files
+# Copy composer files first for better caching
+COPY composer.json composer.lock ./
+
+# Install dependencies (fresh install without scripts)
+RUN composer install --no-dev --optimize-autoloader --no-scripts
+
+# Copy rest of project files
 COPY . /var/www
 
-# Install dependencies
-RUN composer install --no-dev --optimize-autoloader
+# Remove any local vendor artifacts and regenerate autoload
+RUN rm -rf vendor/laravel/sanctum && composer dump-autoload --optimize
+
+# Run post-install scripts
+RUN php artisan package:discover --ansi || true
 
 # Set permissions
 RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
