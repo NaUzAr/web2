@@ -1,7 +1,7 @@
 version: '2.4'
 
 # Docker Compose untuk Laravel App (PHP-FPM)
-# Jalankan: docker compose -f docker-compose.app.yml up -d
+# Jalankan: docker-compose -f docker-compose.app.yml up -d
 # Note: Jalankan Database dulu
 
 services:
@@ -13,7 +13,8 @@ services:
     restart: unless-stopped
     volumes:
       - .:/var/www
-      - ./storage:/var/www/storage
+      - vendor_data:/var/www/vendor
+      - storage_data:/var/www/storage
     networks:
       - smartagri-network
     environment:
@@ -30,3 +31,7 @@ networks:
   smartagri-network:
     driver: bridge
     name: smartagri-network
+
+volumes:
+  vendor_data:
+  storage_data:
