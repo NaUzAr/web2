@@ -1,0 +1,56 @@
+# =============================================
+# WEB 2: Toko Online - Nginx Terpisah
+# =============================================
+# Port: 8081 (HTTP), 8444 (HTTPS)
+# Domain: tokoonline.com
+# =============================================
+
+version: '2.4'
+
+services:
+  # =========== APP ===========
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: tokoonline-app
+    container_name: tokoonline-app
+    restart: unless-stopped
+    volumes:
+      - .:/var/www
+      - tokoonline_vendor:/var/www/vendor
+      - tokoonline_storage:/var/www/storage
+    networks:
+      - smartagri-network
+    environment:
+      - DB_CONNECTION=pgsql
+      - DB_HOST=shared-db
+      - DB_PORT=5432
+      - DB_DATABASE=tokoonline_db
+      - DB_USERNAME=tokoonline_user
+      - DB_PASSWORD=tokoonline_secret
+
+  # =========== NGINX (Terpisah) ===========
+  nginx:
+    image: nginx:alpine
+    container_name: tokoonline-nginx      # ← Nama unik
+    restart: unless-stopped
+    ports:
+      - "8081:80"                          # ← Port HTTP BEDA
+      - "8444:443"                         # ← Port HTTPS BEDA
+    volumes:
+      - .:/var/www
+      - ./docker/nginx.conf:/etc/nginx/conf.d/default.conf
+      - ./docker/ssl:/etc/nginx/ssl:ro
+    networks:
+      - smartagri-network
+    depends_on:
+      - app
+
+networks:
+  smartagri-network:
+    external: true
+
+volumes:
+  tokoonline_vendor:
+  tokoonline_storage:
