@@ -64,8 +64,8 @@ docker-compose up -d
 ```bash
 # Clone project
 cd /root
-git clone https://github.com/NaUzAr/smartagri-iot.git
-cd smartagri-iot
+git clone https://github.com/NaUzAr/iot.git
+cd iot
 
 # Build & Start
 docker-compose build
