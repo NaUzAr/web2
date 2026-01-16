@@ -129,7 +129,7 @@ curl -I http://smartagri.web.id
 ```bash
 docker network create smartagri-network
 cd /root/server-infra/shared-db && docker-compose up -d
-cd /root/smartagri-iot && docker-compose up -d
+cd /root/iot && docker-compose up -d
 cd /root/server-infra/reverse-proxy && docker-compose up -d
 ```
 
@@ -309,7 +309,7 @@ docker logs [container_name] --tail 50
 │   └── shared-db/
 │       └── docker-compose.yml
 │
-├── smartagri-iot/          # Web 1
+├── iot/                    # Web 1 (SmartAgri)
 │   └── docker-compose.yml
 │
 └── newweb/                 # Web 2 (baru)
