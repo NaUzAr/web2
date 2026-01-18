@@ -14,13 +14,13 @@
 
     <style>
         :root {
-            --primary-green: #22c55e;
-            --dark-green: #166534;
-            --light-green: #86efac;
-            --sky-blue: #0ea5e9;
-            --light-sky: #7dd3fc;
-            --primary-gradient: linear-gradient(135deg, #22c55e 0%, #16a34a 50%, #0ea5e9 100%);
-            --nature-gradient: linear-gradient(135deg, #134e4a 0%, #166534 50%, #14532d 100%);
+            --primary-red: #ef4444;
+            --dark-red: #991b1b;
+            --light-red: #fca5a5;
+            --accent-orange: #f97316;
+            --light-orange: #fdba74;
+            --primary-gradient: linear-gradient(135deg, #ef4444 0%, #dc2626 50%, #f97316 100%);
+            --nature-gradient: linear-gradient(135deg, #450a0a 0%, #7f1d1d 50%, #991b1b 100%);
             --glass-bg: rgba(255, 255, 255, 0.1);
             --glass-border: rgba(255, 255, 255, 0.2);
         }
@@ -41,19 +41,19 @@
             width: 100%;
             height: 100%;
             z-index: -1;
-            background: radial-gradient(circle at 20% 80%, rgba(34, 197, 94, 0.2) 0%, transparent 50%),
-                radial-gradient(circle at 80% 20%, rgba(14, 165, 233, 0.2) 0%, transparent 50%);
+            background: radial-gradient(circle at 20% 80%, rgba(239, 68, 68, 0.2) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(249, 115, 22, 0.2) 0%, transparent 50%);
         }
 
         .navbar-glass {
-            background: rgba(20, 83, 45, 0.95) !important;
+            background: rgba(127, 29, 29, 0.95) !important;
             backdrop-filter: blur(20px);
             border-bottom: 1px solid var(--glass-border);
         }
 
         .navbar-brand {
             font-weight: 700;
-            color: #86efac !important;
+            color: #fca5a5 !important;
         }
 
         .nav-link {
@@ -61,7 +61,7 @@
         }
 
         .nav-link:hover {
-            color: #86efac !important;
+            color: #fca5a5 !important;
         }
 
         .page-header {
@@ -102,7 +102,7 @@
 
         .sensor-card:hover {
             transform: translateY(-5px);
-            border-color: var(--primary-green);
+            border-color: #ef4444;
         }
 
         .sensor-icon {
@@ -131,7 +131,7 @@
         }
 
         .sensor-unit {
-            color: #86efac;
+            color: #fca5a5;
             font-size: 1rem;
             font-weight: 600;
         }
@@ -180,7 +180,7 @@
         .live-dot {
             width: 10px;
             height: 10px;
-            background: #22c55e;
+            background: #ef4444;
             border-radius: 50%;
             display: inline-block;
             animation: pulse 2s ease-in-out infinite;
@@ -204,8 +204,8 @@
         }
 
         .table-glass thead th {
-            background: rgba(20, 83, 45, 0.8);
-            color: #86efac;
+            background: rgba(127, 29, 29, 0.8);
+            color: #fca5a5;
             font-weight: 600;
             border-bottom: 1px solid var(--glass-border);
             padding: 1rem;
@@ -262,8 +262,8 @@
 
         .nav-tabs-glass .nav-link.active {
             background: transparent;
-            color: #86efac;
-            border-bottom: 3px solid #22c55e;
+            color: #fca5a5;
+            border-bottom: 3px solid #ef4444;
         }
 
         /* Output Control Styles */
@@ -342,7 +342,7 @@
         }
 
         .toggle-switch input:checked+.toggle-slider {
-            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
         }
 
         .toggle-switch input:checked+.toggle-slider:before {
@@ -356,7 +356,7 @@
         }
 
         .output-status.on {
-            color: #22c55e;
+            color: #ef4444;
         }
 
         .output-status.off {
@@ -378,7 +378,7 @@
             width: 20px;
             height: 20px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
             cursor: pointer;
         }
 

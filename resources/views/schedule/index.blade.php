@@ -14,7 +14,7 @@
         }
 
         body {
-            background: linear-gradient(135deg, #134e4a 0%, #166534 50%, #14532d 100%);
+            background: linear-gradient(135deg, #450a0a 0%, #7f1d1d 50%, #991b1b 100%);
             min-height: 100vh;
             padding: 2rem 0;
             color: #fff;
@@ -44,7 +44,7 @@
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
             border: none;
         }
 
@@ -73,8 +73,8 @@
         }
 
         .day-checkbox input[type="checkbox"]:checked+label {
-            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
-            border-color: #22c55e;
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            border-color: #ef4444;
         }
 
         .schedule-slot {
@@ -92,13 +92,13 @@
         .form-control:focus,
         .form-select:focus {
             background: rgba(255, 255, 255, 0.15);
-            border-color: #22c55e;
+            border-color: #ef4444;
             color: #fff;
-            box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.2);
+            box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2);
         }
 
         .form-select option {
-            background: #166534;
+            background: #991b1b;
             color: #fff;
         }
     </style>

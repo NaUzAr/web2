@@ -12,174 +12,84 @@
         rel="stylesheet">
 
 
+    @include('partials.theme')
+
     <style>
-        :root {
-            --primary-green: #22c55e;
-            --dark-green: #166534;
-            --light-green: #86efac;
-            --sky-blue: #0ea5e9;
-            --light-sky: #7dd3fc;
-            --primary-gradient: linear-gradient(135deg, #22c55e 0%, #16a34a 50%, #0ea5e9 100%);
-            --secondary-gradient: linear-gradient(135deg, #86efac 0%, #22c55e 100%);
-            --nature-gradient: linear-gradient(135deg, #134e4a 0%, #166534 50%, #14532d 100%);
-            --glass-bg: rgba(255, 255, 255, 0.1);
-            --glass-border: rgba(255, 255, 255, 0.2);
-        }
-
-        * {
-            font-family: 'Inter', sans-serif;
-        }
-
-        body {
-            background: var(--nature-gradient);
-            min-height: 100vh;
-        }
-
-        .bg-animation {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-            background: radial-gradient(circle at 20% 80%, rgba(34, 197, 94, 0.2) 0%, transparent 50%),
-                radial-gradient(circle at 80% 20%, rgba(14, 165, 233, 0.2) 0%, transparent 50%);
-        }
-
-        .navbar-glass {
-            background: rgba(20, 83, 45, 0.95) !important;
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid var(--glass-border);
-        }
-
-        .navbar-brand {
-            font-weight: 700;
-            color: #86efac !important;
-        }
-
-        .nav-link {
-            color: rgba(255, 255, 255, 0.8) !important;
-        }
-
-        .nav-link:hover {
-            color: #86efac !important;
-        }
-
+        /* Page Title */
         .page-title {
             color: #fff;
-            font-weight: 700;
+            font-weight: 800;
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
         }
 
-        .btn-gradient {
-            background: var(--primary-gradient);
-            border: none;
-            color: #fff;
-            padding: 0.6rem 1.25rem;
-            border-radius: 50px;
-            font-weight: 600;
-            transition: all 0.3s ease;
+        .page-subtitle {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 1rem;
         }
 
-        .btn-gradient:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(34, 197, 94, 0.4);
-            color: #fff;
-        }
-
+        /* Device Cards */
         .device-card {
             background: var(--glass-bg);
             backdrop-filter: blur(20px);
             border: 1px solid var(--glass-border);
             border-radius: 20px;
             padding: 1.5rem;
-            transition: all 0.3s ease;
-            height: 100%;
+            transition: all 0.4s ease;
         }
 
         .device-card:hover {
             transform: translateY(-5px);
-            border-color: var(--primary-green);
-            box-shadow: 0 20px 40px rgba(34, 197, 94, 0.2);
+            border-color: var(--primary);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
         }
 
         .device-icon {
             width: 60px;
             height: 60px;
-            background: var(--primary-gradient);
             border-radius: 16px;
+            background: var(--primary-gradient);
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 1.5rem;
-            margin-bottom: 1rem;
+            color: #fff;
+            margin-right: 1rem;
         }
 
         .device-name {
             color: #fff;
             font-weight: 700;
             font-size: 1.1rem;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.25rem;
         }
 
-        .device-type {
-            background: rgba(14, 165, 233, 0.2);
-            color: var(--light-sky);
-            padding: 0.25rem 0.75rem;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            display: inline-block;
-            margin-bottom: 1rem;
+        .device-type-badge {
+            background: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 8px;
         }
 
-        .sensor-count {
+        .device-location {
             color: rgba(255, 255, 255, 0.6);
             font-size: 0.85rem;
         }
 
-        .btn-view {
-            background: rgba(34, 197, 94, 0.2);
-            color: #86efac;
-            border: 1px solid rgba(34, 197, 94, 0.3);
-            border-radius: 10px;
-            padding: 0.5rem 1rem;
-            font-weight: 600;
-            transition: all 0.2s ease;
-            text-decoration: none;
+        .divider {
+            height: 1px;
+            background: var(--glass-border);
+            margin: 1rem 0;
         }
 
-        .btn-view:hover {
-            background: var(--primary-green);
-            color: #fff;
+        .sensor-count {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
         }
 
-        .btn-delete {
-            background: rgba(239, 68, 68, 0.2);
-            color: #fca5a5;
-            border: 1px solid rgba(239, 68, 68, 0.3);
-            border-radius: 10px;
-            padding: 0.5rem;
-            transition: all 0.2s ease;
-        }
-
-        .btn-delete:hover {
-            background: #ef4444;
-            color: #fff;
-        }
-
-        .alert-success-custom {
-            background: rgba(34, 197, 94, 0.2);
-            border: 1px solid rgba(34, 197, 94, 0.3);
-            color: #86efac;
-            border-radius: 12px;
-        }
-
+        /* Empty State */
         .empty-state {
-            background: var(--glass-bg);
-            backdrop-filter: blur(20px);
-            border: 1px solid var(--glass-border);
-            border-radius: 24px;
-            padding: 4rem 2rem;
             text-align: center;
         }
 

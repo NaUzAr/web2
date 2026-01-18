@@ -14,14 +14,14 @@
 
     <style>
         :root {
-            --primary-green: #22c55e;
-            --dark-green: #166534;
-            --light-green: #86efac;
-            --sky-blue: #0ea5e9;
-            --light-sky: #7dd3fc;
-            --primary-gradient: linear-gradient(135deg, #22c55e 0%, #16a34a 50%, #0ea5e9 100%);
-            --secondary-gradient: linear-gradient(135deg, #86efac 0%, #22c55e 100%);
-            --nature-gradient: linear-gradient(135deg, #134e4a 0%, #166534 50%, #14532d 100%);
+            --primary-red: #ef4444;
+            --dark-red: #991b1b;
+            --light-red: #fca5a5;
+            --accent-orange: #f97316;
+            --light-orange: #fdba74;
+            --primary-gradient: linear-gradient(135deg, #ef4444 0%, #dc2626 50%, #f97316 100%);
+            --secondary-gradient: linear-gradient(135deg, #fca5a5 0%, #ef4444 100%);
+            --nature-gradient: linear-gradient(135deg, #450a0a 0%, #7f1d1d 50%, #991b1b 100%);
             --glass-bg: rgba(255, 255, 255, 0.1);
             --glass-border: rgba(255, 255, 255, 0.2);
         }
@@ -42,19 +42,19 @@
             width: 100%;
             height: 100%;
             z-index: -1;
-            background: radial-gradient(circle at 20% 80%, rgba(34, 197, 94, 0.2) 0%, transparent 50%),
-                radial-gradient(circle at 80% 20%, rgba(14, 165, 233, 0.2) 0%, transparent 50%);
+            background: radial-gradient(circle at 20% 80%, rgba(239, 68, 68, 0.2) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(249, 115, 22, 0.2) 0%, transparent 50%);
         }
 
         .navbar-glass {
-            background: rgba(20, 83, 45, 0.95) !important;
+            background: rgba(127, 29, 29, 0.95) !important;
             backdrop-filter: blur(20px);
             border-bottom: 1px solid var(--glass-border);
         }
 
         .navbar-brand {
             font-weight: 700;
-            color: #86efac !important;
+            color: #fca5a5 !important;
         }
 
         .nav-link {
@@ -62,7 +62,7 @@
         }
 
         .nav-link:hover {
-            color: #86efac !important;
+            color: #fca5a5 !important;
         }
 
         .glass-card {
@@ -88,9 +88,9 @@
 
         .form-control:focus {
             background: rgba(255, 255, 255, 0.15);
-            border-color: var(--primary-green);
+            border-color: #ef4444;
             color: #fff;
-            box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.2);
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2);
         }
 
         .form-control::placeholder {
@@ -103,7 +103,7 @@
         }
 
         .form-label {
-            color: #86efac;
+            color: #fca5a5;
             font-weight: 600;
         }
 
@@ -123,7 +123,7 @@
 
         .btn-gradient:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(34, 197, 94, 0.4);
+            box-shadow: 0 10px 30px rgba(239, 68, 68, 0.4);
             color: #fff;
         }
 
@@ -160,8 +160,8 @@
         }
 
         .badge-sensor {
-            background: rgba(34, 197, 94, 0.2);
-            color: #86efac;
+            background: rgba(239, 68, 68, 0.2);
+            color: #fca5a5;
             font-weight: 500;
             padding: 0.5rem 0.75rem;
             border-radius: 10px;
@@ -347,28 +347,33 @@
 
                             <div class="mb-3">
                                 <label class="form-label"><i class="bi bi-geo-alt me-1"></i> Lokasi Alat</label>
-                                <input type="text" name="location" id="locationInput" class="form-control" 
+                                <input type="text" name="location" id="locationInput" class="form-control"
                                     value="{{ $device->location }}"
                                     placeholder="Contoh: Greenhouse A, Kebun Teh Blok 3">
                             </div>
 
                             <!-- Map Picker -->
                             <div class="mb-3">
-                                <label class="form-label"><i class="bi bi-map me-1"></i> Pilih Titik Lokasi di Map</label>
-                                <div id="mapPicker" style="height: 250px; border-radius: 12px; border: 1px solid var(--glass-border);"></div>
+                                <label class="form-label"><i class="bi bi-map me-1"></i> Pilih Titik Lokasi di
+                                    Map</label>
+                                <div id="mapPicker"
+                                    style="height: 250px; border-radius: 12px; border: 1px solid var(--glass-border);">
+                                </div>
                                 <div class="form-text">Klik pada map untuk mengubah koordinat lokasi device.</div>
                             </div>
 
                             <div class="row mb-4">
                                 <div class="col-md-6">
                                     <label class="form-label"><i class="bi bi-geo me-1"></i> Latitude</label>
-                                    <input type="number" step="any" name="latitude" id="latitudeInput" class="form-control"
-                                        value="{{ $device->latitude }}" placeholder="-6.9175" readonly>
+                                    <input type="number" step="any" name="latitude" id="latitudeInput"
+                                        class="form-control" value="{{ $device->latitude }}" placeholder="-6.9175"
+                                        readonly>
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label"><i class="bi bi-geo me-1"></i> Longitude</label>
-                                    <input type="number" step="any" name="longitude" id="longitudeInput" class="form-control"
-                                        value="{{ $device->longitude }}" placeholder="107.6191" readonly>
+                                    <input type="number" step="any" name="longitude" id="longitudeInput"
+                                        class="form-control" value="{{ $device->longitude }}" placeholder="107.6191"
+                                        readonly>
                                 </div>
                             </div>
 
@@ -397,54 +402,54 @@
     <!-- Leaflet JS for Map Picker -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             // Get existing coordinates or use default
             const existingLat = {{ $device->latitude ?? -6.9175 }};
             const existingLng = {{ $device->longitude ?? 107.6191 }};
             const hasExistingCoords = {{ ($device->latitude && $device->longitude) ? 'true' : 'false' }};
-            
+
             const map = L.map('mapPicker').setView([existingLat, existingLng], 13);
-            
+
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
             }).addTo(map);
-            
+
             let marker = null;
-            
+
             // Add existing marker if coordinates exist
             if (hasExistingCoords) {
                 marker = L.marker([existingLat, existingLng], { draggable: true }).addTo(map);
                 marker.bindPopup('<b>📍 Lokasi Device</b><br>Lat: ' + existingLat + '<br>Lng: ' + existingLng);
-                
-                marker.on('dragend', function(event) {
+
+                marker.on('dragend', function (event) {
                     const position = marker.getLatLng();
                     document.getElementById('latitudeInput').value = position.lat.toFixed(7);
                     document.getElementById('longitudeInput').value = position.lng.toFixed(7);
                 });
             }
-            
-            map.on('click', function(e) {
+
+            map.on('click', function (e) {
                 const lat = e.latlng.lat.toFixed(7);
                 const lng = e.latlng.lng.toFixed(7);
-                
+
                 document.getElementById('latitudeInput').value = lat;
                 document.getElementById('longitudeInput').value = lng;
-                
+
                 if (marker) {
                     marker.setLatLng(e.latlng);
                 } else {
                     marker = L.marker(e.latlng, { draggable: true }).addTo(map);
-                    marker.on('dragend', function(event) {
+                    marker.on('dragend', function (event) {
                         const position = marker.getLatLng();
                         document.getElementById('latitudeInput').value = position.lat.toFixed(7);
                         document.getElementById('longitudeInput').value = position.lng.toFixed(7);
                     });
                 }
-                
+
                 marker.bindPopup('<b>📍 Lokasi Device</b><br>Lat: ' + lat + '<br>Lng: ' + lng).openPopup();
             });
-            
-            setTimeout(function() { map.invalidateSize(); }, 100);
+
+            setTimeout(function () { map.invalidateSize(); }, 100);
         });
     </script>
 </body>

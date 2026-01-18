@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <!-- PWA Meta Tags -->
-    <meta name="theme-color" content="#059669">
+    <meta name="theme-color" content="#dc2626">
     <meta name="description" content="SmartAgri IoT - Sistem monitoring pertanian cerdas berbasis IoT">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -21,113 +21,11 @@
     <title>Smart Agriculture - IoT Monitoring System</title>
 
 
+    @include('partials.theme')
+
     <style>
-        :root {
-            /* Agriculture Theme - Green & Sky */
-            --primary-green: #22c55e;
-            --dark-green: #166534;
-            --light-green: #86efac;
-            --sky-blue: #0ea5e9;
-            --light-sky: #7dd3fc;
-            --dark-sky: #0369a1;
-
-            --primary-gradient: linear-gradient(135deg, #22c55e 0%, #16a34a 50%, #0ea5e9 100%);
-            --secondary-gradient: linear-gradient(135deg, #86efac 0%, #22c55e 100%);
-            --sky-gradient: linear-gradient(135deg, #0ea5e9 0%, #0369a1 100%);
-            --nature-gradient: linear-gradient(135deg, #134e4a 0%, #166534 50%, #14532d 100%);
-
-            --glass-bg: rgba(255, 255, 255, 0.1);
-            --glass-border: rgba(255, 255, 255, 0.2);
-        }
-
-        * {
-            font-family: 'Inter', sans-serif;
-        }
-
         body {
-            background: var(--nature-gradient);
-            min-height: 100vh;
             overflow-x: hidden;
-        }
-
-        /* Animated Background - Nature Theme */
-        .bg-animation {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-            overflow: hidden;
-        }
-
-        .bg-animation::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle at 20% 80%, rgba(34, 197, 94, 0.3) 0%, transparent 50%),
-                radial-gradient(circle at 80% 20%, rgba(14, 165, 233, 0.3) 0%, transparent 50%),
-                radial-gradient(circle at 40% 40%, rgba(134, 239, 172, 0.2) 0%, transparent 40%);
-            animation: float 20s ease-in-out infinite;
-        }
-
-        @keyframes float {
-
-            0%,
-            100% {
-                transform: translate(0, 0) rotate(0deg);
-            }
-
-            33% {
-                transform: translate(30px, -30px) rotate(5deg);
-            }
-
-            66% {
-                transform: translate(-20px, 20px) rotate(-5deg);
-            }
-        }
-
-        /* Glassmorphism Navbar */
-        .navbar-glass {
-            background: rgba(20, 83, 45, 0.9) !important;
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid var(--glass-border);
-        }
-
-        .navbar-brand {
-            font-weight: 700;
-            font-size: 1.4rem;
-            color: #86efac !important;
-        }
-
-        .navbar-brand i {
-            color: #22c55e;
-        }
-
-        .nav-link {
-            color: rgba(255, 255, 255, 0.8) !important;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            position: relative;
-        }
-
-        .nav-link:hover {
-            color: #86efac !important;
-        }
-
-        .nav-link.active::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 20px;
-            height: 3px;
-            background: var(--primary-gradient);
-            border-radius: 3px;
         }
 
         /* Hero Section */
@@ -158,22 +56,6 @@
             margin-bottom: 2rem;
         }
 
-        /* Glass Cards */
-        .glass-card {
-            background: var(--glass-bg);
-            backdrop-filter: blur(20px);
-            border: 1px solid var(--glass-border);
-            border-radius: 20px;
-            padding: 2rem;
-            transition: all 0.4s ease;
-        }
-
-        .glass-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 25px 50px rgba(34, 197, 94, 0.3);
-            border-color: rgba(34, 197, 94, 0.5);
-        }
-
         /* Feature Cards */
         .feature-card {
             background: var(--glass-bg);
@@ -188,7 +70,7 @@
         .feature-card:hover {
             background: rgba(255, 255, 255, 0.15);
             transform: translateX(10px);
-            border-color: #22c55e;
+            border-color: var(--primary);
         }
 
         .feature-icon-box {
@@ -215,7 +97,7 @@
         }
 
         .feature-icon-box.wifi {
-            background: linear-gradient(135deg, #22c55e, #16a34a);
+            background: var(--primary-gradient);
         }
 
         .feature-title {
@@ -229,41 +111,6 @@
             color: rgba(255, 255, 255, 0.6);
             font-size: 0.85rem;
             margin: 0;
-        }
-
-        /* Buttons */
-        .btn-gradient {
-            background: var(--primary-gradient);
-            border: none;
-            color: #fff;
-            padding: 0.8rem 2rem;
-            border-radius: 50px;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            box-shadow: 0 10px 30px rgba(34, 197, 94, 0.4);
-        }
-
-        .btn-gradient:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 40px rgba(34, 197, 94, 0.5);
-            color: #fff;
-        }
-
-        .btn-glass {
-            background: var(--glass-bg);
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--glass-border);
-            color: #fff;
-            padding: 0.8rem 2rem;
-            border-radius: 50px;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-
-        .btn-glass:hover {
-            background: rgba(255, 255, 255, 0.2);
-            color: #fff;
-            transform: translateY(-3px);
         }
 
         /* Stats Section */
@@ -320,140 +167,14 @@
             border-radius: 50%;
         }
 
-        /* Footer */
-        .footer-glass {
-            background: rgba(20, 83, 45, 0.9);
-            backdrop-filter: blur(20px);
-            border-top: 1px solid var(--glass-border);
-            padding: 2rem 0;
-            margin-top: 4rem;
-        }
-
         .footer-text {
             color: rgba(255, 255, 255, 0.6);
             margin: 0;
         }
 
-        .footer-link {
-            color: #86efac;
-            text-decoration: none;
-            font-weight: 600;
-        }
-
-        /* Admin Badge */
-        .admin-badge {
-            background: linear-gradient(135deg, #22c55e 0%, #0ea5e9 100%);
-            color: #fff;
-            font-size: 0.7rem;
-            padding: 2px 8px;
-            border-radius: 20px;
-        }
-
-        /* Dropdown styling */
-        .dropdown-menu {
-            background: rgba(20, 83, 45, 0.95);
-            backdrop-filter: blur(20px);
-            border: 1px solid var(--glass-border);
-            border-radius: 12px;
-            padding: 0.5rem;
-        }
-
-        .dropdown-item {
-            color: rgba(255, 255, 255, 0.8);
-            border-radius: 8px;
-            padding: 0.6rem 1rem;
-            transition: all 0.2s ease;
-        }
-
-        .dropdown-item:hover {
-            background: rgba(34, 197, 94, 0.2);
-            color: #86efac;
-        }
-
-        .dropdown-divider {
-            border-color: var(--glass-border);
-        }
-
-        /* Live Indicator */
-        .live-indicator {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            background: rgba(34, 197, 94, 0.2);
-            color: #86efac;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: 600;
-        }
-
-        .live-dot {
-            width: 8px;
-            height: 8px;
-            background: #22c55e;
-            border-radius: 50%;
-            animation: pulse 2s ease-in-out infinite;
-        }
-
-        @keyframes pulse {
-
-            0%,
-            100% {
-                opacity: 1;
-                transform: scale(1);
-            }
-
-            50% {
-                opacity: 0.5;
-                transform: scale(1.2);
-            }
-        }
-
-        /* Navbar Toggler - Mobile Hamburger Icon */
-        .navbar-toggler {
-            padding: 0.5rem;
-        }
-
+        /* Navbar Toggler */
         .navbar-toggler-icon {
             background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 0.9%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
-        }
-
-        .navbar-toggler:focus {
-            box-shadow: 0 0 0 0.2rem rgba(134, 239, 172, 0.5);
-        }
-
-        /* Mobile Navbar Collapse */
-        @media (max-width: 991.98px) {
-            .navbar-collapse {
-                background: rgba(20, 83, 45, 0.98);
-                backdrop-filter: blur(20px);
-                border-radius: 12px;
-                margin-top: 1rem;
-                padding: 1rem;
-                border: 1px solid var(--glass-border);
-            }
-
-            .navbar-nav .nav-link {
-                padding: 0.75rem 1rem;
-                border-radius: 8px;
-                margin-bottom: 0.25rem;
-            }
-
-            .navbar-nav .nav-link:hover {
-                background: rgba(34, 197, 94, 0.2);
-            }
-
-            .navbar-nav .dropdown-menu {
-                background: rgba(15, 60, 35, 0.95);
-                border: none;
-                margin-top: 0.5rem;
-                margin-bottom: 0.5rem;
-            }
-
-            .navbar-nav .btn {
-                width: 100%;
-                margin-top: 0.5rem;
-            }
         }
 
         /* Responsive */

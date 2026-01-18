@@ -12,12 +12,12 @@
 
     <style>
         :root {
-            --primary-green: #22c55e;
-            --dark-green: #166534;
-            --light-green: #86efac;
-            --sky-blue: #0ea5e9;
-            --primary-gradient: linear-gradient(135deg, #22c55e 0%, #16a34a 50%, #0ea5e9 100%);
-            --nature-gradient: linear-gradient(135deg, #134e4a 0%, #166534 50%, #14532d 100%);
+            --primary-red: #ef4444;
+            --dark-red: #991b1b;
+            --light-red: #fca5a5;
+            --accent-orange: #f97316;
+            --primary-gradient: linear-gradient(135deg, #ef4444 0%, #dc2626 50%, #f97316 100%);
+            --nature-gradient: linear-gradient(135deg, #450a0a 0%, #7f1d1d 50%, #991b1b 100%);
             --glass-bg: rgba(255, 255, 255, 0.1);
             --glass-border: rgba(255, 255, 255, 0.2);
         }
@@ -42,8 +42,8 @@
             width: 100%;
             height: 100%;
             z-index: -1;
-            background: radial-gradient(circle at 20% 80%, rgba(34, 197, 94, 0.3) 0%, transparent 50%),
-                radial-gradient(circle at 80% 20%, rgba(14, 165, 233, 0.3) 0%, transparent 50%);
+            background: radial-gradient(circle at 20% 80%, rgba(239, 68, 68, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(249, 115, 22, 0.3) 0%, transparent 50%);
         }
 
         .add-card {
@@ -83,7 +83,7 @@
         }
 
         .form-label {
-            color: #86efac;
+            color: #fca5a5;
             font-weight: 600;
         }
 
@@ -102,9 +102,9 @@
 
         .form-control:focus {
             background: rgba(255, 255, 255, 0.15);
-            border-color: var(--primary-green);
+            border-color: #ef4444;
             color: #fff;
-            box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.2);
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2);
         }
 
         .form-control::placeholder {
@@ -131,7 +131,7 @@
 
         .btn-gradient:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(34, 197, 94, 0.4);
+            box-shadow: 0 10px 30px rgba(239, 68, 68, 0.4);
             color: #fff;
         }
 

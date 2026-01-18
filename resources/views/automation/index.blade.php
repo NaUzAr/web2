@@ -11,9 +11,9 @@
         rel="stylesheet">
     <style>
         :root {
-            --primary-green: #22c55e;
-            --dark-green: #166534;
-            --nature-gradient: linear-gradient(135deg, #134e4a 0%, #166534 50%, #14532d 100%);
+            --primary-red: #ef4444;
+            --dark-red: #991b1b;
+            --nature-gradient: linear-gradient(135deg, #450a0a 0%, #7f1d1d 50%, #991b1b 100%);
             --glass-bg: rgba(255, 255, 255, 0.1);
             --glass-border: rgba(255, 255, 255, 0.2);
         }
@@ -87,8 +87,8 @@
 
         .nav-tabs-glass .nav-link.active {
             background: transparent;
-            color: #86efac;
-            border-bottom: 3px solid #22c55e;
+            color: #fca5a5;
+            border-bottom: 3px solid #ef4444;
         }
 
         .table-glass {
@@ -96,8 +96,8 @@
         }
 
         .table-glass thead th {
-            background: rgba(20, 83, 45, 0.8);
-            color: #86efac;
+            background: rgba(127, 29, 29, 0.8);
+            color: #fca5a5;
             font-weight: 600;
             border-bottom: 1px solid var(--glass-border);
             padding: 1rem;
@@ -151,7 +151,7 @@
         }
 
         .toggle-switch-small input:checked+.toggle-slider-small {
-            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
         }
 
         .toggle-switch-small input:checked+.toggle-slider-small:before {

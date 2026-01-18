@@ -14,14 +14,14 @@
 
     <style>
         :root {
-            --primary-green: #22c55e;
-            --dark-green: #166534;
-            --light-green: #86efac;
-            --sky-blue: #0ea5e9;
-            --light-sky: #7dd3fc;
-            --primary-gradient: linear-gradient(135deg, #22c55e 0%, #16a34a 50%, #0ea5e9 100%);
-            --secondary-gradient: linear-gradient(135deg, #86efac 0%, #22c55e 100%);
-            --nature-gradient: linear-gradient(135deg, #134e4a 0%, #166534 50%, #14532d 100%);
+            --primary-red: #ef4444;
+            --dark-red: #991b1b;
+            --light-red: #fca5a5;
+            --accent-orange: #f97316;
+            --light-orange: #fdba74;
+            --primary-gradient: linear-gradient(135deg, #ef4444 0%, #dc2626 50%, #f97316 100%);
+            --secondary-gradient: linear-gradient(135deg, #fca5a5 0%, #ef4444 100%);
+            --nature-gradient: linear-gradient(135deg, #450a0a 0%, #7f1d1d 50%, #991b1b 100%);
             --glass-bg: rgba(255, 255, 255, 0.1);
             --glass-border: rgba(255, 255, 255, 0.2);
         }
@@ -42,19 +42,19 @@
             width: 100%;
             height: 100%;
             z-index: -1;
-            background: radial-gradient(circle at 20% 80%, rgba(34, 197, 94, 0.2) 0%, transparent 50%),
-                radial-gradient(circle at 80% 20%, rgba(14, 165, 233, 0.2) 0%, transparent 50%);
+            background: radial-gradient(circle at 20% 80%, rgba(239, 68, 68, 0.2) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(249, 115, 22, 0.2) 0%, transparent 50%);
         }
 
         .navbar-glass {
-            background: rgba(20, 83, 45, 0.95) !important;
+            background: rgba(127, 29, 29, 0.95) !important;
             backdrop-filter: blur(20px);
             border-bottom: 1px solid var(--glass-border);
         }
 
         .navbar-brand {
             font-weight: 700;
-            color: #86efac !important;
+            color: #fca5a5 !important;
         }
 
         .nav-link {
@@ -62,7 +62,7 @@
         }
 
         .nav-link:hover {
-            color: #86efac !important;
+            color: #fca5a5 !important;
         }
 
         .glass-card {
@@ -90,9 +90,9 @@
         .form-control:focus,
         .form-select:focus {
             background: rgba(255, 255, 255, 0.15);
-            border-color: var(--primary-green);
+            border-color: #ef4444;
             color: #fff;
-            box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.2);
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2);
         }
 
         .form-control::placeholder {
@@ -100,12 +100,12 @@
         }
 
         .form-select option {
-            background: #166534;
+            background: #991b1b;
             color: #fff;
         }
 
         .form-label {
-            color: #86efac;
+            color: #fca5a5;
             font-weight: 600;
         }
 
@@ -126,14 +126,14 @@
 
         .type-card:hover,
         .type-card.selected {
-            border-color: var(--primary-green);
-            background: rgba(34, 197, 94, 0.2);
+            border-color: #ef4444;
+            background: rgba(239, 68, 68, 0.2);
             transform: translateY(-5px);
         }
 
         .type-card i {
             font-size: 2.5rem;
-            color: var(--light-green);
+            color: #fca5a5;
         }
 
         .type-card h6 {
@@ -152,7 +152,7 @@
 
         .sensor-row:hover {
             background: rgba(255, 255, 255, 0.1);
-            border-color: var(--primary-green);
+            border-color: #ef4444;
         }
 
         .btn-gradient {
@@ -167,7 +167,7 @@
 
         .btn-gradient:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(34, 197, 94, 0.4);
+            box-shadow: 0 10px 30px rgba(239, 68, 68, 0.4);
             color: #fff;
         }
 
@@ -187,8 +187,8 @@
 
         .btn-outline-add {
             background: transparent;
-            border: 2px dashed var(--primary-green);
-            color: var(--light-green);
+            border: 2px dashed #ef4444;
+            color: #fca5a5;
             border-radius: 12px;
             padding: 0.75rem;
             font-weight: 600;
@@ -196,7 +196,7 @@
         }
 
         .btn-outline-add:hover {
-            background: rgba(34, 197, 94, 0.2);
+            background: rgba(239, 68, 68, 0.2);
             color: #fff;
             border-style: solid;
         }
@@ -217,7 +217,7 @@
 
         .badge-count {
             background: var(--secondary-gradient);
-            color: #166534;
+            color: #991b1b;
             font-weight: 700;
             padding: 0.25rem 0.75rem;
             border-radius: 20px;
@@ -304,21 +304,24 @@
 
                             <!-- Map Picker -->
                             <div class="mb-3">
-                                <label class="form-label"><i class="bi bi-map me-1"></i> Pilih Titik Lokasi di Map</label>
-                                <div id="mapPicker" style="height: 250px; border-radius: 12px; border: 1px solid var(--glass-border);"></div>
+                                <label class="form-label"><i class="bi bi-map me-1"></i> Pilih Titik Lokasi di
+                                    Map</label>
+                                <div id="mapPicker"
+                                    style="height: 250px; border-radius: 12px; border: 1px solid var(--glass-border);">
+                                </div>
                                 <div class="form-text">Klik pada map untuk menentukan koordinat lokasi device.</div>
                             </div>
 
                             <div class="row mb-4">
                                 <div class="col-md-6">
                                     <label class="form-label"><i class="bi bi-geo me-1"></i> Latitude</label>
-                                    <input type="number" step="any" name="latitude" id="latitudeInput" class="form-control"
-                                        placeholder="-6.9175" readonly>
+                                    <input type="number" step="any" name="latitude" id="latitudeInput"
+                                        class="form-control" placeholder="-6.9175" readonly>
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label"><i class="bi bi-geo me-1"></i> Longitude</label>
-                                    <input type="number" step="any" name="longitude" id="longitudeInput" class="form-control"
-                                        placeholder="107.6191" readonly>
+                                    <input type="number" step="any" name="longitude" id="longitudeInput"
+                                        class="form-control" placeholder="107.6191" readonly>
                                 </div>
                             </div>
 
@@ -629,36 +632,36 @@
             const sensors = document.querySelectorAll('.sensor-row:not(.output-row)').length;
             if (!type) { e.preventDefault(); alert('Pilih tipe alat terlebih dahulu!'); return false; }
             if (sensors === 0) { e.preventDefault(); alert('Tambahkan minimal 1 sensor!'); return false; }
-    });
+        });
     </script>
 
     <!-- Leaflet JS for Map Picker -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
         // Initialize Map Picker
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             // Default center: Indonesia
             const defaultLat = -6.9175;
             const defaultLng = 107.6191;
-            
+
             const map = L.map('mapPicker').setView([defaultLat, defaultLng], 13);
-            
+
             // Add OpenStreetMap tile layer
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
             }).addTo(map);
-            
+
             let marker = null;
-            
+
             // Click event to place marker
-            map.on('click', function(e) {
+            map.on('click', function (e) {
                 const lat = e.latlng.lat.toFixed(7);
                 const lng = e.latlng.lng.toFixed(7);
-                
+
                 // Update input fields
                 document.getElementById('latitudeInput').value = lat;
                 document.getElementById('longitudeInput').value = lng;
-                
+
                 // Add or move marker
                 if (marker) {
                     marker.setLatLng(e.latlng);
@@ -666,20 +669,20 @@
                     marker = L.marker(e.latlng, {
                         draggable: true
                     }).addTo(map);
-                    
+
                     // Drag event for marker
-                    marker.on('dragend', function(event) {
+                    marker.on('dragend', function (event) {
                         const position = marker.getLatLng();
                         document.getElementById('latitudeInput').value = position.lat.toFixed(7);
                         document.getElementById('longitudeInput').value = position.lng.toFixed(7);
                     });
                 }
-                
+
                 marker.bindPopup('<b>📍 Lokasi Device</b><br>Lat: ' + lat + '<br>Lng: ' + lng).openPopup();
             });
-            
+
             // Fix map display issue when in tabs/hidden containers
-            setTimeout(function() {
+            setTimeout(function () {
                 map.invalidateSize();
             }, 100);
         });
