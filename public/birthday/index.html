@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎂 Happy Birthday!</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Great+Vibes&family=Montserrat:wght@300;400;500;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <!-- Opening Screen - Balloon Pop -->
+    <div class="opening-screen" id="openingScreen">
+        <div class="balloons-container" id="balloonsContainer"></div>
+        <div class="pop-particles" id="popParticles"></div>
+    </div>
+
+    <!-- Stars Background -->
+    <div id="stars"></div>
+
+    <!-- Confetti Canvas -->
+    <canvas id="confetti"></canvas>
+
+    <!-- Main Content Wrapper -->
+    <div class="main-wrapper" id="mainWrapper">
+        <!-- Slides Container -->
+        <div class="slides-container">
+
+            <!-- Slide 1: Opening -->
+            <section class="slide slide-1 active">
+                <div class="content">
+                    <div class="sparkles">
+                        <span>✨</span><span>✨</span><span>✨</span>
+                    </div>
+                    <p class="pre-title">✨ Today We Celebrate ✨</p>
+                    <h1 class="main-title">
+                        <span class="word">Happy</span>
+                        <span class="word">Birthday</span>
+                    </h1>
+                    <div class="title-decoration">
+                        <span class="line"></span>
+                        <span class="star">⭐</span>
+                        <span class="line"></span>
+                    </div>
+                    <h2 class="birthday-name">Lizz</h2>
+                    <p class="subtitle">Wishing You a Magical Day!</p>
+                    <div class="floating-emojis">
+                        <span>🎈</span><span>🎁</span><span>🌟</span>
+                        <span>💖</span><span>🎂</span><span>🎉</span>
+                    </div>
+                </div>
+                <div class="scroll-hint">
+                    <div class="mouse">
+                        <div class="wheel"></div>
+                    </div>
+                    <span>Scroll Down</span>
+                </div>
+            </section>
+
+            <!-- Slide 2: Quote -->
+            <section class="slide slide-2">
+                <div class="content">
+                    <div class="quote-box">
+                        <div class="quote-marks">"</div>
+                        <p class="quote-text">
+                            Another year of <em>beautiful memories</em>,<br>
+                            another chapter of <em>amazing adventures</em>,<br>
+                            another chance to <em>chase your dreams</em>.
+                        </p>
+                        <p class="quote-author">— Birthday Wishes</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Slide 3: Age -->
+            <section class="slide slide-3">
+                <div class="content">
+                    <h2 class="celebrating">Celebrating</h2>
+                    <div class="age-wrapper">
+                        <div class="age-glow"></div>
+                        <div class="age-number" data-age="25">0</div>
+                    </div>
+                    <h3 class="years-text">Years of Being <span>Wonderful</span></h3>
+                    <div class="cake-3d">
+                        <div class="cake-emoji">🎂</div>
+                        <div class="candle-flames">
+                            <span class="mini-flame">🔥</span>
+                            <span class="mini-flame">🔥</span>
+                            <span class="mini-flame">🔥</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Slide 4: Wishes -->
+            <section class="slide slide-4">
+                <div class="content">
+                    <h2 class="section-title">💝 Heartfelt Wishes 💝</h2>
+                    <div class="wishes-grid">
+                        <div class="wish-card">
+                            <div class="card-shine"></div>
+                            <div class="icon">💝</div>
+                            <h3>Love & Happiness</h3>
+                            <p>May your heart be filled with love so pure, and happiness that will forever endure.</p>
+                        </div>
+                        <div class="wish-card">
+                            <div class="card-shine"></div>
+                            <div class="icon">⭐</div>
+                            <h3>Dreams Come True</h3>
+                            <p>May every dream you've ever dreamed come true, and every star shine bright for you.</p>
+                        </div>
+                        <div class="wish-card">
+                            <div class="card-shine"></div>
+                            <div class="icon">🌈</div>
+                            <h3>Bright Future</h3>
+                            <p>May your path be illuminated with success, joy, and endless possibilities.</p>
+                        </div>
+                        <div class="wish-card">
+                            <div class="card-shine"></div>
+                            <div class="icon">💎</div>
+                            <h3>Precious Moments</h3>
+                            <p>May you treasure every moment and create memories worth a lifetime.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Slide 5: Letter -->
+            <section class="slide slide-5">
+                <div class="content">
+                    <div class="letter-card" id="letterCard">
+                        <div class="letter-front">
+                            <div class="envelope-design">
+                                <div class="envelope-flap"></div>
+                                <div class="seal">💌</div>
+                            </div>
+                            <p class="tap-text">Tap to read your letter</p>
+                        </div>
+                        <div class="letter-back">
+                            <div class="letter-content">
+                                <h2>Dear Beautiful Soul,</h2>
+                                <p>On this magical day, I want you to know that you are one of the most incredible
+                                    people I've ever known.</p>
+                                <p>Your smile lights up every room. Your kindness touches every heart. Your presence
+                                    makes the world a better place.</p>
+                                <p>As you begin this new chapter, may it be filled with love, laughter, success, and
+                                    everything your heart desires.</p>
+                                <p>You deserve all the happiness in the universe!</p>
+                                <div class="signature">
+                                    <p>With endless love,</p>
+                                    <p class="name">Your Biggest Fan 💝</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Slide 6: Finale -->
+            <section class="slide slide-6">
+                <div class="content">
+                    <h1 class="finale-title">✨ Make a Wish! ✨</h1>
+                    <div class="candle-container">
+                        <div class="candle">
+                            <div class="flame" id="flame">
+                                <div class="flame-inner"></div>
+                            </div>
+                            <div class="candle-body">
+                                <div class="stripes"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="blow-text" id="blowText">🌬️ Click the flame to make your wish!</p>
+                    <div class="wish-made" id="wishMade">
+                        <p>✨ Your wish has been sent to the stars! ✨</p>
+                    </div>
+                    <div class="final-message">
+                        <h2>Happy Birthday!</h2>
+                        <p>May all your wishes come true</p>
+                        <div class="emoji-row">
+                            <span>🎊</span><span>🎉</span><span>🥳</span><span>🎈</span><span>🎁</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </div>
+
+    <!-- Navigation Dots -->
+    <nav class="nav-dots">
+        <span class="dot active" data-slide="0"></span>
+        <span class="dot" data-slide="1"></span>
+        <span class="dot" data-slide="2"></span>
+        <span class="dot" data-slide="3"></span>
+        <span class="dot" data-slide="4"></span>
+        <span class="dot" data-slide="5"></span>
+    </nav>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
