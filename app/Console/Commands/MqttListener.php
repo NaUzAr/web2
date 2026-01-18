@@ -30,10 +30,15 @@ class MqttListener extends Command
      */
     public function handle()
     {
-        $host = $this->option('host');
-        $port = (int) $this->option('port');
-        $username = $this->option('username');
-        $password = $this->option('password');
+        // Baca dari .env dulu, jika tidak ada gunakan option/default
+        $host = $this->option('host') !== 'localhost'
+            ? $this->option('host')
+            : env('MQTT_HOST', 'localhost');
+        $port = (int) ($this->option('port') !== 1883
+            ? $this->option('port')
+            : env('MQTT_PORT', 1883));
+        $username = $this->option('username') ?: env('MQTT_USERNAME');
+        $password = $this->option('password') ?: env('MQTT_PASSWORD');
 
         $this->info("🚀 Starting MQTT Listener...");
         $this->info("   Broker: {$host}:{$port}");
