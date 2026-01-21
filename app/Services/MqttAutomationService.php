@@ -32,7 +32,7 @@ class MqttAutomationService
     {
         try {
             $mqtt = $this->connect();
-            $topic = "{$mqttTopic}/control";
+            $topic = rtrim($mqttTopic, '/') . '/pub';
 
             $configPayloads = array_map(function ($config) {
                 return is_object($config) ? $config->toMqttPayload() : $config;
@@ -75,7 +75,7 @@ class MqttAutomationService
     {
         try {
             $mqtt = $this->connect();
-            $topic = "{$mqttTopic}/control";
+            $topic = rtrim($mqttTopic, '/') . '/pub';
 
             $message = json_encode([
                 'type' => 'automation_delete',
@@ -112,7 +112,7 @@ class MqttAutomationService
     {
         try {
             $mqtt = $this->connect();
-            $topic = "{$mqttTopic}/control";
+            $topic = rtrim($mqttTopic, '/') . '/pub';
 
             $message = json_encode([
                 'type' => 'status_request',
@@ -145,7 +145,7 @@ class MqttAutomationService
     {
         try {
             $mqtt = $this->connect();
-            $topic = "{$mqttTopic}/control";
+            $topic = rtrim($mqttTopic, '/') . '/pub';
 
             $message = json_encode([
                 'type' => 'manual_control',

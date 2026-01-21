@@ -241,7 +241,7 @@ class MonitoringController extends Controller
         // Publish ke MQTT untuk kirim perintah ke device
         try {
             $device = $userDevice->device;
-            $topic = $device->mqtt_topic . '/control';
+            $topic = rtrim($device->mqtt_topic, '/') . '/pub';
 
             // Format simpel: <output#value>
             $message = sprintf('<%s#%s>', $output->output_name, $newValue);

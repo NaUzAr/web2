@@ -63,37 +63,22 @@ class MqttListener extends Command
 
             $this->info("✅ Connected to MQTT Broker!");
 
-            // Get all devices and subscribe to their topics
+            // Get all devices and subscribe to their topics + /sub
             $devices = Device::all();
 
             if ($devices->isEmpty()) {
                 $this->warn("⚠️  No devices found. Create devices first via admin panel.");
-                $this->info("   Listening for wildcard topic: sensor/#");
-
-                $mqtt->subscribe('sensor/#', function ($topic, $message) {
-                    $this->processMessage($topic, $message);
-                }, 0);
             } else {
                 foreach ($devices as $device) {
-                    $topic = $device->mqtt_topic;
-                    $this->info("📡 Subscribed to: {$topic}");
+                    // Subscribe to {mqtt_topic}/sub (mesin kirim ke server)
+                    $subTopic = rtrim($device->mqtt_topic, '/') . '/sub';
+                    $this->info("📡 Subscribed to: {$subTopic} (Device: {$device->name})");
 
-                    $mqtt->subscribe($topic, function ($topic, $message) {
+                    $mqtt->subscribe($subTopic, function ($topic, $message) {
                         $this->processMessage($topic, $message);
                     }, 0);
                 }
-
-                // Also subscribe to wildcard for new devices
-                $mqtt->subscribe('sensor/#', function ($topic, $message) {
-                    $this->processMessage($topic, $message);
-                }, 0);
             }
-
-            // Subscribe to device status topic (device-as-master)
-            $this->info("📡 Subscribed to: devices/+/status (Device Status)");
-            $mqtt->subscribe('devices/+/status', function ($topic, $message) {
-                $this->processDeviceStatus($topic, $message);
-            }, 1);
 
             $this->info("");
             $this->info("👂 Listening for messages... (Press Ctrl+C to stop)");
@@ -139,7 +124,14 @@ class MqttListener extends Command
             }
 
             // Cari device berdasarkan topic ATAU token
-            $device = Device::where('mqtt_topic', $topic)->first();
+            // Topic yang diterima: {mqtt_topic}/sub, tapi di DB hanya {mqtt_topic}
+            $baseTopic = preg_replace('/\/sub$/', '', $topic);
+            $device = Device::where('mqtt_topic', $baseTopic)->first();
+
+            // Fallback: cari dengan topic asli
+            if (!$device) {
+                $device = Device::where('mqtt_topic', $topic)->first();
+            }
 
             if (!$device && isset($data['token'])) {
                 $device = Device::where('token', $data['token'])->first();
@@ -206,7 +198,7 @@ class MqttListener extends Command
 
     /**
      * Save sensor data to database (Counter 1)
-     * Uses mqtt_key from device_sensors for flexible ESP32 key mapping
+     * Uses hardcoded mapping for ESP32 keys to database columns
      */
     private function saveSensorData($device, $data)
     {
@@ -219,19 +211,68 @@ class MqttListener extends Command
             return;
         }
 
+        // Hardcoded mapping: ESP32 key => DB column
+        // Tambahkan mapping baru disini jika ada sensor baru
+        $keyMapping = [
+            // === SENSOR DATA (Counter 1 dari ESP32) ===
+            // Primary sensors
+            'ni_PH' => 'ni_PH',
+            'ni_EC' => 'ni_EC',
+            'ni_TDS' => 'ni_TDS',
+            'ni_LUX' => 'ni_LUX',
+            'ni_SUHU' => 'ni_SUHU',
+            'ni_KELEM' => 'ni_KELEM',
+
+            // Weather sensors
+            'rainfall' => 'rainfall',
+            'wind_speed' => 'wind_speed',
+            'wind_direction' => 'wind_direction',
+            'pressure' => 'pressure',
+            'uv_index' => 'uv_index',
+
+            // Soil sensors
+            'soil_moisture' => 'soil_moisture',
+            'soil_temperature' => 'soil_temperature',
+            'soil_ph' => 'soil_ph',
+
+            // Other sensors
+            'water_level' => 'water_level',
+            'co2' => 'co2',
+
+            // === ALIAS untuk multiple sensor (tambahkan angka di belakang) ===
+            'ni_SUHU_2' => 'ni_SUHU_2',
+            'ni_KELEM_2' => 'ni_KELEM_2',
+            'ni_PH_2' => 'ni_PH_2',
+            'ni_EC_2' => 'ni_EC_2',
+            'ni_TDS_2' => 'ni_TDS_2',
+            'ni_LUX_2' => 'ni_LUX_2',
+
+            // === Legacy/Alternative keys (jika ESP32 pakai format lain) ===
+            'temperature' => 'ni_SUHU',
+            'temperature_1' => 'ni_SUHU',
+            'temperature_2' => 'ni_SUHU_2',
+            'humidity' => 'ni_KELEM',
+            'humidity_1' => 'ni_KELEM',
+            'humidity_2' => 'ni_KELEM_2',
+            'ph' => 'ni_PH',
+            'ec' => 'ni_EC',
+            'tds' => 'ni_TDS',
+            'light' => 'ni_LUX',
+            'light_intensity' => 'ni_LUX',
+            'lux' => 'ni_LUX',
+        ];
+
         $insertData = ['recorded_at' => now()];
 
-        // Get sensor columns from device config and match by mqtt_key
-        $sensors = $device->sensors;
-        foreach ($sensors as $sensor) {
-            // mqtt_key adalah key yang dikirim dari ESP32 (contoh: ni_PH)
-            // sensor_name adalah nama kolom di database (contoh: ph atau ni_PH)
-            $mqttKey = $sensor->mqtt_key ?? $sensor->sensor_name;
-            $dbColumn = $sensor->sensor_name;
+        // Cek setiap key di data, mapping ke DB column
+        foreach ($data as $espKey => $value) {
+            // Cari mapping, jika tidak ada pakai key asli
+            $dbColumn = $keyMapping[$espKey] ?? $espKey;
 
-            if (isset($data[$mqttKey])) {
-                $insertData[$dbColumn] = (float) $data[$mqttKey];
-                $this->line("           • {$mqttKey} → {$dbColumn}: " . $data[$mqttKey]);
+            // Cek apakah kolom ada di tabel
+            if (\Schema::hasColumn($tableName, $dbColumn)) {
+                $insertData[$dbColumn] = (float) $value;
+                $this->line("           • {$espKey} → {$dbColumn}: {$value}");
             }
         }
 
@@ -242,6 +283,7 @@ class MqttListener extends Command
         } else {
             $this->warn("           ⚠️  No matching sensor data found");
             $this->line("           Available keys in data: " . implode(', ', array_keys($data)));
+            $this->line("           Available mappings: " . implode(', ', array_keys($keyMapping)));
         }
     }
 

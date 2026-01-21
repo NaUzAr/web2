@@ -33,8 +33,8 @@ class MqttScheduleService
     {
         try {
             $mqtt = $this->connect();
-            // Gunakan mqtt_topic dari device + /control
-            $topic = "{$mqttTopic}/control";
+            // Gunakan mqtt_topic dari device + /pub
+            $topic = rtrim($mqttTopic, '/') . '/pub';
 
             $message = json_encode([
                 'type' => 'time_schedule',
@@ -81,7 +81,7 @@ class MqttScheduleService
     {
         try {
             $mqtt = $this->connect();
-            $topic = "{$mqttTopic}/control";
+            $topic = rtrim($mqttTopic, '/') . '/pub';
 
             // Build message based on automation mode
             switch ($automationMode) {
@@ -158,7 +158,7 @@ class MqttScheduleService
     {
         try {
             $mqtt = $this->connect();
-            $topic = "{$mqttTopic}/control";
+            $topic = rtrim($mqttTopic, '/') . '/pub';
 
             // Format simple: <set#output#operator#threshold>
             $message = sprintf(
@@ -194,7 +194,7 @@ class MqttScheduleService
     {
         try {
             $mqtt = $this->connect();
-            $topic = "{$mqttTopic}/control";
+            $topic = env('MQTT_TOPIC_PUB', '/smartgh01/pub');
 
             $message = json_encode([
                 'type' => 'status_request',
