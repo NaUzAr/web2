@@ -444,6 +444,11 @@
                     {{ strtoupper($device->type ?? 'DEVICE') }}
                 </span>
                 @if(!($isAdminView ?? false))
+                    @if($scheduleConfig ?? false)
+                        <a href="{{ route('schedule.index', $userDevice->id) }}" class="btn-glass">
+                            <i class="bi bi-calendar-check me-1"></i> Jadwal
+                        </a>
+                    @endif
                     <button type="button" class="btn-glass" data-bs-toggle="modal" data-bs-target="#exportModal">
                         <i class="bi bi-download me-1"></i> Download CSV
                     </button>
@@ -464,7 +469,7 @@
                                 <i class="bi bi-thermometer-half text-white"></i>
                             </div>
                             <div class="sensor-label">{{ $sensor->sensor_label }}</div>
-                            <div class="sensor-value">
+                            <div class="sensor-value" id="sensor-val-{{ $sensor->id }}">
                                 @if($value !== null)
                                     {{ number_format($value, 1) }}
                                 @else
@@ -530,17 +535,8 @@
                                     </div>
                                 @endif
 
-                                {{-- Schedule button - only for user view --}}
-                                <div class="mt-2">
-                                    @if(!($isAdminView ?? false) && $output->automation_mode !== 'none')
-                                        <a href="{{ route('schedule.index', [$userDevice->id, $output->id]) }}"
-                                            class="btn btn-sm btn-outline-light w-100" style="font-size: 0.75rem;">
-                                            <i class="bi bi-calendar-check"></i> Schedule
-                                        </a>
-                                    @else
-                                        <div style="height: 31px;"></div>
-                                    @endif
-                                </div>
+                                {{-- Schedule button was here, now in header --}}
+                                <div class="mt-2" style="height: 31px;"></div>
                             </div>
                         </div>
                     @endforeach
@@ -1012,6 +1008,93 @@
                 if (valueEl) {
                     valueEl.textContent = value + unit;
                 }
+            }
+
+            // Auto-reload status every 2 seconds
+            setInterval(fetchStatus, 2000);
+
+            async function fetchStatus() {
+                try {
+                    @if($isAdminView ?? false)
+                        const response = await fetch('{{ route("admin.device.status", $device->id) }}');
+                    @else
+                        const response = await fetch('{{ route("monitoring.status", $userDevice->id) }}');
+                    @endif
+                    const data = await response.json();
+
+                    if (data.success) {
+                        if (data.outputs) {
+                            updateOutputs(data.outputs);
+                        }
+                        if (data.sensors) {
+                            updateSensors(data.sensors);
+                        }
+                    }
+                } catch (error) {
+                    console.error('Polling error:', error);
+                }
+            }
+
+            // Map sensor name to ID using PHP array
+            const sensorMap = @json($sensors->pluck('id', 'sensor_name'));
+
+            function updateSensors(sensorData) {
+                // key is sensor_name (e.g. ni_PH), value is the reading
+                for (const [key, value] of Object.entries(sensorData)) {
+                    if (sensorMap[key]) {
+                        const sensorId = sensorMap[key];
+                        const el = document.getElementById(`sensor-val-${sensorId}`);
+                        if (el) {
+                            // Format number to 1 decimal place if it's a number
+                            const num = parseFloat(value);
+                            el.innerText = !isNaN(num) ? num.toFixed(1) : value;
+                        }
+                    }
+                }
+            }
+
+            function updateOutputs(outputs) {
+                outputs.forEach(output => {
+                    // Update Boolean Outputs (Buttons)
+                    const btnOn = document.getElementById(`btn-on-${output.id}`);
+                    const btnOff = document.getElementById(`btn-off-${output.id}`);
+                    const statusEl = document.getElementById(`output-status-${output.id}`);
+
+                    if (btnOn && btnOff && statusEl) {
+                        const isOn = parseFloat(output.value) > 0;
+
+                        if (isOn) {
+                            btnOn.classList.remove('btn-outline-success');
+                            btnOn.classList.add('btn-success');
+                            btnOff.classList.remove('btn-danger');
+                            btnOff.classList.add('btn-outline-danger');
+                            statusEl.className = 'output-status on';
+                            statusEl.innerText = 'ON';
+                        } else {
+                            btnOn.classList.remove('btn-success');
+                            btnOn.classList.add('btn-outline-success');
+                            btnOff.classList.remove('btn-outline-danger');
+                            btnOff.classList.add('btn-danger');
+                            statusEl.className = 'output-status off';
+                            statusEl.innerText = 'OFF';
+                        }
+                    }
+
+                    // Update Range/Slider Outputs
+                    const slider = document.getElementById(`output-${output.id}`);
+                    const valueDisplay = document.getElementById(`output-value-${output.id}`);
+
+                    if (slider && document.activeElement !== slider) {
+                        slider.value = output.value;
+                        if (valueDisplay) {
+                            // Extract unit from existing text or data attribute (simplification needed?)
+                            // Assuming unit is static suffix for now or extract last non-digits
+                            const currentText = valueDisplay.innerText;
+                            const unit = currentText.replace(/[0-9\.]/g, '');
+                            valueDisplay.innerText = parseInt(output.value) + unit;
+                        }
+                    }
+                });
             }
         </script>
     @endif

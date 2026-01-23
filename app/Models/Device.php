@@ -40,6 +40,14 @@ class Device extends Model
     }
 
     /**
+     * Relasi ke DeviceSchedule (satu device punya banyak schedule)
+     */
+    public function schedules()
+    {
+        return $this->hasMany(DeviceSchedule::class);
+    }
+
+    /**
      * Relasi ke OutputAutomationConfig (satu device punya banyak automation configs)
      */
     public function automationConfigs()
@@ -179,7 +187,19 @@ class Device extends Model
             'servo' => ['label' => 'Servo Motor', 'type' => 'number', 'unit' => '°', 'icon' => 'bi-arrow-repeat'],
             'heater' => ['label' => 'Pemanas/Heater', 'type' => 'boolean', 'unit' => '', 'icon' => 'bi-thermometer-high'],
             'sprinkler' => ['label' => 'Sprinkler', 'type' => 'boolean', 'unit' => '', 'icon' => 'bi-cloud-drizzle'],
-            // Tambahkan output baru di sini
+
+            // Custom Outputs (User Request)
+            'sts_air_input' => ['label' => 'Air Input', 'type' => 'boolean', 'unit' => '', 'icon' => 'bi-arrow-right-circle'],
+            'sts_mixing' => ['label' => 'Mixing Process', 'type' => 'boolean', 'unit' => '', 'icon' => 'bi-arrow-repeat'],
+            'sts_pompa' => ['label' => 'Pompa Utama', 'type' => 'boolean', 'unit' => '', 'icon' => 'bi-droplet-fill'],
+            'sts_fan' => ['label' => 'Kipas Exhaust', 'type' => 'boolean', 'unit' => '', 'icon' => 'bi-fan'],
+            'sts_misting' => ['label' => 'Misting/Kabut', 'type' => 'boolean', 'unit' => '', 'icon' => 'bi-cloud-fog'],
+            'sts_lampu' => ['label' => 'Lampu Grow Light', 'type' => 'boolean', 'unit' => '', 'icon' => 'bi-lightbulb-fill'],
+            'sts_dosing' => ['label' => 'Dosing Pump', 'type' => 'boolean', 'unit' => '', 'icon' => 'bi-eyedropper'],
+            'sts_ph_up' => ['label' => 'pH Up Pump', 'type' => 'boolean', 'unit' => '', 'icon' => 'bi-arrow-up-circle'],
+            'sts_ph_down' => ['label' => 'pH Down Pump', 'type' => 'boolean', 'unit' => '', 'icon' => 'bi-arrow-down-circle'],
+            'sts_air_baku' => ['label' => 'Air Baku Valve', 'type' => 'boolean', 'unit' => '', 'icon' => 'bi-water'],
+            'sts_air_pupuk' => ['label' => 'Air Pupuk Valve', 'type' => 'boolean', 'unit' => '', 'icon' => 'bi-flower1'],
         ];
     }
 
@@ -203,5 +223,57 @@ class Device extends Model
         ];
 
         return $defaults[$type] ?? [];
+    }
+
+    /**
+     * =====================================================
+     * KONFIGURASI SCHEDULE DEVICE
+     * =====================================================
+     */
+
+    /**
+     * Daftar Tipe Penjadwalan yang Tersedia
+     * Format: 'schedule_key' => ['label' => 'Label', 'description' => 'Deskripsi', 'icon' => 'bi-icon']
+     * Mode: 
+     *   - time: Waktu mulai dan selesai (contoh: 08:00 - 17:00)
+     *   - time_duration: Waktu mulai + durasi menit (contoh: 08:00, durasi 5 menit)
+     *   - time_days: Waktu + pilihan hari
+     *   - time_days_duration: Waktu + hari + durasi
+     *   - time_days_sector: Waktu + hari + sektor
+     */
+    public static function getAvailableScheduleTypes(): array
+    {
+        return [
+            'time' => [
+                'label' => 'Waktu Mulai-Selesai',
+                'description' => 'Set jam mulai dan jam selesai',
+                'icon' => 'bi-clock'
+            ],
+            'time_duration' => [
+                'label' => 'Waktu + Durasi',
+                'description' => 'Set jam mulai dan durasi (menit)',
+                'icon' => 'bi-stopwatch'
+            ],
+            'time_days' => [
+                'label' => 'Waktu + Hari',
+                'description' => 'Set jam mulai-selesai dan pilih hari',
+                'icon' => 'bi-calendar-week'
+            ],
+            'time_days_duration' => [
+                'label' => 'Waktu + Hari + Durasi',
+                'description' => 'Set jam mulai, durasi, dan pilih hari',
+                'icon' => 'bi-calendar-check'
+            ],
+            'time_days_sector' => [
+                'label' => 'Waktu + Hari + Sektor',
+                'description' => 'Set jam, hari, dan sektor (untuk irigasi multi-zona)',
+                'icon' => 'bi-grid-3x3'
+            ],
+            'time_days_duration_sector' => [
+                'label' => 'Waktu + Hari + Durasi + Sektor',
+                'description' => 'Set jam, durasi, hari, dan sektor',
+                'icon' => 'bi-grid-fill'
+            ],
+        ];
     }
 }

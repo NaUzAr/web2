@@ -114,7 +114,10 @@ class MonitoringController extends Controller
             $logData = new \Illuminate\Pagination\LengthAwarePaginator([], 0, 20);
         }
 
-        return view('monitoring.show', compact('userDevice', 'device', 'sensors', 'outputs', 'logData', 'chartData', 'latestData'));
+        // Ambil konfigurasi jadwal jika ada
+        $scheduleConfig = $device->schedules()->first();
+
+        return view('monitoring.show', compact('userDevice', 'device', 'sensors', 'outputs', 'logData', 'chartData', 'latestData', 'scheduleConfig'));
     }
 
     /**
@@ -241,7 +244,7 @@ class MonitoringController extends Controller
         // Publish ke MQTT untuk kirim perintah ke device
         try {
             $device = $userDevice->device;
-            $topic = rtrim($device->mqtt_topic, '/') . '/pub';
+            $topic = rtrim($device->mqtt_topic, '/') . '/sub';
 
             // Format simpel: <output#value>
             $message = sprintf('<%s#%s>', $output->output_name, $newValue);
@@ -279,6 +282,45 @@ class MonitoringController extends Controller
             'output_name' => $output->output_name,
             'new_value' => $newValue,
             'message' => "Output {$output->output_label} berhasil diupdate!",
+        ]);
+    }
+    /**
+     * Get real-time status (outputs & latest sensor data)
+     * Polled by frontend
+     */
+    public function getStatus($id)
+    {
+        // Validasi user punya akses
+        $userDevice = UserDevice::with(['device.outputs'])
+            ->where('user_id', Auth::id())
+            ->where('id', $id)
+            ->firstOrFail();
+
+        $device = $userDevice->device;
+
+        // Get Output States
+        $outputs = $device->outputs->map(function ($output) {
+            return [
+                'id' => $output->id,
+                'name' => $output->output_name,
+                'value' => $output->current_value,
+                'label' => $output->output_label
+            ];
+        });
+
+        // Get Latest Sensor Data
+        $latestSensorData = null;
+        if ($device->table_name && \Schema::hasTable($device->table_name)) {
+            $latestSensorData = DB::table($device->table_name)
+                ->orderBy('recorded_at', 'desc')
+                ->first();
+        }
+
+        return response()->json([
+            'success' => true,
+            'outputs' => $outputs,
+            'sensors' => $latestSensorData,
+            'timestamp' => now()->toIso8601String()
         ]);
     }
 }

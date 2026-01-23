@@ -70,8 +70,8 @@ class MqttListener extends Command
                 $this->warn("⚠️  No devices found. Create devices first via admin panel.");
             } else {
                 foreach ($devices as $device) {
-                    // Subscribe to {mqtt_topic}/sub (mesin kirim ke server)
-                    $subTopic = rtrim($device->mqtt_topic, '/') . '/sub';
+                    // Subscribe to {mqtt_topic}/pub (mesin publish ke topic ini, server listen)
+                    $subTopic = rtrim($device->mqtt_topic, '/') . '/pub';
                     $this->info("📡 Subscribed to: {$subTopic} (Device: {$device->name})");
 
                     $mqtt->subscribe($subTopic, function ($topic, $message) {
@@ -107,15 +107,36 @@ class MqttListener extends Command
         $this->line("           Raw: {$message}");
 
         try {
-            // Extract JSON from wrapper <dat|{JSON}|>
-            $data = null;
-            if (preg_match('/<dat\|(.*?)\|>/', $message, $matches)) {
-                $jsonString = $matches[1];
-                $data = json_decode($jsonString, true);
-                $this->line("           Parsed: {$jsonString}");
-            } else {
-                // Fallback: try direct JSON parse
-                $data = json_decode($message, true);
+            // Try to parse JSON
+            $data = json_decode($message, true);
+
+            // AUTO-FIX: Attempt to fix common malformed JSON from Arduino (unquoted strings)
+            // Example: {"waktu":Jumat...} -> {"waktu":"Jumat..."}
+            if (!$data) {
+                // AUTO-FIX 1: Remove trailing commas in objects (e.g. {"a":1,})
+                // Look for comma followed immediately by }
+                $fixedMessage = preg_replace('/,(\s*})/', '$1', $message);
+                $data = json_decode($fixedMessage, true);
+
+                if (!$data) {
+                    // AUTO-FIX 2: Handle unquoted strings + trailing commas combined
+                    // First regex: wrap unquoted values (alphanumeric+symbols) in quotes
+                    $fixedMessage = preg_replace('/:\s*([a-zA-Z0-9_\-\.\:\s]+?)\s*([,}])/', ':"$1"$2', $message);
+                    // Second regex: remove trailing commas again (in case they existed)
+                    $fixedMessage = preg_replace('/,(\s*})/', '$1', $fixedMessage);
+                    $data = json_decode($fixedMessage, true);
+                }
+
+                if ($data) {
+                    $this->line("           🔧 Auto-fixed JSON");
+                }
+            }
+
+            if (!$data) {
+                // Fallback: Try wrapper <dat|...|>
+                if (preg_match('/<dat\|(.*?)\|>/', $message, $matches)) {
+                    $data = json_decode($matches[1], true);
+                }
             }
 
             if (!$data) {
@@ -125,7 +146,7 @@ class MqttListener extends Command
 
             // Cari device berdasarkan topic ATAU token
             // Topic yang diterima: {mqtt_topic}/sub, tapi di DB hanya {mqtt_topic}
-            $baseTopic = preg_replace('/\/sub$/', '', $topic);
+            $baseTopic = preg_replace('/\/pub$/', '', $topic);
             $device = Device::where('mqtt_topic', $baseTopic)->first();
 
             // Fallback: cari dengan topic asli
@@ -154,35 +175,51 @@ class MqttListener extends Command
     /**
      * Process data based on type (counter 1-7 from ESP32)
      */
+    /**
+     * Process data based on type (counter 1-7 from ESP32)
+     */
     private function processDataByType($device, $data)
     {
-        // Counter 1: Sensor Data (ni_PH, ni_EC, ni_TDS, ni_LUX, ni_SUHU, ni_KELEM)
-        if (isset($data['ni_PH']) || isset($data['ni_SUHU']) || isset($data['ni_EC'])) {
-            $this->saveSensorData($device, $data);
-            return;
-        }
+        $keys = array_keys($data);
 
-        // Counter 2 & 3: Schedule Data (sch1-sch14)
-        if (isset($data['sch1']) || isset($data['sch8'])) {
+        // Helper to check if any key starts with prefix
+        $hasPrefix = function ($prefix) use ($keys) {
+            foreach ($keys as $key) {
+                if (str_starts_with($key, $prefix))
+                    return true;
+            }
+            return false;
+        };
+
+        // Counter 2 & 3: Schedule Data (sch*)
+        if ($hasPrefix('sch')) {
             $this->logScheduleData($device, $data);
             return;
         }
 
-        // Counter 4: Threshold/Batas Data (bts_ats_*, bts_bwh_*)
-        if (isset($data['bts_ats_suhu']) || isset($data['bts_bwh_suhu'])) {
+        // Counter 6: Status Output (sts_*)
+        // Check for sts_ prefix OR known status keys
+        if ($hasPrefix('sts_')) {
+            $this->logStatusData($device, $data);
+            return;
+        }
+
+        // Counter 1: Sensor Data (ni_*, rainfall, etc)
+        // Check if typical sensor keys exist
+        if ($hasPrefix('ni_') || isset($data['rainfall']) || isset($data['soil_moisture'])) {
+            $this->saveSensorData($device, $data);
+            return;
+        }
+
+        // Counter 4: Threshold/Batas Data (bts_*)
+        if ($hasPrefix('bts_')) {
             $this->logThresholdData($device, $data);
             return;
         }
 
-        // Counter 5: Mode Data (mode_dos, mode_clim)
-        if (isset($data['mode_dos']) || isset($data['mode_clim'])) {
+        // Counter 5: Mode Data (mode_*)
+        if ($hasPrefix('mode_')) {
             $this->logModeData($device, $data);
-            return;
-        }
-
-        // Counter 6: Status Output (sts_*)
-        if (isset($data['sts_pompa']) || isset($data['sts_fan']) || isset($data['sts_air_input'])) {
-            $this->logStatusData($device, $data);
             return;
         }
 
@@ -192,7 +229,7 @@ class MqttListener extends Command
             return;
         }
 
-        // Unknown data type - try legacy sensor format
+        // Unknown data type - try legacy sensor format as fallback
         $this->saveSensorData($device, $data);
     }
 
@@ -353,32 +390,42 @@ class MqttListener extends Command
     /**
      * Log status output data (Counter 6)
      */
+    /**
+     * Log status output data (Counter 6)
+     */
     private function logStatusData($device, $data)
     {
         $this->info("           🔌 Type: STATUS OUTPUT");
 
-        $outputs = [
-            'sts_air_input' => 'Air Input',
-            'sts_mixing' => 'Mixing',
-            'sts_pompa' => 'Pompa',
-            'sts_fan' => 'Fan',
-            'sts_misting' => 'Misting',
-            'sts_lampu' => 'Lampu',
-            'sts_dosing' => 'Dosing',
-            'sts_ph_up' => 'pH Up',
-            'sts_air_baku' => 'Air Baku',
-            'sts_air_pupuk' => 'Air Pupuk',
-            'sts_ph_down' => 'pH Down',
-        ];
+        $updatesCount = 0;
 
-        foreach ($outputs as $key => $label) {
-            if (isset($data[$key])) {
-                $status = $data[$key] ? "🟢 ON" : "🔴 OFF";
-                $this->line("           • {$label}: {$status}");
+        // Iterate any key starting with sts_
+        foreach ($data as $key => $value) {
+            if (str_starts_with($key, 'sts_')) {
+                $label = ucwords(str_replace('sts_', '', str_replace('_', ' ', $key)));
+
+                // Allow integer/boolean values
+                $status = $value ? "🟢 ON" : "🔴 OFF";
+                $this->line("           • {$label} ({$key}): {$status}");
+
+                // Save to Database
+                $output = \App\Models\DeviceOutput::where('device_id', $device->id)
+                    ->where('output_name', $key)
+                    ->first();
+
+                if ($output) {
+                    $output->current_value = (float) $value;
+                    $output->save();
+                    $updatesCount++;
+                }
             }
         }
 
-        $this->info("           ✅ Status received");
+        if ($updatesCount > 0) {
+            $this->info("           ✅ Updated {$updatesCount} outputs in database");
+        } else {
+            $this->info("           ✅ Status received (No DB updates)");
+        }
     }
 
     /**

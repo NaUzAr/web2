@@ -34,7 +34,7 @@ class MqttScheduleService
         try {
             $mqtt = $this->connect();
             // Gunakan mqtt_topic dari device + /pub
-            $topic = rtrim($mqttTopic, '/') . '/pub';
+            $topic = rtrim($mqttTopic, '/') . '/sub';
 
             $message = json_encode([
                 'type' => 'time_schedule',
@@ -81,11 +81,12 @@ class MqttScheduleService
     {
         try {
             $mqtt = $this->connect();
-            $topic = rtrim($mqttTopic, '/') . '/pub';
+            $topic = rtrim($mqttTopic, '/') . '/sub';
 
             // Build message based on automation mode
             switch ($automationMode) {
                 case 'time_days_sector':
+                case 'time_days_duration_sector':
                     // Format: <jdw{id}#{output}#{on}#{off}#{days}#{sector}#>
                     $message = sprintf(
                         '<jdw%d#%s#%s#%s#%s#%d#>',
@@ -99,6 +100,7 @@ class MqttScheduleService
                     break;
 
                 case 'time_days':
+                case 'time_days_duration': // Treat duration mode same as normal days since off-time is calculated
                     // Format: <jdw{id}#{output}#{on}#{off}#{days}#>
                     $message = sprintf(
                         '<jdw%d#%s#%s#%s#%s#>',
@@ -111,6 +113,7 @@ class MqttScheduleService
                     break;
 
                 case 'time':
+                case 'time_duration': // Treat duration mode same as normal time
                 default:
                     // Format: <jdw{id}#{output}#{on}#{off}#>
                     $message = sprintf(

@@ -365,9 +365,49 @@
 
                                 <div id="outputContainer"></div>
 
-                                <button type="button" class="btn btn-outline-add w-100" onclick="addOutputRow()">
+                                <button type="button" class="btn btn-outline-add w-100 mt-3" onclick="addOutputRow()">
                                     <i class="bi bi-plus-circle me-1"></i> Tambah Output
                                 </button>
+
+                            </div>
+
+                            <!-- STEP 5: TIPE PENJADWALAN (OPTIONAL) -->
+                            <div class="mb-4">
+                                <label class="form-label">
+                                    <i class="bi bi-clock me-1"></i> Tipe Penjadwalan (Opsional)
+                                </label>
+                                <div class="alert alert-info-custom py-2 mb-3">
+                                    <small><i class="bi bi-info-circle me-1"></i>
+                                        Pilih tipe penjadwalan jika device ini membutuhkan fitur jadwal otomatis.
+                                        Kosongkan jika tidak perlu.
+                                    </small>
+                                </div>
+
+                                <select class="form-select mb-3" name="schedule_type" id="scheduleType"
+                                    onchange="toggleScheduleOptions(this.value)">
+                                    <option value="">-- Tidak Ada Penjadwalan --</option>
+                                    @foreach($scheduleTypes as $key => $info)
+                                        <option value="{{ $key }}">{{ $info['label'] }} - {{ $info['description'] }}
+                                        </option>
+                                    @endforeach
+                                </select>
+
+                                <div id="scheduleOptions" style="display: none;">
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label small text-white-50">Jumlah Slot Jadwal</label>
+                                            <input type="number" class="form-control" name="max_slots" value="8" min="1"
+                                                max="20">
+                                            <div class="form-text">Berapa banyak jadwal yang bisa disimpan</div>
+                                        </div>
+                                        <div class="col-md-6" id="sectorField" style="display: none;">
+                                            <label class="form-label small text-white-50">Jumlah Sektor</label>
+                                            <input type="number" class="form-control" name="max_sectors" value="1"
+                                                min="1" max="10">
+                                            <div class="form-text">Untuk mode multi-sektor/zona</div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
 
                             <div class="alert alert-warning-custom">
@@ -397,6 +437,24 @@
         const defaultOutputs = @json($defaultOutputs);
         let sensorCounter = 0;
         let outputCounter = 0;
+
+        // Toggle schedule options visibility
+        function toggleScheduleOptions(value) {
+            const scheduleOptions = document.getElementById('scheduleOptions');
+            const sectorField = document.getElementById('sectorField');
+
+            if (value) {
+                scheduleOptions.style.display = 'block';
+                // Show sector field only for sector mode
+                if (value === 'time_days_sector') {
+                    sectorField.style.display = 'block';
+                } else {
+                    sectorField.style.display = 'none';
+                }
+            } else {
+                scheduleOptions.style.display = 'none';
+            }
+        }
 
         function getSensorOptions(selectedKey = '') {
             let options = '<option value="">-- Pilih Jenis Sensor --</option>';
@@ -443,120 +501,41 @@
         `;
             container.appendChild(row);
             updateSensorCount();
+            container.appendChild(row);
+            updateSensorCount();
             updateSubmitButton();
-            refreshAutomationSensorDropdowns(); // Refresh automation sensor dropdowns
         }
 
-        function addOutputRow(outputKey = '', customLabel = '', autoMode = 'none', maxSchedules = 8, maxSectors = 1, sensorId = '') {
+        function addOutputRow(outputKey = '', customLabel = '') {
             outputCounter++;
             const container = document.getElementById('outputContainer');
             const row = document.createElement('div');
             row.className = 'sensor-row output-row';
             row.id = `outputRow_${outputCounter}`;
 
-            const sensorOptions = getAddedSensorOptions(sensorId);
-            const isTimeMode = ['time', 'time_days', 'time_days_sector'].includes(autoMode);
-            const hasSector = autoMode === 'time_days_sector';
-
             row.innerHTML = `
-            <div class="row align-items-end g-3 mb-2">
-                <div class="col-md-3">
+            <div class="row align-items-center g-3">
+                <div class="col-md-5">
                     <label class="form-label small text-white-50">Output Type</label>
                     <select class="form-select output-select" name="outputs[${outputCounter}][type]" onchange="updateSubmitButton()">
                         ${getOutputOptions(outputKey)}
                     </select>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-5">
                     <label class="form-label small text-white-50">Label (opsional)</label>
                     <input type="text" class="form-control output-label-input" name="outputs[${outputCounter}][label]" 
                            placeholder="Label custom" value="${customLabel}">
                 </div>
-                <div class="col-md-3">
-                    <label class="form-label small text-white-50">Automation Mode</label>
-                    <select class="form-select" name="outputs[${outputCounter}][automation_mode]" 
-                            onchange="toggleAutomationFields(${outputCounter}, this.value)">
-                        <option value="none" ${autoMode === 'none' ? 'selected' : ''}>None</option>
-                        <option value="time" ${autoMode === 'time' ? 'selected' : ''}>Time Only</option>
-                        <option value="time_days" ${autoMode === 'time_days' ? 'selected' : ''}>Time + Days</option>
-                        <option value="time_days_sector" ${autoMode === 'time_days_sector' ? 'selected' : ''}>Time + Days + Sector</option>
-                        <option value="sensor" ${autoMode === 'sensor' ? 'selected' : ''}>Sensor</option>
-                    </select>
-                </div>
-                <div class="col-md-3 text-end">
+                <div class="col-md-2 text-end">
                     <button type="button" class="btn btn-outline-danger" 
                             onclick="removeOutputRow(${outputCounter})" style="border-radius: 12px;">
-                        <i class="bi bi-trash me-1"></i> Hapus
+                        <i class="bi bi-trash"></i>
                     </button>
-                </div>
-            </div>
-            <div class="row align-items-end g-3" id="automationRow_${outputCounter}">
-                <div class="col-md-3 automation-time-fields" id="timeFields_${outputCounter}" style="display: ${isTimeMode ? 'block' : 'none'}">
-                    <label class="form-label small text-white-50">Max Schedule Slots</label>
-                    <input type="number" class="form-control" name="outputs[${outputCounter}][max_schedules]" 
-                           value="${maxSchedules}" min="1" max="20">
-                </div>
-                <div class="col-md-3 automation-sector-fields" id="sectorFields_${outputCounter}" style="display: ${hasSector ? 'block' : 'none'}">
-                    <label class="form-label small text-white-50">Jumlah Sektor</label>
-                    <input type="number" class="form-control" name="outputs[${outputCounter}][max_sectors]" 
-                           value="${maxSectors}" min="1" max="10">
-                </div>
-                <div class="col-md-4 automation-sensor-fields" id="sensorSelectFields_${outputCounter}" style="display: ${autoMode === 'sensor' ? 'block' : 'none'}">
-                    <label class="form-label small text-white-50">Pilih Sensor</label>
-                    <select class="form-select automation-sensor-select" name="outputs[${outputCounter}][automation_sensor_id]">
-                        <option value="">-- Pilih Sensor --</option>
-                        ${sensorOptions}
-                    </select>
                 </div>
             </div>
         `;
             container.appendChild(row);
             updateOutputCount();
-        }
-
-        function getAddedSensorOptions(selectedId = '') {
-            const sensorRows = document.querySelectorAll('.sensor-row:not(.output-row)');
-            let options = '';
-            let sensorIndex = 1;
-
-            sensorRows.forEach(row => {
-                const select = row.querySelector('.sensor-select');
-                const labelInput = row.querySelector('.sensor-label-input');
-
-                if (select && select.value) {
-                    const sensorType = select.value;
-                    const sensorInfo = availableSensors[sensorType];
-                    const customLabel = labelInput ? labelInput.value.trim() : '';
-                    const label = customLabel || sensorInfo.label;
-                    const value = `sensor_${sensorIndex}`;
-
-                    options += `<option value="${value}" ${value == selectedId ? 'selected' : ''}>${label}</option>`;
-                    sensorIndex++;
-                }
-            });
-
-            return options;
-        }
-
-        function refreshAutomationSensorDropdowns() {
-            const sensorOptions = getAddedSensorOptions();
-            document.querySelectorAll('.automation-sensor-select').forEach(dropdown => {
-                const currentValue = dropdown.value;
-                dropdown.innerHTML = '<option value="">-- Select Sensor --</option>' + sensorOptions;
-                dropdown.value = currentValue; // Restore selection if still valid
-            });
-        }
-
-        function toggleAutomationFields(index, mode) {
-            const timeFields = document.getElementById(`timeFields_${index}`);
-            const sectorFields = document.getElementById(`sectorFields_${index}`);
-            const sensorSelectFields = document.getElementById(`sensorSelectFields_${index}`);
-
-            const isTimeMode = ['time', 'time_days', 'time_days_sector'].includes(mode);
-            const hasSector = mode === 'time_days_sector';
-
-            timeFields.style.display = isTimeMode ? 'block' : 'none';
-            sectorFields.style.display = hasSector ? 'block' : 'none';
-            sensorSelectFields.style.display = mode === 'sensor' ? 'block' : 'none';
         }
 
         function removeSensorRow(id) {
@@ -565,7 +544,6 @@
                 row.remove();
                 updateSensorCount();
                 updateSubmitButton();
-                refreshAutomationSensorDropdowns(); // Refresh dropdowns after sensor removed
             }
         }
 
@@ -575,7 +553,7 @@
         }
 
         function updateSensorCount() {
-            const count = document.querySelectorAll('.sensor-row:not(.output-row)').length;
+            const count = document.querySelectorAll('.sensor-row:not(.output-row):not(.schedule-row)').length;
             document.getElementById('sensorCount').textContent = count + ' sensor';
         }
 
@@ -583,6 +561,12 @@
             const count = document.querySelectorAll('.output-row').length;
             document.getElementById('outputCount').textContent = count + ' output';
         }
+
+        function updateScheduleCount() {
+            // Deprecated - kept for safety if referenced but simplified not to fail
+        }
+
+        // Schedule Functions - Removed legacy code
 
         function updateSubmitButton() {
             const typeSelected = document.getElementById('deviceType').value !== '';
@@ -603,6 +587,10 @@
             // Reset outputs
             document.getElementById('outputContainer').innerHTML = '';
             outputCounter = 0;
+
+            // Reset schedule dropdown
+            document.getElementById('scheduleType').value = '';
+            toggleScheduleOptions('');
 
             // Add default sensors
             if (defaultSensors[type]) {

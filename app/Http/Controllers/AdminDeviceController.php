@@ -54,6 +54,7 @@ class AdminDeviceController extends Controller
         $deviceTypes = Device::getDeviceTypes();
         $availableSensors = Device::getAvailableSensors();
         $availableOutputs = Device::getAvailableOutputs();
+        $scheduleTypes = Device::getAvailableScheduleTypes();
 
         // Build default sensors/outputs from model
         $defaultSensors = [];
@@ -63,7 +64,14 @@ class AdminDeviceController extends Controller
             $defaultOutputs[$type] = Device::getDefaultOutputsForType($type);
         }
 
-        return view('admin.create_device', compact('deviceTypes', 'availableSensors', 'availableOutputs', 'defaultSensors', 'defaultOutputs'));
+        return view('admin.create_device', compact(
+            'deviceTypes',
+            'availableSensors',
+            'availableOutputs',
+            'scheduleTypes',
+            'defaultSensors',
+            'defaultOutputs'
+        ));
     }
 
     // 3. PROSES SIMPAN DEVICE BARU (STORE)
@@ -161,7 +169,7 @@ class AdminDeviceController extends Controller
             ]);
         }
 
-        // G. Simpan Outputs ke device_outputs
+        // G. Simpan Outputs ke device_outputs (tanpa automation fields - pindah ke schedules)
         if ($request->has('outputs')) {
             $outputCounter = [];
             foreach ($request->outputs as $output) {
@@ -193,15 +201,31 @@ class AdminDeviceController extends Controller
                     'output_label' => $label,
                     'output_type' => $outputConfig['type'],
                     'unit' => $outputConfig['unit'],
-                    'automation_mode' => $output['automation_mode'] ?? 'none',
-                    'max_schedules' => $output['max_schedules'] ?? 8,
-                    'max_sectors' => $output['max_sectors'] ?? 1,
-                    'automation_sensor_id' => $this->findSensorId($device->id, $output['automation_sensor'] ?? null),
                 ]);
             }
         }
 
-        // H. Redirect ke Halaman List Device
+        // H. Simpan Schedule Type ke device_schedules (maksimal 1 per device)
+        if ($request->filled('schedule_type')) {
+            $scheduleTypes = Device::getAvailableScheduleTypes();
+            $scheduleType = $request->schedule_type;
+
+            if (isset($scheduleTypes[$scheduleType])) {
+                $scheduleInfo = $scheduleTypes[$scheduleType];
+
+                \App\Models\DeviceSchedule::create([
+                    'device_id' => $device->id,
+                    'schedule_name' => 'schedule',
+                    'schedule_label' => $scheduleInfo['label'],
+                    'output_key' => 'general', // Output umum, bisa dikonfigurasi nanti
+                    'schedule_mode' => $scheduleType,
+                    'max_slots' => $request->max_slots ?? 8,
+                    'max_sectors' => $request->max_sectors ?? 1,
+                ]);
+            }
+        }
+
+        // I. Redirect ke Halaman List Device
         return redirect()->route('admin.devices.index')
             ->with('success', "Sukses! Device '{$request->name}' berhasil dibuat dengan " . count($sensorColumns) . " sensor.");
     }
@@ -332,7 +356,7 @@ class AdminDeviceController extends Controller
 
         // Publish ke MQTT untuk kirim perintah ke device
         try {
-            $topic = rtrim($device->mqtt_topic, '/') . '/pub';
+            $topic = rtrim($device->mqtt_topic, '/') . '/sub';
 
             // Format simpel: <output#value>
             $message = sprintf('<%s#%s>', $output->output_name, $newValue);
@@ -369,6 +393,40 @@ class AdminDeviceController extends Controller
             'output_name' => $output->output_name,
             'new_value' => $newValue,
             'message' => "Output {$output->output_label} berhasil diupdate!",
+        ]);
+    }
+    /**
+     * Get real-time status for Admin (Direct Device ID)
+     */
+    public function getStatus($id)
+    {
+        $this->checkAdmin();
+
+        $device = Device::with(['outputs'])->findOrFail($id);
+
+        // Get Output States
+        $outputs = $device->outputs->map(function ($output) {
+            return [
+                'id' => $output->id,
+                'name' => $output->output_name,
+                'value' => $output->current_value,
+                'label' => $output->output_label
+            ];
+        });
+
+        // Get Latest Sensor Data
+        $latestSensorData = null;
+        if ($device->table_name && Schema::hasTable($device->table_name)) {
+            $latestSensorData = \DB::table($device->table_name)
+                ->orderBy('recorded_at', 'desc')
+                ->first();
+        }
+
+        return response()->json([
+            'success' => true,
+            'outputs' => $outputs,
+            'sensors' => $latestSensorData,
+            'timestamp' => now()->toIso8601String()
         ]);
     }
 }

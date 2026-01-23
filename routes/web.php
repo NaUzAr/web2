@@ -32,6 +32,9 @@ Route::middleware(['auth'])->group(function () {
 
         // Toggle Output (Admin)
         Route::post('/device/{deviceId}/output/{outputId}/toggle', [AdminDeviceController::class, 'toggleOutput'])->name('device.output.toggle');
+
+        // Status (Admin Polling)
+        Route::get('/device/{id}/status', [AdminDeviceController::class, 'getStatus'])->name('device.status');
     });
 
     // === MONITORING ROUTES (untuk semua user yang login) ===
@@ -43,6 +46,7 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('/device/{id}', [MonitoringController::class, 'destroy'])->name('destroy');
         Route::post('/device/{id}/export', [MonitoringController::class, 'exportCsv'])->name('export');
         Route::post('/device/{id}/output/{outputId}/toggle', [MonitoringController::class, 'toggleOutput'])->name('output.toggle');
+        Route::get('/device/{id}/status', [MonitoringController::class, 'getStatus'])->name('status');
     });
 
     // === AUTOMATION ROUTES (untuk user kelola automation) ===
@@ -61,10 +65,10 @@ Route::middleware(['auth'])->group(function () {
     });
 
     // === SCHEDULE MANAGEMENT ROUTES (Real-time MQTT) ===
-    Route::prefix('device/{userDeviceId}/output/{outputId}/schedule')->name('schedule.')->group(function () {
+    Route::prefix('device/{userDeviceId}/schedule')->name('schedule.')->group(function () {
         Route::get('/', [ScheduleController::class, 'index'])->name('index');
         Route::post('/time', [ScheduleController::class, 'storeTimeSchedules'])->name('time.store');
-        Route::post('/sensor', [ScheduleController::class, 'storeSensorRule'])->name('sensor.store');
+        // Route::post('/sensor', [ScheduleController::class, 'storeSensorRule'])->name('sensor.store'); // Sensor rules might need rethink or move
     });
 });
 

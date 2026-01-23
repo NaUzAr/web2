@@ -19,9 +19,9 @@ class ScheduleController extends Controller
     }
 
     /**
-     * Show schedule management page for specific output
+     * Show schedule management page for specific device
      */
-    public function index($userDeviceId, $outputId)
+    public function index($userDeviceId)
     {
         $userDevice = UserDevice::where('id', $userDeviceId)
             ->where('user_id', Auth::id())
@@ -29,110 +29,114 @@ class ScheduleController extends Controller
 
         $device = $userDevice->device;
 
-        $output = DeviceOutput::where('id', $outputId)
-            ->where('device_id', $device->id)
-            ->firstOrFail();
+        // Check if device has schedule functionality
+        $scheduleConfig = \App\Models\DeviceSchedule::where('device_id', $device->id)->first();
 
-        // Check if this output has automation configured
-        if ($output->automation_mode === 'none') {
+        if (!$scheduleConfig) {
             return redirect()->route('monitoring.show', $userDevice->id)
-                ->with('error', 'Output ini tidak memiliki automation yang dikonfigurasi.');
+                ->with('error', 'Device ini tidak memiliki konfigurasi penjadwalan.');
         }
 
-        return view('schedule.index', compact('userDevice', 'device', 'output'));
+        return view('schedule.index', compact('userDevice', 'device', 'scheduleConfig'));
     }
 
     /**
-     * Send single time schedule to device
-     * Supports modes: time, time_days, time_days_sector
+     * Send schedule to device
+     * Supports modes: time, time_days, time_days_sector, time_duration, time_days_duration
      */
-    public function storeTimeSchedules(Request $request, $userDeviceId, $outputId)
+    public function storeTimeSchedules(Request $request, $userDeviceId)
     {
         $userDevice = UserDevice::where('id', $userDeviceId)
             ->where('user_id', Auth::id())
             ->firstOrFail();
 
         $device = $userDevice->device;
-        $output = DeviceOutput::findOrFail($outputId);
+        $scheduleConfig = \App\Models\DeviceSchedule::where('device_id', $device->id)->firstOrFail();
 
-        $validated = $request->validate([
+        // Validation rules based on mode
+        $rules = [
             'slot_id' => 'required|integer|min:1',
             'on_time' => 'required|date_format:H:i',
-            'off_time' => 'required|date_format:H:i',
-            'days' => 'nullable|string|max:7',
-            'sector' => 'nullable|integer|min:1',
-        ]);
+        ];
+
+        // Determine if we need off_time or duration
+        $isDurationMode = str_contains($scheduleConfig->schedule_mode, 'duration');
+
+        if ($isDurationMode) {
+            $rules['duration'] = 'required|integer|min:1|max:1440'; // Max 24 hours
+        } else {
+            $rules['off_time'] = 'required|date_format:H:i';
+        }
+
+        if (str_contains($scheduleConfig->schedule_mode, 'days')) {
+            $rules['days'] = 'nullable|string|max:7';
+        }
+
+        if (str_contains($scheduleConfig->schedule_mode, 'sector')) {
+            $rules['sector'] = 'nullable|integer|min:1';
+        }
+
+        $validated = $request->validate($rules);
+
+        // Prepare schedule payload
+        $onTime = $validated['on_time'];
+        $offTime = null;
+
+        if ($isDurationMode) {
+            // Calculate off_time based on duration
+            // Note: This logic assumes simple same-day calculation or wrapping
+            // For now, simpler implementation: PHP calculates end time string
+            $startTime = \Carbon\Carbon::createFromFormat('H:i', $onTime);
+            $endTime = $startTime->copy()->addMinutes((int) $validated['duration']);
+            $offTime = $endTime->format('H:i');
+        } else {
+            $offTime = $validated['off_time'];
+        }
 
         $schedule = [
             'id' => $validated['slot_id'],
-            'on' => $validated['on_time'],
-            'off' => $validated['off_time'],
+            'on' => $onTime,
+            'off' => $offTime,
         ];
 
-        // Add days if provided (for time_days and time_days_sector modes)
-        if (!empty($validated['days'])) {
+        if (isset($validated['days'])) {
             $schedule['days'] = $validated['days'];
         }
 
-        // Add sector if provided (for time_days_sector mode)
-        if (!empty($validated['sector'])) {
+        if (isset($validated['sector'])) {
             $schedule['sector'] = $validated['sector'];
         }
 
+        // Send to MQTT
+        // Note: output_key from config is used as the target output name
         $success = $this->mqttService->sendSingleTimeSchedule(
             $device->mqtt_topic,
             $device->token,
-            $output->output_name,
+            $scheduleConfig->output_key ?? 'general', // fallback if empty
             $schedule,
-            $output->automation_mode
+            $scheduleConfig->schedule_mode
         );
 
         if ($success) {
+            $msg = 'Jadwal slot ' . $validated['slot_id'] . ' berhasil dikirim!';
+            if ($isDurationMode) {
+                $msg .= " (Selesai pukul {$offTime})";
+            }
+
             return response()->json([
                 'success' => true,
-                'message' => 'Jadwal slot ' . $validated['slot_id'] . ' berhasil dikirim ke device!',
+                'message' => $msg,
             ]);
         }
 
         return response()->json([
             'success' => false,
-            'message' => 'Gagal mengirim jadwal ke device.',
+            'message' => 'Gagal mengirim jadwal ke device via MQTT.',
         ], 500);
     }
 
-    /**
-     * Send sensor rule to device
-     */
-    public function storeSensorRule(Request $request, $userDeviceId, $outputId)
-    {
-        $userDevice = UserDevice::where('id', $userDeviceId)
-            ->where('user_id', Auth::id())
-            ->firstOrFail();
-
-        $device = $userDevice->device;
-        $output = DeviceOutput::findOrFail($outputId);
-
-        $validated = $request->validate([
-            'operator' => 'required|in:>,<,>=,<=,==',
-            'threshold' => 'required|numeric',
-        ]);
-
-        $rule = [
-            'operator' => $validated['operator'],
-            'threshold' => (float) $validated['threshold'],
-        ];
-
-        $success = $this->mqttService->sendSensorRule(
-            $device->mqtt_topic,
-            $device->token,
-            $output->output_name,
-            $rule
-        );
-
-        if ($success) {
-            return back()->with('success', 'Sensor rule berhasil dikirim ke device!');
-        }
-
-        return back()->with('error', 'Gagal mengirim sensor rule ke device.');
-    }
+    // storeSensorRule removed for now as per route update or kept if needed but updated
+    // Keeping it commented or empty to avoid errors if called, 
+    // but routes commented it out. I will just omit it for now or return error 
+    // to strictly clean up.
 }
