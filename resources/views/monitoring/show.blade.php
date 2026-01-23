@@ -738,6 +738,23 @@
                 </div>
             </div>
         @endif
+
+        {{-- Active Schedules Card --}}
+        @if(isset($device->table_name))
+            <div class="glass-card mt-4">
+                <h5 class="card-title">
+                    <i class="bi bi-calendar-range me-2"></i> Jadwal Aktif
+                    <small class="text-white-50 ms-2" style="font-size: 0.8rem;">(Dari Device)</small>
+                </h5>
+
+                <div id="scheduleContainer" class="mt-3">
+                    <div class="text-center py-3 text-white-50">
+                        <div class="spinner-border spinner-border-sm mb-2" role="status"></div>
+                        <div>Memuat jadwal...</div>
+                    </div>
+                </div>
+            </div>
+        @endif
     </div>
 
     @if(!($isAdminView ?? false))
@@ -1020,7 +1037,7 @@
                     @else
                         const response = await fetch('{{ route("monitoring.status", $userDevice->id) }}');
                     @endif
-                        const data = await response.json();
+                                const data = await response.json();
 
                     if (data.success) {
                         if (data.outputs) {
@@ -1120,6 +1137,9 @@
                     if (data.sensors) {
                         updateSensors(data.sensors);
                     }
+                    if (data.schedules) {
+                        updateSchedules(data.schedules);
+                    }
                 }
             } catch (error) {
                 console.error('Polling error:', error);
@@ -1182,6 +1202,58 @@
                     }
                 }
             });
+        }
+
+        function updateSchedules(schedules) {
+            const container = document.getElementById('scheduleContainer');
+            if (!container) return;
+
+            if (schedules.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-3 text-white-50">
+                        <i class="bi bi-calendar-x mb-2" style="font-size: 1.5rem;"></i>
+                        <div>Tidak ada jadwal aktif</div>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = '';
+
+            // Sort schedules by key (sch1, sch2, etc)
+            schedules.sort((a, b) => {
+                const numA = parseInt(a.key.replace('sch', ''));
+                const numB = parseInt(b.key.replace('sch', ''));
+                return numA - numB;
+            });
+
+            schedules.forEach(sch => {
+                html += `
+                    <div class="d-flex align-items-center p-3 mb-2" 
+                         style="background: rgba(255,255,255,0.05); border-radius: 12px; border-left: 4px solid #10b981;">
+                        <div class="me-3 text-white-50" style="min-width: 40px;">
+                            ${sch.key.toUpperCase()}
+                        </div>
+                        <div class="flex-grow-1">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span class="fw-bold text-white">${sch.name || 'Set Jadwal'}</span>
+                                <span class="badge bg-success bg-opacity-25 text-success">
+                                    <i class="bi bi-clock me-1"></i> ${sch.time}
+                                </span>
+                            </div>
+                            <div class="text-white-50 small mb-1">
+                                <i class="bi bi-hourglass-split me-1"></i> Durasi: ${sch.duration || 0} min
+                                ${sch.sector > 0 ? `<span class="ms-2 text-warning"><i class="bi bi-grid me-1"></i> Sektor ${sch.sector}</span>` : ''}
+                            </div>
+                            <div class="text-white-50 small" style="font-size: 0.75rem;">
+                                <i class="bi bi-calendar-week me-1"></i> ${sch.days}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
         }
     </script>
 

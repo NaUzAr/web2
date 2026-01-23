@@ -422,10 +422,26 @@ class AdminDeviceController extends Controller
                 ->first();
         }
 
+        // Get active schedules
+        $activeSchedules = \App\Models\DeviceScheduleData::where('device_id', $device->id)
+            ->where('is_active', true)
+            ->get()
+            ->map(function ($schedule) {
+                return [
+                    'key' => $schedule->slot_key,
+                    'name' => $schedule->name,
+                    'time' => $schedule->display_time,
+                    'duration' => $schedule->duration,
+                    'sector' => $schedule->sector,
+                    'days' => $schedule->display_days,
+                ];
+            });
+
         return response()->json([
             'success' => true,
             'outputs' => $outputs,
             'sensors' => $latestSensorData,
+            'schedules' => $activeSchedules,
             'timestamp' => now()->toIso8601String()
         ]);
     }

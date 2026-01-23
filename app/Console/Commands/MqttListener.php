@@ -325,22 +325,51 @@ class MqttListener extends Command
     }
 
     /**
-     * Log schedule data (Counter 2 & 3) - display only, device is master
+     * Log schedule data (Counter 2 & 3) - parse and save to database
      */
     private function logScheduleData($device, $data)
     {
         $this->info("           📅 Type: SCHEDULE DATA");
 
-        $schedules = [];
+        $savedCount = 0;
+
+        // Process sch1 through sch14
         for ($i = 1; $i <= 14; $i++) {
             $key = "sch{$i}";
             if (isset($data[$key])) {
-                $schedules[$key] = $data[$key];
+                $rawValue = $data[$key];
+
+                // Parse using model method
+                $parsed = \App\Models\DeviceScheduleData::parseFromDevice($rawValue);
+
+                // Save or update
+                \App\Models\DeviceScheduleData::updateOrCreate(
+                    [
+                        'device_id' => $device->id,
+                        'slot_key' => $key,
+                    ],
+                    [
+                        'on_time' => $parsed['on_time'],
+                        'duration' => $parsed['duration'],
+                        'sector' => $parsed['sector'],
+                        'name' => $parsed['name'],
+                        'days' => $parsed['days'],
+                        'is_active' => $parsed['is_active'],
+                    ]
+                );
+
+                if ($parsed['is_active']) {
+                    $this->line("           • {$key}: {$parsed['name']} @ {$parsed['on_time']} ({$parsed['duration']}min, Sektor {$parsed['sector']})");
+                    $savedCount++;
+                }
             }
         }
 
-        $this->line("           Schedules: " . json_encode($schedules));
-        $this->info("           ✅ Schedule received (device is master)");
+        if ($savedCount > 0) {
+            $this->info("           ✅ Saved {$savedCount} active schedules to database");
+        } else {
+            $this->info("           ✅ Schedule received (no active schedules)");
+        }
     }
 
     /**

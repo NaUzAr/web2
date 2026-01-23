@@ -445,8 +445,8 @@
 
             if (value) {
                 scheduleOptions.style.display = 'block';
-                // Show sector field only for sector mode
-                if (value === 'time_days_sector') {
+                // Show sector field for any mode containing 'sector'
+                if (value.includes('sector')) {
                     sectorField.style.display = 'block';
                 } else {
                     sectorField.style.display = 'none';
