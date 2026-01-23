@@ -1020,7 +1020,7 @@
                     @else
                         const response = await fetch('{{ route("monitoring.status", $userDevice->id) }}');
                     @endif
-                    const data = await response.json();
+                        const data = await response.json();
 
                     if (data.success) {
                         if (data.outputs) {
@@ -1098,6 +1098,92 @@
             }
         </script>
     @endif
+
+    {{-- Auto-Reload Script - Always runs regardless of initial data --}}
+    <script>
+        // Auto-reload status every 2 seconds
+        setInterval(fetchStatus, 2000);
+
+        async function fetchStatus() {
+            try {
+                @if($isAdminView ?? false)
+                    const response = await fetch('{{ route("admin.device.status", $device->id) }}');
+                @else
+                    const response = await fetch('{{ route("monitoring.status", $userDevice->id) }}');
+                @endif
+                const data = await response.json();
+
+                if (data.success) {
+                    if (data.outputs) {
+                        updateOutputs(data.outputs);
+                    }
+                    if (data.sensors) {
+                        updateSensors(data.sensors);
+                    }
+                }
+            } catch (error) {
+                console.error('Polling error:', error);
+            }
+        }
+
+        // Map sensor name to ID using PHP array
+        const sensorMap = @json($sensors->pluck('id', 'sensor_name'));
+
+        function updateSensors(sensorData) {
+            for (const [key, value] of Object.entries(sensorData)) {
+                if (sensorMap[key]) {
+                    const sensorId = sensorMap[key];
+                    const el = document.getElementById(`sensor-val-${sensorId}`);
+                    if (el) {
+                        const num = parseFloat(value);
+                        el.innerText = !isNaN(num) ? num.toFixed(1) : value;
+                    }
+                }
+            }
+        }
+
+        function updateOutputs(outputs) {
+            outputs.forEach(output => {
+                // Update Boolean Outputs (Buttons)
+                const btnOn = document.getElementById(`btn-on-${output.id}`);
+                const btnOff = document.getElementById(`btn-off-${output.id}`);
+                const statusEl = document.getElementById(`output-status-${output.id}`);
+
+                if (btnOn && btnOff && statusEl) {
+                    const isOn = parseFloat(output.value) > 0;
+
+                    if (isOn) {
+                        btnOn.classList.remove('btn-outline-success');
+                        btnOn.classList.add('btn-success');
+                        btnOff.classList.remove('btn-danger');
+                        btnOff.classList.add('btn-outline-danger');
+                        statusEl.className = 'output-status on';
+                        statusEl.innerText = 'ON';
+                    } else {
+                        btnOn.classList.remove('btn-success');
+                        btnOn.classList.add('btn-outline-success');
+                        btnOff.classList.remove('btn-outline-danger');
+                        btnOff.classList.add('btn-danger');
+                        statusEl.className = 'output-status off';
+                        statusEl.innerText = 'OFF';
+                    }
+                }
+
+                // Update Range/Slider Outputs
+                const slider = document.getElementById(`output-${output.id}`);
+                const valueDisplay = document.getElementById(`output-value-${output.id}`);
+
+                if (slider && document.activeElement !== slider) {
+                    slider.value = output.value;
+                    if (valueDisplay) {
+                        const currentText = valueDisplay.innerText;
+                        const unit = currentText.replace(/[0-9\.]/g, '');
+                        valueDisplay.innerText = parseInt(output.value) + unit;
+                    }
+                }
+            });
+        }
+    </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
     @include('partials.pwa-scripts')

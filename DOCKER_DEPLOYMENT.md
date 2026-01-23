@@ -408,7 +408,11 @@ COPY supervisord.ini /etc/supervisor.d/supervisord.ini
 
 WORKDIR /var/www/html
 COPY src/ /var/www/html/
-RUN composer install --optimize-autoloader --no-dev --no-interaction
+
+# PENTING: Hapus vendor saja, JANGAN hapus composer.lock
+# --no-scripts untuk menghindari error Sanctum
+RUN rm -rf vendor && composer install --optimize-autoloader --no-dev --no-interaction --no-scripts
+
 RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 755 /var/www/html/storage /var/www/html/bootstrap/cache
 
@@ -440,7 +444,7 @@ server {
 ```
 
 ```bash
-# 5. Buat supervisord.ini
+# 5. Buat supervisord.ini (INCLUDE MQTT LISTENER AUTO-RUN)
 nano /opt/docker-apps/NAMA_PROJECT/supervisord.ini
 ```
 
@@ -467,7 +471,7 @@ stderr_logfile=/var/www/html/storage/logs/mqtt-error.log
 ```
 
 ```bash
-# 6. Buat docker-compose.yml
+# 6. Buat docker-compose.yml (dengan MQTT environment)
 nano /opt/docker-apps/NAMA_PROJECT/docker-compose.yml
 ```
 
@@ -487,6 +491,11 @@ services:
       DB_DATABASE: db_NAMA_PROJECT
       DB_USERNAME: webadmin
       DB_PASSWORD: YOUR_PASSWORD
+      # MQTT Configuration
+      MQTT_HOST: YOUR_VPS_IP
+      MQTT_PORT: 1883
+      MQTT_USERNAME: iot
+      MQTT_PASSWORD: smartgh
     volumes:
       - ./src/storage:/var/www/html/storage
     networks:
@@ -509,6 +518,10 @@ cd /opt/docker-apps/NAMA_PROJECT && docker compose up -d --build
 docker exec NAMA_PROJECT_app php artisan key:generate
 docker exec NAMA_PROJECT_app php artisan migrate --force
 docker exec NAMA_PROJECT_app php artisan storage:link
+docker exec NAMA_PROJECT_app php artisan package:discover
+
+# 10. Cek MQTT Listener berjalan
+docker exec NAMA_PROJECT_app supervisorctl status mqtt-listener
 ```
 
 ---
@@ -796,8 +809,21 @@ docker compose up -d --build
 
 **Solusi - Update Dockerfile:**
 ```dockerfile
-RUN rm -rf vendor composer.lock && composer install --optimize-autoloader --no-dev --no-interaction
+# JANGAN hapus composer.lock, hanya hapus vendor folder
+# Tambahkan --no-scripts untuk menghindari error Sanctum
+RUN rm -rf vendor && composer install --optimize-autoloader --no-dev --no-interaction --no-scripts
 ```
+
+---
+
+## Error: Connection timeout saat composer install
+
+**Penyebab:** VPS tidak bisa connect ke packagist.org.
+
+**Solusi:**
+1. Jangan hapus `composer.lock` - file ini berisi cache URL packages
+2. Pastikan DNS resolver VPS berfungsi: `ping google.com`
+3. Jika masih timeout, coba jalankan composer dari local dan upload vendor via git
 
 ---
 
@@ -818,7 +844,43 @@ RUN rm -rf vendor composer.lock && composer install --optimize-autoloader --no-d
 ufw allow 22/tcp    # SSH
 ufw allow 80/tcp    # HTTP
 ufw allow 443/tcp   # HTTPS
+ufw allow 1883/tcp  # MQTT
 ufw allow 5432/tcp  # PostgreSQL (jika remote access)
 ufw enable
 ufw status
 ```
+
+---
+
+# 🔄 Update Project dari GitHub
+
+```bash
+cd /opt/docker-apps/NAMA_PROJECT/src
+git pull origin main
+
+cd /opt/docker-apps/NAMA_PROJECT
+docker compose up -d --build
+
+# Jika ada migrasi baru
+docker exec NAMA_PROJECT_app php artisan migrate --force
+docker exec NAMA_PROJECT_app php artisan config:clear
+```
+
+---
+
+# 📊 Monitoring & Logs
+
+```bash
+# Lihat logs aplikasi
+docker logs -f NAMA_PROJECT_app
+
+# Lihat logs MQTT Listener
+docker exec NAMA_PROJECT_app tail -f storage/logs/mqtt.log
+
+# Cek status supervisor
+docker exec NAMA_PROJECT_app supervisorctl status
+
+# Restart MQTT Listener
+docker exec NAMA_PROJECT_app supervisorctl restart mqtt-listener
+```
+
