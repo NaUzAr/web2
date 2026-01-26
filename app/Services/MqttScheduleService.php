@@ -107,8 +107,8 @@ class MqttScheduleService
             // Get sector (default 1)
             $sector = $schedule['sector'] ?? 1;
 
-            // Map type to numeric value: BAKU=0, PUPUK=2
-            $typeMap = ['BAKU' => 0, 'PUPUK' => 2];
+            // Map type to numeric value: BAKU=0, PUPUK=1
+            $typeMap = ['BAKU' => 0, 'PUPUK' => 1];
             $typeNum = $typeMap[strtoupper($outputName)] ?? 0;
 
             // Convert days to binary format (Sun-Sat: 0111110 = Mon-Fri)
