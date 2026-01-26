@@ -246,6 +246,52 @@ class Device extends Model
     }
 
     /**
+     * Preset Otomasi Granular (Climate vs Fertilizer)
+     */
+    public static function getAutomationPresets(): array
+    {
+        return [
+            'climate' => [
+                'label' => 'Otomasi Iklim (Climate)',
+                'description' => 'Kontrol Suhu, Kelembaban, dan Cahaya',
+                'icon' => 'bi-thermometer-sun',
+                'sensors' => [
+                    'ni_SUHU' => 1,
+                    'ni_KELEM' => 1,
+                    'ni_LUX' => 1,
+                    'co2' => 1
+                ],
+                'outputs' => [
+                    'sts_fan' => 1,
+                    'sts_misting' => 1,
+                    'sts_lampu' => 1
+                ]
+            ],
+            'fertilizer' => [
+                'label' => 'Otomasi Pemupukan (Fertigation)',
+                'description' => 'Kontrol Nutrisi (AB Mix), pH, dan Irigasi',
+                'icon' => 'bi-flower1',
+                'sensors' => [
+                    'ni_PH' => 1,
+                    'ni_TDS' => 1,
+                    'water_level' => 1
+                ],
+                'outputs' => [
+                    'sts_pompa' => 1,
+                    'sts_air_input' => 1,
+                    'sts_mixing' => 1,
+                    'sts_dosing' => 1,
+                    'sts_ph_up' => 1,
+                    'sts_ph_down' => 1,
+                    'sts_air_baku' => 1,
+                    'sts_air_pupuk' => 1
+                ]
+            ]
+        ];
+    }
+
+
+    /**
      * =====================================================
      * KONFIGURASI SCHEDULE DEVICE
      * =====================================================

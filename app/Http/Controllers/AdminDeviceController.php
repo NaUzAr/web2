@@ -55,6 +55,7 @@ class AdminDeviceController extends Controller
         $availableSensors = Device::getAvailableSensors();
         $availableOutputs = Device::getAvailableOutputs();
         $scheduleTypes = Device::getAvailableScheduleTypes();
+        $automationPresets = Device::getAutomationPresets();
 
         // Build default sensors/outputs from model
         $defaultSensors = [];
@@ -70,7 +71,8 @@ class AdminDeviceController extends Controller
             'availableOutputs',
             'scheduleTypes',
             'defaultSensors',
-            'defaultOutputs'
+            'defaultOutputs',
+            'automationPresets'
         ));
     }
 

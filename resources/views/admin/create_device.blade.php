@@ -351,6 +351,46 @@
                                 </button>
                             </div>
 
+                            <!-- STEP 3.5: KONFIGURASI OTOMASI (GRANULAR) -->
+                            <div class="mb-4">
+                                <label class="form-label">
+                                    <i class="bi bi-robot me-1"></i> Konfigurasi Otomasi (Opsional)
+                                </label>
+                                <div class="alert alert-info-custom py-2 mb-3">
+                                    <small><i class="bi bi-info-circle me-1"></i>
+                                        Pilih paket otomasi yang ingin diaktifkan. Sensor & Output akan otomatis
+                                        ditambahkan.
+                                    </small>
+                                </div>
+
+                                <div class="row g-3">
+                                    @foreach($automationPresets as $key => $preset)
+                                        <div class="col-md-6">
+                                            <div class="glass-card p-3 h-100 border-0"
+                                                style="background: rgba(255,255,255,0.05);">
+                                                <div class="form-check form-switch mb-2">
+                                                    <input class="form-check-input" type="checkbox" id="auto_{{ $key }}"
+                                                        onchange="toggleAutomation('{{ $key }}')">
+                                                    <label class="form-check-label fw-bold text-white"
+                                                        for="auto_{{ $key }}">
+                                                        <i class="bi {{ $preset['icon'] }} me-1"></i> {{ $preset['label'] }}
+                                                    </label>
+                                                </div>
+                                                <small class="text-white-50 d-block ms-4 mb-2">
+                                                    {{ $preset['description'] }}
+                                                </small>
+                                                <div class="ms-4 small text-white-50">
+                                                    <div><i class="bi bi-thermometer-half me-1"></i> Sensor:
+                                                        {{ count($preset['sensors']) }}</div>
+                                                    <div><i class="bi bi-toggle-on me-1"></i> Output:
+                                                        {{ count($preset['outputs']) }}</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+
                             <!-- STEP 4: DAFTAR OUTPUT -->
                             <div class="mb-4">
                                 <label class="form-label">
@@ -435,6 +475,7 @@
         const availableOutputs = @json($availableOutputs);
         const defaultSensors = @json($defaultSensors);
         const defaultOutputs = @json($defaultOutputs);
+        const automationPresets = @json($automationPresets);
         let sensorCounter = 0;
         let outputCounter = 0;
 
@@ -602,6 +643,9 @@
                 }
             }
 
+            // Uncheck automation switches when changing type
+            document.querySelectorAll('input[type="checkbox"][id^="auto_"]').forEach(el => el.checked = false);
+
             // Add default outputs
             if (defaultOutputs[type]) {
                 for (const [outputKey, count] of Object.entries(defaultOutputs[type])) {
@@ -621,6 +665,38 @@
             if (!type) { e.preventDefault(); alert('Pilih tipe alat terlebih dahulu!'); return false; }
             if (sensors === 0) { e.preventDefault(); alert('Tambahkan minimal 1 sensor!'); return false; }
         });
+    </script>
+    <script>
+        // Automation Toggle Logic
+        function toggleAutomation(key) {
+            const isChecked = document.getElementById(`auto_${key}`).checked;
+            const preset = automationPresets[key];
+
+            if (isChecked) {
+                // Add Sensors
+                for (const [sensorKey, count] of Object.entries(preset.sensors)) {
+                    // Check if already exists to avoid duplicates (optional, strictly speaking we can add more)
+                    // For simplicity, we just add. De-duplication is complex without ID tracking.
+                    // But we ideally want unique outputs for automation logic.
+                    // Let's add them. 
+                    for (let i = 0; i < count; i++) {
+                        addSensorRow(sensorKey);
+                    }
+                }
+
+                // Add Outputs
+                for (const [outKey, count] of Object.entries(preset.outputs)) {
+                    for (let i = 0; i < count; i++) {
+                        addOutputRow(outKey);
+                    }
+                }
+            } else {
+                // Remove logic is hard because we don't know which row belongs to this preset 
+                // unless we track it. For now, simple "Uncheck" won't remove rows to prevent accidental deletion of manual edits.
+                // We can notify user.
+                alert('Menonaktifkan preset tidak menghapus sensor/output yang sudah ditambahkan. Silakan hapus manual jika tidak diperlukan.');
+            }
+        }
     </script>
 
     <!-- Leaflet JS for Map Picker -->
