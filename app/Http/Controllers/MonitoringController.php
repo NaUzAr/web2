@@ -298,12 +298,22 @@ class MonitoringController extends Controller
 
         $device = $userDevice->device;
 
-        // Get Output States
-        $outputs = $device->outputs->map(function ($output) {
+        // Get Output States from Cache
+        $cachedOutputs = \Cache::get("device_outputs_{$device->id}", []);
+
+        $outputs = $device->outputs->map(function ($output) use ($cachedOutputs) {
+            // Check if value exists in cache (try output_name directly)
+            $cachedVal = $cachedOutputs[$output->output_name] ?? null;
+
+            // If output_name in DB doesn't have 'sts_' prefix but cache does, try matching
+            // But MqttListener saves DB with same key as cache (from valid keys), so direct match should work.
+
+            $val = $cachedVal !== null ? $cachedVal : $output->current_value;
+
             return [
                 'id' => $output->id,
                 'name' => $output->output_name,
-                'value' => $output->current_value,
+                'value' => $val,
                 'label' => $output->output_label
             ];
         });

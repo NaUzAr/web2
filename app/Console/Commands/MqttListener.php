@@ -428,6 +428,7 @@ class MqttListener extends Command
         $this->info("           🔌 Type: STATUS OUTPUT");
 
         $updatesCount = 0;
+        $cachedOutputs = \Cache::get("device_outputs_{$device->id}", []);
 
         // Iterate any key starting with sts_
         foreach ($data as $key => $value) {
@@ -437,6 +438,12 @@ class MqttListener extends Command
                 // Allow integer/boolean values
                 $status = $value ? "🟢 ON" : "🔴 OFF";
                 $this->line("           • {$label} ({$key}): {$status}");
+
+                // Update Cache
+                // Map sts_pump to pump (remove sts_ prefix for consistency with output_name if needed)
+                // Actually MonitoringController maps output_name. 
+                // Let's store raw key-value in cache for simple mapping later
+                $cachedOutputs[$key] = $value;
 
                 // Save to Database
                 $output = \App\Models\DeviceOutput::where('device_id', $device->id)
@@ -451,10 +458,13 @@ class MqttListener extends Command
             }
         }
 
+        // Save to cache (24 hours)
+        \Cache::put("device_outputs_{$device->id}", $cachedOutputs, now()->addHours(24));
+
         if ($updatesCount > 0) {
-            $this->info("           ✅ Updated {$updatesCount} outputs in database");
+            $this->info("           ✅ Updated {$updatesCount} outputs in database & cache");
         } else {
-            $this->info("           ✅ Status received (No DB updates)");
+            $this->info("           ✅ Status received (Cache updated, No DB match)");
         }
     }
 
