@@ -224,9 +224,14 @@
                                 </td>
                                 
                                 <td>
-                                    <button class="btn btn-sm btn-outline-light" onclick='openScheduleModal({{ $i }}, @json($sch))'>
+                                    <button class="btn btn-sm btn-outline-light me-1" onclick='openScheduleModal({{ $i }}, @json($sch))'>
                                         <i class="bi bi-pencil-square"></i> Edit
                                     </button>
+                                    @if($isActive)
+                                        <button class="btn btn-sm btn-outline-danger" onclick="deleteSchedule({{ $i }})">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    @endif
                                 </td>
                             </tr>
                         @endfor
@@ -238,7 +243,7 @@
                 <i class="bi bi-info-circle-fill me-2 fs-4"></i>
                 <div>
                     Data di atas adalah sinkronisasi terakhir dari device. 
-                    <br>Jika Anda mengirim jadwal baru, data akan terupdate setelah device merespons.
+                    <br>Jika Anda mengirim jadwal baru atau menghapus, data akan terupdate setelah device merespons.
                 </div>
             </div>
         </div>
@@ -318,12 +323,17 @@
                     </div>
                     @endif
                 </div>
-                <div class="modal-footer border-top border-secondary">
-                    <button type="button" class="btn btn-link text-white-50 text-decoration-none" data-bs-dismiss="modal">Batal</button>
-                    <button type="button" class="btn btn-primary" onclick="sendSchedule()">
-                        <span id="btnText">Kirim ke Device</span>
-                        <div id="btnLoading" class="spinner-border spinner-border-sm ms-2 d-none"></div>
+                <div class="modal-footer border-top border-secondary justify-content-between">
+                    <button type="button" class="btn btn-outline-danger d-none" id="btnDeleteModal" onclick="deleteScheduleFromModal()">
+                        <i class="bi bi-trash me-1"></i> Hapus
                     </button>
+                    <div>
+                        <button type="button" class="btn btn-link text-white-50 text-decoration-none" data-bs-dismiss="modal">Batal</button>
+                        <button type="button" class="btn btn-primary" onclick="sendSchedule()">
+                            <span id="btnText">Kirim ke Device</span>
+                            <div id="btnLoading" class="spinner-border spinner-border-sm ms-2 d-none"></div>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -332,6 +342,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         const storeUrl = '{{ route("schedule.time.store", [$userDevice->id]) }}';
+        const deleteUrlBase = '{{ url("/device/" . $userDevice->id . "/schedule") }}';
         const csrfToken = '{{ csrf_token() }}';
         
         // PHP configs to JS
@@ -347,6 +358,8 @@
             document.getElementById('slot_id').value = slotId;
             document.getElementById('modalTitle').innerText = `Edit Slot ${slotId}`;
             
+            const btnDelete = document.getElementById('btnDeleteModal');
+            
             // Default values
             document.getElementById('on_time').value = '';
             if(isDuration) document.getElementById('duration').value = 5;
@@ -361,6 +374,8 @@
             
             // Fill data if editing existing schedule
             if (data && data.is_active) {
+                btnDelete.classList.remove('d-none');
+                
                 document.getElementById('on_time').value = data.on_time ? data.on_time.substring(0, 5) : '';
                 
                 if(isDuration) document.getElementById('duration').value = data.duration || 5;
@@ -381,11 +396,41 @@
                     });
                 }
             } else {
-                // Should we set defaults for "New" schedule in this slot?
-                // Already set above.
+                btnDelete.classList.add('d-none');
             }
             
             modal.show();
+        }
+
+        async function deleteSchedule(slotId) {
+            if(!confirm(`Yakin ingin menghapus jadwal Slot ${slotId}?`)) return;
+            
+            try {
+                const res = await fetch(`${deleteUrlBase}/${slotId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken
+                    }
+                });
+                
+                const data = await res.json();
+                
+                if(data.success) {
+                    alert(data.message);
+                    location.reload();
+                } else {
+                    alert('Gagal: ' + data.message);
+                }
+            } catch (e) {
+                alert('Error: ' + e.message);
+            }
+        }
+
+        function deleteScheduleFromModal() {
+            const slotId = document.getElementById('slot_id').value;
+            deleteSchedule(slotId);
+            modal.hide();
         }
 
         async function sendSchedule() {

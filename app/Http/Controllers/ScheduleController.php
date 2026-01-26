@@ -145,4 +145,34 @@ class ScheduleController extends Controller
     // Keeping it commented or empty to avoid errors if called, 
     // but routes commented it out. I will just omit it for now or return error 
     // to strictly clean up.
+    /**
+     * Delete/Disable schedule slot
+     */
+    public function destroy($userDeviceId, $slotId)
+    {
+        $userDevice = UserDevice::where('id', $userDeviceId)
+            ->where('user_id', Auth::id())
+            ->firstOrFail();
+
+        $device = $userDevice->device;
+
+        // MQTT command to delete
+        $success = $this->mqttService->deleteSchedule(
+            $device->mqtt_topic,
+            $device->token,
+            (int) $slotId
+        );
+
+        if ($success) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Perintah hapus jadwal slot ' . $slotId . ' dikirim.'
+            ]);
+        }
+
+        return response()->json([
+            'success' => false,
+            'message' => 'Gagal mengirim perintah hapus.'
+        ], 500);
+    }
 }

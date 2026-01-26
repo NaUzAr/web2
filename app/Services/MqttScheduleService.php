@@ -150,6 +150,35 @@ class MqttScheduleService
     }
 
     /**
+     * Send delete/disable schedule command to device
+     * Format: <sch{id}#70#70#0#0#2#>
+     */
+    public function deleteSchedule(string $mqttTopic, string $deviceToken, int $slotId): bool
+    {
+        try {
+            $mqtt = $this->connect();
+            $topic = rtrim($mqttTopic, '/') . '/sub';
+
+            // Format specific request: <sch{id}#70#70#0#0#2#>
+            $message = sprintf('<sch%d#70#70#0#0#2#>', $slotId);
+
+            $mqtt->publish($topic, $message, 1);
+            $mqtt->disconnect();
+
+            Log::info("Delete schedule command sent via {$topic}", [
+                'message' => $message,
+                'slot_id' => $slotId
+            ]);
+
+            return true;
+
+        } catch (\Exception $e) {
+            Log::error("Failed to delete schedule via MQTT: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
      * Convert days format to binary (Sun-Sat)
      * Input: "12345" (1=Mon...7=Sun) or "1234567" 
      * Output: "0111110" (Sun-Sat, Mon-Fri active)

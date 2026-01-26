@@ -68,6 +68,7 @@ Route::middleware(['auth'])->group(function () {
     Route::prefix('device/{userDeviceId}/schedule')->name('schedule.')->group(function () {
         Route::get('/', [ScheduleController::class, 'index'])->name('index');
         Route::post('/time', [ScheduleController::class, 'storeTimeSchedules'])->name('time.store');
+        Route::delete('/{slotId}', [ScheduleController::class, 'destroy'])->name('destroy');
         // Route::post('/sensor', [ScheduleController::class, 'storeSensorRule'])->name('sensor.store'); // Sensor rules might need rethink or move
     });
 });
