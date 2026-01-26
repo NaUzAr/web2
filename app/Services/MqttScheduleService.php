@@ -66,15 +66,21 @@ class MqttScheduleService
 
     /**
      * Send single time-based schedule to device
-     * Supports different formats based on automation_mode:
-     * - time: <jdw{id}#{output}#{on}#{off}#>
-     * - time_days: <jdw{id}#{output}#{on}#{off}#{days}#>
-     * - time_days_sector: <jdw{id}#{output}#{on}#{off}#{days}#{sector}#>
+     * Format ESP32: <sch{id}#{hour}#{minute}#{duration}#{sector}#{type}#{days}>
+     * 
+     * Example: <sch1#8#30#15#2#1#0111110>
+     * - sch1 = Slot 1
+     * - 8 = Hour (08:xx)
+     * - 30 = Minute (xx:30)
+     * - 15 = Duration in minutes
+     * - 2 = Sector
+     * - 1 = Type (1=BAKU, 2=PUPUK, 3=DRAIN)
+     * - 0111110 = Days (Sun-Sat, 0=off, 1=on)
      * 
      * @param string $mqttTopic MQTT topic dari device (dari Admin Panel)
      * @param string $deviceToken Token device untuk identifikasi
-     * @param string $outputName Nama output yang dijadwalkan
-     * @param array $schedule Single jadwal (id, on, off, days?, sector?)
+     * @param string $outputName Nama output/jenis (BAKU, PUPUK, DRAIN)
+     * @param array $schedule Single jadwal (id, on, off, days?, sector?, duration?)
      * @param string $automationMode Mode automation (time, time_days, time_days_sector)
      */
     public function sendSingleTimeSchedule(string $mqttTopic, string $deviceToken, string $outputName, array $schedule, string $automationMode = 'time'): bool
@@ -83,56 +89,52 @@ class MqttScheduleService
             $mqtt = $this->connect();
             $topic = rtrim($mqttTopic, '/') . '/sub';
 
-            // Build message based on automation mode
-            switch ($automationMode) {
-                case 'time_days_sector':
-                case 'time_days_duration_sector':
-                    // Format: <jdw{id}#{output}#{on}#{off}#{days}#{sector}#>
-                    $message = sprintf(
-                        '<jdw%d#%s#%s#%s#%s#%d#>',
-                        $schedule['id'],
-                        $outputName,
-                        $schedule['on'],
-                        $schedule['off'],
-                        $schedule['days'] ?? '1234567',
-                        $schedule['sector'] ?? 1
-                    );
-                    break;
+            // Parse time (HH:MM) into hour and minute
+            $timeParts = explode(':', $schedule['on']);
+            $hour = (int) ($timeParts[0] ?? 0);
+            $minute = (int) ($timeParts[1] ?? 0);
 
-                case 'time_days':
-                case 'time_days_duration': // Treat duration mode same as normal days since off-time is calculated
-                    // Format: <jdw{id}#{output}#{on}#{off}#{days}#>
-                    $message = sprintf(
-                        '<jdw%d#%s#%s#%s#%s#>',
-                        $schedule['id'],
-                        $outputName,
-                        $schedule['on'],
-                        $schedule['off'],
-                        $schedule['days'] ?? '1234567'
-                    );
-                    break;
-
-                case 'time':
-                case 'time_duration': // Treat duration mode same as normal time
-                default:
-                    // Format: <jdw{id}#{output}#{on}#{off}#>
-                    $message = sprintf(
-                        '<jdw%d#%s#%s#%s#>',
-                        $schedule['id'],
-                        $outputName,
-                        $schedule['on'],
-                        $schedule['off']
-                    );
-                    break;
+            // Calculate duration from on/off time if not provided
+            $duration = $schedule['duration'] ?? 5;
+            if (!isset($schedule['duration']) && isset($schedule['off'])) {
+                $onTime = \Carbon\Carbon::createFromFormat('H:i', $schedule['on']);
+                $offTime = \Carbon\Carbon::createFromFormat('H:i', $schedule['off']);
+                $duration = $onTime->diffInMinutes($offTime);
+                if ($duration < 0)
+                    $duration += 1440; // Handle overnight
             }
+
+            // Get sector (default 1)
+            $sector = $schedule['sector'] ?? 1;
+
+            // Map type to numeric value: BAKU=1, PUPUK=2, DRAIN=3
+            $typeMap = ['BAKU' => 1, 'PUPUK' => 2, 'DRAIN' => 3];
+            $typeNum = $typeMap[strtoupper($outputName)] ?? 1;
+
+            // Convert days to binary format (Sun-Sat: 0111110 = Mon-Fri)
+            // Input: "12345" or "1234567" (1=Mon, 7=Sun) or already binary
+            $daysInput = $schedule['days'] ?? '1234567';
+            $daysBinary = $this->convertDaysToBinary($daysInput);
+
+            // Build message: <sch{id}#{hour}#{minute}#{duration}#{sector}#{type}#{days}>
+            $message = sprintf(
+                '<sch%d#%d#%d#%d#%d#%d#%s>',
+                $schedule['id'],
+                $hour,
+                $minute,
+                $duration,
+                $sector,
+                $typeNum,
+                $daysBinary
+            );
 
             $mqtt->publish($topic, $message, 1); // QoS 1
             $mqtt->disconnect();
 
-            Log::info("Time schedule sent to device via {$topic}", [
+            Log::info("Schedule sent to device via {$topic}", [
                 'message' => $message,
-                'output' => $outputName,
                 'slot_id' => $schedule['id'],
+                'type' => $outputName,
                 'mode' => $automationMode,
             ]);
 
@@ -145,6 +147,34 @@ class MqttScheduleService
             ]);
             return false;
         }
+    }
+
+    /**
+     * Convert days format to binary (Sun-Sat)
+     * Input: "12345" (1=Mon...7=Sun) or "1234567" 
+     * Output: "0111110" (Sun-Sat, Mon-Fri active)
+     */
+    private function convertDaysToBinary(string $days): string
+    {
+        // If already binary format (7 chars of 0/1)
+        if (preg_match('/^[01]{7}$/', $days)) {
+            return $days;
+        }
+
+        // Convert numeric days (1=Mon...7=Sun) to binary (Sun-Sat)
+        // Binary positions: [Sun, Mon, Tue, Wed, Thu, Fri, Sat] = [7, 1, 2, 3, 4, 5, 6]
+        $binary = ['0', '0', '0', '0', '0', '0', '0']; // Sun-Sat
+
+        for ($i = 0; $i < strlen($days); $i++) {
+            $day = (int) $days[$i];
+            if ($day >= 1 && $day <= 7) {
+                // Map: 1(Mon)->index 1, 2(Tue)->2, ..., 6(Sat)->6, 7(Sun)->0
+                $binaryIndex = ($day == 7) ? 0 : $day;
+                $binary[$binaryIndex] = '1';
+            }
+        }
+
+        return implode('', $binary);
     }
 
     /**

@@ -155,7 +155,7 @@
                                 </div>
 
                                 @if($isDays)
-                                    <div class="col-12 col-lg-4">
+                                    <div class="col-12 col-lg-3">
                                         <label class="form-label small">Days</label>
                                         <div class="d-flex flex-wrap">
                                             @foreach([1 => 'Sen', 2 => 'Sel', 3 => 'Rab', 4 => 'Kam', 5 => 'Jum', 6 => 'Sab', 7 => 'Min'] as $val => $label)
@@ -178,6 +178,16 @@
                                         </select>
                                     </div>
                                 @endif
+
+                                {{-- Jenis (Type) Field --}}
+                                <div class="col-6 col-lg-1">
+                                    <label class="form-label small">Jenis</label>
+                                    <select id="type_{{ $i }}" class="form-select">
+                                        <option value="BAKU">Baku</option>
+                                        <option value="PUPUK">Pupuk</option>
+                                        <option value="DRAIN">Drain</option>
+                                    </select>
+                                </div>
 
                                 <div class="col-6 col-lg-1">
                                     <button type="button" class="btn btn-primary w-100" onclick="sendSchedule({{ $i }})">
@@ -240,6 +250,10 @@
                         sector = sectorSelect ? sectorSelect.value : 1;
                     }
 
+                    // Get schedule type (Jenis)
+                    const typeSelect = document.getElementById(`type_${slotIndex}`);
+                    const scheduleType = typeSelect ? typeSelect.value : 'BAKU';
+
                     statusBadge.className = 'badge bg-warning';
                     statusBadge.textContent = 'Mengirim...';
 
@@ -250,7 +264,8 @@
                             off_time: offTime, // can be null if duration used
                             duration: duration,
                             days: days || null,
-                            sector: sector
+                            sector: sector,
+                            schedule_type: scheduleType
                         };
 
                         const response = await fetch(storeUrl, {
