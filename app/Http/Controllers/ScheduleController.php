@@ -53,28 +53,16 @@ class ScheduleController extends Controller
         $device = $userDevice->device;
         $scheduleConfig = \App\Models\DeviceSchedule::where('device_id', $device->id)->firstOrFail();
 
-        // Validation rules based on mode
+        // Flexible validation - accept both duration and off_time
         $rules = [
             'slot_id' => 'required|integer|min:1',
             'on_time' => 'required|date_format:H:i',
+            'schedule_type' => 'nullable|string|in:BAKU,PUPUK,DRAIN',
+            'duration' => 'nullable|integer|min:1|max:1440',
+            'off_time' => 'nullable|date_format:H:i',
+            'days' => 'nullable|string|max:7',
+            'sector' => 'nullable|integer|min:1',
         ];
-
-        // Determine if we need off_time or duration
-        $isDurationMode = str_contains($scheduleConfig->schedule_mode, 'duration');
-
-        if ($isDurationMode) {
-            $rules['duration'] = 'required|integer|min:1|max:1440'; // Max 24 hours
-        } else {
-            $rules['off_time'] = 'required|date_format:H:i';
-        }
-
-        if (str_contains($scheduleConfig->schedule_mode, 'days')) {
-            $rules['days'] = 'nullable|string|max:7';
-        }
-
-        if (str_contains($scheduleConfig->schedule_mode, 'sector')) {
-            $rules['sector'] = 'nullable|integer|min:1';
-        }
 
         $validated = $request->validate($rules);
 
@@ -82,45 +70,52 @@ class ScheduleController extends Controller
         $onTime = $validated['on_time'];
         $offTime = null;
 
-        if ($isDurationMode) {
-            // Calculate off_time based on duration
-            // Note: This logic assumes simple same-day calculation or wrapping
-            // For now, simpler implementation: PHP calculates end time string
+        // Calculate off_time from duration if provided
+        if (!empty($validated['duration'])) {
             $startTime = \Carbon\Carbon::createFromFormat('H:i', $onTime);
             $endTime = $startTime->copy()->addMinutes((int) $validated['duration']);
             $offTime = $endTime->format('H:i');
-        } else {
+        } elseif (!empty($validated['off_time'])) {
             $offTime = $validated['off_time'];
+        } else {
+            // Default: 5 minutes duration
+            $startTime = \Carbon\Carbon::createFromFormat('H:i', $onTime);
+            $offTime = $startTime->copy()->addMinutes(5)->format('H:i');
         }
 
+        // Build schedule array
         $schedule = [
             'id' => $validated['slot_id'],
             'on' => $onTime,
             'off' => $offTime,
         ];
 
-        if (isset($validated['days'])) {
+        // Add days if provided
+        if (!empty($validated['days'])) {
             $schedule['days'] = $validated['days'];
         }
 
-        if (isset($validated['sector'])) {
+        // Add sector if provided
+        if (!empty($validated['sector'])) {
             $schedule['sector'] = $validated['sector'];
         }
 
+        // Get schedule type (Jenis) - use as output_key if schedule_type is provided
+        $outputKey = $validated['schedule_type'] ?? $scheduleConfig->output_key ?? 'general';
+
         // Send to MQTT
-        // Note: output_key from config is used as the target output name
         $success = $this->mqttService->sendSingleTimeSchedule(
             $device->mqtt_topic,
             $device->token,
-            $scheduleConfig->output_key ?? 'general', // fallback if empty
+            $outputKey,
             $schedule,
             $scheduleConfig->schedule_mode
         );
 
         if ($success) {
             $msg = 'Jadwal slot ' . $validated['slot_id'] . ' berhasil dikirim!';
-            if ($isDurationMode) {
-                $msg .= " (Selesai pukul {$offTime})";
+            if (!empty($validated['duration'])) {
+                $msg .= " (Durasi: {$validated['duration']} menit, selesai pukul {$offTime})";
             }
 
             return response()->json([

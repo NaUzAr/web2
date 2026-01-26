@@ -36,6 +36,9 @@ class DeviceSchedule extends Model
             'time' => 'Waktu Saja',
             'time_days' => 'Waktu + Hari',
             'time_days_sector' => 'Waktu + Hari + Sektor',
+            'time_duration' => 'Waktu + Durasi',
+            'time_days_duration' => 'Waktu + Hari + Durasi',
+            'time_days_duration_sector' => 'Waktu + Hari + Durasi + Sektor',
             default => $this->schedule_mode,
         };
     }

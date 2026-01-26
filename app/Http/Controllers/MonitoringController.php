@@ -316,26 +316,43 @@ class MonitoringController extends Controller
                 ->first();
         }
 
-        // Get Active Device Schedules
-        $activeSchedules = \App\Models\DeviceScheduleData::where('device_id', $device->id)
-            ->where('is_active', true)
-            ->get()
-            ->map(function ($schedule) {
-                return [
-                    'key' => $schedule->slot_key,
-                    'name' => $schedule->name,
-                    'time' => $schedule->display_time,
-                    'duration' => $schedule->duration,
-                    'sector' => $schedule->sector,
-                    'days' => $schedule->display_days,
-                ];
-            });
+        // Get Schedule Config
+        $scheduleConfig = $device->schedules()->first();
+        $maxSlots = $scheduleConfig?->max_slots ?? 14;
+        $maxSectors = $scheduleConfig?->max_sectors ?? 1;
+        $scheduleMode = $scheduleConfig?->schedule_mode ?? 'time_days_duration_sector_type';
+
+        // Get Device Schedules from Cache (all schedules, not just active)
+        $cachedSchedules = \Cache::get("device_schedules_{$device->id}", []);
+
+        // Format schedules for frontend
+        $schedules = collect($cachedSchedules)->map(function ($schedule) {
+            $days = is_array($schedule['days']) ? implode(', ', $schedule['days']) : ($schedule['days'] ?? '-');
+            $time = $schedule['on_time'] ? substr($schedule['on_time'], 0, 5) : '-';
+
+            return [
+                'key' => $schedule['slot_key'],
+                'name' => $schedule['name'] ?? '-',
+                'time' => $time,
+                'duration' => $schedule['duration'] ?? 0,
+                'sector' => $schedule['sector'] ?? 0,
+                'days' => $days,
+                'is_active' => $schedule['is_active'] ?? false,
+            ];
+        })->sortBy(function ($item) {
+            return (int) str_replace('sch', '', $item['key']);
+        })->values();
 
         return response()->json([
             'success' => true,
             'outputs' => $outputs,
             'sensors' => $latestSensorData,
-            'schedules' => $activeSchedules,
+            'schedules' => $schedules,
+            'schedule_config' => [
+                'max_slots' => $maxSlots,
+                'max_sectors' => $maxSectors,
+                'mode' => $scheduleMode,
+            ],
             'timestamp' => now()->toIso8601String()
         ]);
     }

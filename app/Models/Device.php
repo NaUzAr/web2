@@ -274,6 +274,11 @@ class Device extends Model
                 'description' => 'Set jam, durasi, hari, dan sektor',
                 'icon' => 'bi-grid-fill'
             ],
+            'time_days_duration_sector_type' => [
+                'label' => 'Waktu + Hari + Durasi + Sektor + Jenis',
+                'description' => 'Set jam, durasi, hari, sektor, dan jenis (Pupuk/Air Baku)',
+                'icon' => 'bi-list-check'
+            ],
         ];
     }
 }

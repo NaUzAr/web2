@@ -325,50 +325,51 @@ class MqttListener extends Command
     }
 
     /**
-     * Log schedule data (Counter 2 & 3) - parse and save to database
+     * Log schedule data (Counter 2 & 3) - parse and save to cache
      */
     private function logScheduleData($device, $data)
     {
         $this->info("           📅 Type: SCHEDULE DATA");
 
+        // Get existing schedules from cache (to merge with new data)
+        $cacheKey = "device_schedules_{$device->id}";
+        $existingSchedules = \Cache::get($cacheKey, []);
+
         $savedCount = 0;
 
-        // Process sch1 through sch14
-        for ($i = 1; $i <= 14; $i++) {
-            $key = "sch{$i}";
-            if (isset($data[$key])) {
-                $rawValue = $data[$key];
+        // Process sch1 through sch14 (or more based on config)
+        foreach ($data as $key => $rawValue) {
+            if (!str_starts_with($key, 'sch'))
+                continue;
 
-                // Parse using model method
-                $parsed = \App\Models\DeviceScheduleData::parseFromDevice($rawValue);
+            // Parse using model method
+            $parsed = \App\Models\DeviceScheduleData::parseFromDevice($rawValue);
 
-                // Save or update
-                \App\Models\DeviceScheduleData::updateOrCreate(
-                    [
-                        'device_id' => $device->id,
-                        'slot_key' => $key,
-                    ],
-                    [
-                        'on_time' => $parsed['on_time'],
-                        'duration' => $parsed['duration'],
-                        'sector' => $parsed['sector'],
-                        'name' => $parsed['name'],
-                        'days' => $parsed['days'],
-                        'is_active' => $parsed['is_active'],
-                    ]
-                );
+            // Store in array with slot key
+            $existingSchedules[$key] = [
+                'slot_key' => $key,
+                'on_time' => $parsed['on_time'],
+                'duration' => $parsed['duration'],
+                'sector' => $parsed['sector'],
+                'name' => $parsed['name'],
+                'days' => $parsed['days'],
+                'is_active' => $parsed['is_active'],
+                'updated_at' => now()->toIso8601String(),
+            ];
 
-                if ($parsed['is_active']) {
-                    $this->line("           • {$key}: {$parsed['name']} @ {$parsed['on_time']} ({$parsed['duration']}min, Sektor {$parsed['sector']})");
-                    $savedCount++;
-                }
+            if ($parsed['is_active']) {
+                $this->line("           • {$key}: {$parsed['name']} @ {$parsed['on_time']} ({$parsed['duration']}min, Sektor {$parsed['sector']})");
+                $savedCount++;
             }
         }
 
+        // Save merged schedules to cache (24 hours expiry)
+        \Cache::put($cacheKey, $existingSchedules, now()->addHours(24));
+
         if ($savedCount > 0) {
-            $this->info("           ✅ Saved {$savedCount} active schedules to database");
+            $this->info("           ✅ Cached {$savedCount} active schedules");
         } else {
-            $this->info("           ✅ Schedule received (no active schedules)");
+            $this->info("           ✅ Schedule received (cached to memory)");
         }
     }
 
