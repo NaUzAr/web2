@@ -338,6 +338,21 @@
                                     <i class="bi bi-thermometer-half me-1"></i> Konfigurasi Sensor
                                     <span class="badge-count ms-2" id="sensorCount">0 sensor</span>
                                 </label>
+                                
+                                <!-- Quick Add Sensors -->
+                                <div class="mb-3">
+                                    <label class="small text-white-50 mb-2 d-block">Quick Add (Klik untuk menambahkan):</label>
+                                    <div class="d-flex flex-wrap gap-2">
+                                        @foreach($availableSensors as $key => $sensor)
+                                            <button type="button" class="btn btn-sm btn-outline-light bg-opacity-10" 
+                                                    onclick="addSensorRow('{{ $key }}')"
+                                                    style="border-color: var(--glass-border); background: rgba(255,255,255,0.05);">
+                                                <i class="bi {{ $sensor['icon'] }} me-1"></i> {{ $sensor['label'] }}
+                                            </button>
+                                        @endforeach
+                                    </div>
+                                </div>
+
                                 <div class="alert alert-info-custom py-2 mb-3">
                                     <small><i class="bi bi-info-circle me-1"></i>
                                         Tambahkan sensor sesuai kebutuhan. Bisa menambah sensor dengan jenis yang sama.
@@ -347,7 +362,7 @@
                                 <div id="sensorContainer"></div>
 
                                 <button type="button" class="btn btn-outline-add w-100" onclick="addSensorRow()">
-                                    <i class="bi bi-plus-circle me-1"></i> Tambah Sensor
+                                    <i class="bi bi-plus-circle me-1"></i> Tambah Sensor Manual
                                 </button>
                             </div>
 
@@ -358,32 +373,49 @@
                                 </label>
                                 <div class="alert alert-info-custom py-2 mb-3">
                                     <small><i class="bi bi-info-circle me-1"></i>
-                                        Pilih paket otomasi yang ingin diaktifkan. Sensor & Output akan otomatis
-                                        ditambahkan.
+                                        Pilih sensor dan output yang ingin ditambahkan untuk paket otomasi ini (Klik tombol).
                                     </small>
                                 </div>
-
+                                
                                 <div class="row g-3">
                                     @foreach($automationPresets as $key => $preset)
                                         <div class="col-md-6">
-                                            <div class="glass-card p-3 h-100 border-0"
-                                                style="background: rgba(255,255,255,0.05);">
-                                                <div class="form-check form-switch mb-2">
-                                                    <input class="form-check-input" type="checkbox" id="auto_{{ $key }}"
-                                                        onchange="toggleAutomation('{{ $key }}')">
-                                                    <label class="form-check-label fw-bold text-white"
-                                                        for="auto_{{ $key }}">
-                                                        <i class="bi {{ $preset['icon'] }} me-1"></i> {{ $preset['label'] }}
-                                                    </label>
+                                            <div class="glass-card p-3 h-100 border-0" style="background: rgba(255,255,255,0.05);">
+                                                <h6 class="text-white fw-bold mb-2">
+                                                    <i class="bi {{ $preset['icon'] }} me-1"></i> {{ $preset['label'] }}
+                                                </h6>
+                                                <p class="small text-white-50 mb-3">{{ $preset['description'] }}</p>
+
+                                                <!-- Sensors Group -->
+                                                <div class="mb-2">
+                                                    <strong class="d-block small text-white-50 mb-1">Rekomendasi Sensor:</strong>
+                                                    <div class="d-flex flex-wrap gap-2">
+                                                        @foreach($preset['sensors'] as $sensorKey => $qty)
+                                                            @if(isset($availableSensors[$sensorKey]))
+                                                                <button type="button" class="btn btn-sm btn-outline-info bg-opacity-10" 
+                                                                        onclick="addSensorRow('{{ $sensorKey }}')"
+                                                                        title="Tambah Sensor {{ $availableSensors[$sensorKey]['label'] }}">
+                                                                    <i class="bi {{ $availableSensors[$sensorKey]['icon'] }}"></i> {{ $availableSensors[$sensorKey]['label'] }}
+                                                                </button>
+                                                            @endif
+                                                        @endforeach
+                                                    </div>
                                                 </div>
-                                                <small class="text-white-50 d-block ms-4 mb-2">
-                                                    {{ $preset['description'] }}
-                                                </small>
-                                                <div class="ms-4 small text-white-50">
-                                                    <div><i class="bi bi-thermometer-half me-1"></i> Sensor:
-                                                        {{ count($preset['sensors']) }}</div>
-                                                    <div><i class="bi bi-toggle-on me-1"></i> Output:
-                                                        {{ count($preset['outputs']) }}</div>
+
+                                                <!-- Outputs Group -->
+                                                <div>
+                                                    <strong class="d-block small text-white-50 mb-1">Rekomendasi Output:</strong>
+                                                    <div class="d-flex flex-wrap gap-2">
+                                                        @foreach($preset['outputs'] as $outputKey => $qty)
+                                                            @if(isset($availableOutputs[$outputKey]))
+                                                                <button type="button" class="btn btn-sm btn-outline-warning bg-opacity-10" 
+                                                                        onclick="addOutputRow('{{ $outputKey }}')"
+                                                                        title="Tambah Output {{ $availableOutputs[$outputKey]['label'] }}">
+                                                                    <i class="bi {{ $availableOutputs[$outputKey]['icon'] }}"></i> {{ $availableOutputs[$outputKey]['label'] }}
+                                                                </button>
+                                                            @endif
+                                                        @endforeach
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -397,6 +429,22 @@
                                     <i class="bi bi-toggle-on me-1"></i> Konfigurasi Output (Opsional)
                                     <span class="badge-count ms-2" id="outputCount">0 output</span>
                                 </label>
+                                
+                                 <!-- Quick Add Outputs -->
+                                <div class="mb-3">
+                                    <label class="small text-white-50 mb-2 d-block">Quick Add (Klik untuk menambahkan):</label>
+                                    <div class="d-flex flex-wrap gap-2">
+                                        @foreach($availableOutputs as $key => $output)
+                                            <!-- Filter out automation specific outputs to avoid clutter if too many, or show all -->
+                                            <!-- Showing all for now as per "make output like that too" -->
+                                            <button type="button" class="btn btn-sm btn-outline-light bg-opacity-10" 
+                                                    onclick="addOutputRow('{{ $key }}')"
+                                                    style="border-color: var(--glass-border); background: rgba(255,255,255,0.05);">
+                                                <i class="bi {{ $output['icon'] }} me-1"></i> {{ $output['label'] }}
+                                            </button>
+                                        @endforeach
+                                    </div>
+                                </div>
                                 <div class="alert alert-info-custom py-2 mb-3">
                                     <small><i class="bi bi-info-circle me-1"></i>
                                         Output adalah aktuator yang dapat dikontrol via MQTT (relay, pompa, kipas, dll).
@@ -666,38 +714,7 @@
             if (sensors === 0) { e.preventDefault(); alert('Tambahkan minimal 1 sensor!'); return false; }
         });
     </script>
-    <script>
-        // Automation Toggle Logic
-        function toggleAutomation(key) {
-            const isChecked = document.getElementById(`auto_${key}`).checked;
-            const preset = automationPresets[key];
 
-            if (isChecked) {
-                // Add Sensors
-                for (const [sensorKey, count] of Object.entries(preset.sensors)) {
-                    // Check if already exists to avoid duplicates (optional, strictly speaking we can add more)
-                    // For simplicity, we just add. De-duplication is complex without ID tracking.
-                    // But we ideally want unique outputs for automation logic.
-                    // Let's add them. 
-                    for (let i = 0; i < count; i++) {
-                        addSensorRow(sensorKey);
-                    }
-                }
-
-                // Add Outputs
-                for (const [outKey, count] of Object.entries(preset.outputs)) {
-                    for (let i = 0; i < count; i++) {
-                        addOutputRow(outKey);
-                    }
-                }
-            } else {
-                // Remove logic is hard because we don't know which row belongs to this preset 
-                // unless we track it. For now, simple "Uncheck" won't remove rows to prevent accidental deletion of manual edits.
-                // We can notify user.
-                alert('Menonaktifkan preset tidak menghapus sensor/output yang sudah ditambahkan. Silakan hapus manual jika tidak diperlukan.');
-            }
-        }
-    </script>
 
     <!-- Leaflet JS for Map Picker -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
