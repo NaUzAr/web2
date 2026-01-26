@@ -387,20 +387,22 @@
                                             </h6>
                                             <p class="small text-white-50 mb-2">{{ $preset['description'] }}</p>
 
-                                            <label class="small text-white-50 mb-2 d-block">Quick Add Sensor (Klik untuk
-                                                menambahkan):</label>
-                                            <div class="d-flex flex-wrap gap-2">
+                                            <label class="small text-white-50 mb-2 d-block">Quick Add Sensor (Klik untuk menambahkan):</label>
+                                            <div class="d-flex flex-wrap gap-2 mb-3">
                                                 @foreach($preset['sensors'] as $sensorKey => $qty)
                                                     @if(isset($availableSensors[$sensorKey]))
                                                         <button type="button" class="btn btn-sm btn-outline-info bg-opacity-10"
-                                                            onclick="addSensorRow('{{ $sensorKey }}')" style="border-style: dashed;"
-                                                            title="Tambah Sensor Otomasi {{ $availableSensors[$sensorKey]['label'] }}">
-                                                            <i class="bi {{ $availableSensors[$sensorKey]['icon'] }}"></i>
-                                                            {{ $availableSensors[$sensorKey]['label'] }}
+                                                                onclick="addSensorRow('{{ $sensorKey }}', '', 'autoContainer_{{ $key }}')"
+                                                                style="border-style: dashed;"
+                                                                title="Tambah Sensor Otomasi {{ $availableSensors[$sensorKey]['label'] }}">
+                                                            <i class="bi {{ $availableSensors[$sensorKey]['icon'] }}"></i> {{ $availableSensors[$sensorKey]['label'] }}
                                                         </button>
                                                     @endif
                                                 @endforeach
                                             </div>
+
+                                            <!-- Container for Independent Automation Sensors -->
+                                            <div id="autoContainer_{{ $key }}" class="ps-3 border-start border-white-10"></div>
                                         </div>
                                         @if(!$loop->last)
                                         <hr class="border-white-10 my-3"> @endif
@@ -535,33 +537,47 @@
             return options;
         }
 
-        function addSensorRow(sensorKey = '', customLabel = '') {
-            sensorCounter++;
-            const container = document.getElementById('sensorContainer');
+        function addSensorRow(key = '', label = '', containerId = 'sensorContainer') {
+            const index = sensorCounter++;
+
+            // Auto-select based on key
+            const sensorData = key ? availableSensors[key] : null;
+            const inputLabel = label || (sensorData ? sensorData.label : '');
+
             const row = document.createElement('div');
-            row.className = 'sensor-row';
-            row.id = `sensorRow_${sensorCounter}`;
-            row.innerHTML = `
+            row.className = 'sensor-row mb-2';
+            row.id = `sensorRow_${index}`;
+            const html = `
             <div class="row align-items-center g-2">
                 <div class="col-md-5">
-                    <select class="form-select sensor-select" name="sensors[${sensorCounter}][type]" required onchange="updateSubmitButton()">
-                        ${getSensorOptions(sensorKey)}
+                    <select class="form-select sensor-select" name="sensors[${index}][type]" required onchange="updateSubmitButton()">
+                        ${getSensorOptions(key)}
                     </select>
                 </div>
                 <div class="col-md-5">
-                    <input type="text" class="form-control sensor-label-input" name="sensors[${sensorCounter}][label]" 
-                           placeholder="Label custom (opsional)" value="${customLabel}">
+                    <input type="text" class="form-control sensor-label-input" name="sensors[${index}][label]"
+                           placeholder="Label custom (opsional)" value="${inputLabel}">
                 </div>
                 <div class="col-md-2 text-end">
-                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeSensorRow(${sensorCounter})" style="border-radius: 50%;">
+                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeSensorRow(${index})" style="border-radius: 50%;">
                         <i class="bi bi-trash"></i>
                     </button>
                 </div>
             </div>
         `;
-            container.appendChild(row);
-            updateSensorCount();
-            container.appendChild(row);
+            row.innerHTML = html;
+            document.getElementById(containerId).appendChild(row);
+
+            if (key) {
+                const select = row.querySelector('.sensor-select');
+                select.value = key;
+                // updateSensorUnit(select); // If you have a function to update unit display
+            }
+
+            // Only update main submit button if adding to main container,
+            // but ideally validation should check all sensors.
+            // Current validation checks '.sensor-row', which is class for all.
+            // So it works globally.
             updateSensorCount();
             updateSubmitButton();
         }
@@ -583,11 +599,11 @@
                 </div>
                 <div class="col-md-5">
                     <label class="form-label small text-white-50">Label (opsional)</label>
-                    <input type="text" class="form-control output-label-input" name="outputs[${outputCounter}][label]" 
+                    <input type="text" class="form-control output-label-input" name="outputs[${outputCounter}][label]"
                            placeholder="Label custom" value="${customLabel}">
                 </div>
                 <div class="col-md-2 text-end">
-                    <button type="button" class="btn btn-outline-danger" 
+                    <button type="button" class="btn btn-outline-danger"
                             onclick="removeOutputRow(${outputCounter})" style="border-radius: 12px;">
                         <i class="bi bi-trash"></i>
                     </button>
