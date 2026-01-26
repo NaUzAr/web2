@@ -229,6 +229,12 @@ class MqttListener extends Command
             return;
         }
 
+        // Counter 8: Automation Settings (ats_*, bwh_*)
+        if ($hasPrefix('ats_') || $hasPrefix('bwh_')) {
+            $this->logSettingData($device, $data);
+            return;
+        }
+
         // Unknown data type - try legacy sensor format as fallback
         $this->saveSensorData($device, $data);
     }
@@ -485,6 +491,37 @@ class MqttListener extends Command
         }
 
         $this->info("           ✅ Time received");
+    }
+
+    /**
+     * Log settings data (ats_*, bwh_*)
+     */
+    private function logSettingData($device, $data)
+    {
+        $this->info("           ⚙️ Type: AUTOMATION SETTINGS");
+
+        $settings = \Cache::get("device_settings_{$device->id}", []);
+        $updatesCount = 0;
+
+        foreach ($data as $key => $value) {
+            if (str_starts_with($key, 'ats_') || str_starts_with($key, 'bwh_')) {
+                $this->line("           • {$key}: {$value}");
+
+                // Update Cache
+                $settings[$key] = $value;
+
+                // Update DB
+                \App\Models\DeviceSetting::updateOrCreate(
+                    ['device_id' => $device->id, 'key' => $key],
+                    ['value' => (string) $value]
+                );
+                $updatesCount++;
+            }
+        }
+
+        \Cache::put("device_settings_{$device->id}", $settings, now()->addHours(24));
+
+        $this->info("           ✅ Updated {$updatesCount} settings in database & cache");
     }
 
 

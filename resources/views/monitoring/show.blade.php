@@ -448,6 +448,9 @@
                         <a href="{{ route('schedule.index', $userDevice->id) }}" class="btn-glass">
                             <i class="bi bi-calendar-check me-1"></i> Jadwal
                         </a>
+                        <a href="{{ route('automasi.index', $userDevice->id) }}" class="btn-glass">
+                            <i class="bi bi-cpu me-1"></i> Otomasi
+                        </a>
                     @endif
                     <button type="button" class="btn-glass" data-bs-toggle="modal" data-bs-target="#exportModal">
                         <i class="bi bi-download me-1"></i> Download CSV
@@ -1025,7 +1028,7 @@
                     @else
                         const response = await fetch('{{ route("monitoring.status", $userDevice->id) }}');
                     @endif
-                                        const data = await response.json();
+                                            const data = await response.json();
 
                     if (data.success) {
                         if (data.outputs) {

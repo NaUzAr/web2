@@ -64,6 +64,15 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/device/{deviceId}/sensors', [AutomationConfigController::class, 'getSensorsForDevice'])->name('sensors');
     });
 
+    // === AUTOMASI CUSTOM ROUTES ===
+    Route::prefix('device/{id}/automasi')->name('automasi.')->group(function () {
+        Route::get('/', [App\Http\Controllers\AutomasiController::class, 'index'])->name('index');
+        Route::get('/fertilizer', [App\Http\Controllers\AutomasiController::class, 'fertilizer'])->name('fertilizer');
+        Route::post('/fertilizer', [App\Http\Controllers\AutomasiController::class, 'storeFertilizer'])->name('fertilizer.store');
+        Route::get('/climate', [App\Http\Controllers\AutomasiController::class, 'climate'])->name('climate');
+        Route::post('/climate', [App\Http\Controllers\AutomasiController::class, 'storeClimate'])->name('climate.store');
+    });
+
     // === SCHEDULE MANAGEMENT ROUTES (Real-time MQTT) ===
     Route::prefix('device/{userDeviceId}/schedule')->name('schedule.')->group(function () {
         Route::get('/', [ScheduleController::class, 'index'])->name('index');

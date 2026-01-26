@@ -134,6 +134,38 @@ class MqttAutomationService
     }
 
     /**
+     * Send custom automation settings (key-value pairs)
+     */
+    public function sendCustomAutomationConfig(string $mqttTopic, string $deviceToken, array $settings): bool
+    {
+        try {
+            $mqtt = $this->connect();
+            $topic = rtrim($mqttTopic, '/') . '/pub';
+
+            $message = json_encode([
+                'type' => 'custom_automation',
+                'token' => $deviceToken,
+                'settings' => $settings,
+                'timestamp' => now()->toIso8601String(),
+            ]);
+
+            $mqtt->publish($topic, $message, 1);
+            $mqtt->disconnect();
+
+            Log::info("Custom automation settings sent to topic {$topic}", [
+                'token' => $deviceToken,
+                'settings_count' => count($settings),
+            ]);
+
+            return true;
+
+        } catch (\Exception $e) {
+            Log::error("Failed to send custom automation settings: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
      * Send output control command to device
      * 
      * @param string $mqttTopic MQTT topic dari device
