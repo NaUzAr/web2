@@ -100,6 +100,7 @@ class Device extends Model
         return [
             'aws' => 'AWS (Automatic Weather Station)',
             'smart_gh' => 'Smart GH (Smart Greenhouse)',
+            'smart_gh_auto' => 'Smart GH (Full Automation)',
             // Tambahkan tipe baru di sini:
             // 'water_quality' => 'Water Quality Sensor',
             // 'air_quality' => 'Air Quality Sensor',
@@ -155,6 +156,14 @@ class Device extends Model
                 // 'ni_KELEM' => 2,     // 2 sensor kelembaban
                 // 'soil_moisture' => 1,
                 // 'ni_LUX' => 1,
+            ],
+            'smart_gh_auto' => [
+                'ni_SUHU' => 1,
+                'ni_KELEM' => 1,
+                'ni_PH' => 1,
+                'ni_TDS' => 1,
+                'ni_LUX' => 1,
+                'co2' => 1,
             ],
             // Tambahkan default sensor untuk tipe baru:
             // 'water_quality' => ['water_level' => 1, 'ph' => 1, 'temperature' => 1],
@@ -214,7 +223,10 @@ class Device extends Model
                 // AWS biasanya tidak punya output, hanya monitoring
             ],
             'smart_gh' => [
-                // Presets Otomasi
+                // 'pump' => 1,
+                // 'fan' => 1,
+            ],
+            'smart_gh_auto' => [
                 'sts_air_input' => 1,
                 'sts_mixing' => 1,
                 'sts_pompa' => 1,
@@ -226,9 +238,6 @@ class Device extends Model
                 'sts_ph_down' => 1,
                 'sts_air_baku' => 1,
                 'sts_air_pupuk' => 1,
-
-                // Legacy generic maps if needed, or remove if redundant
-                // 'ni_SUHU' => 2, // If defined in sensors
             ],
             // Tambahkan default output untuk tipe baru:
         ];
