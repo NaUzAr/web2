@@ -214,10 +214,21 @@ class Device extends Model
                 // AWS biasanya tidak punya output, hanya monitoring
             ],
             'smart_gh' => [
-                // 'pump' => 1,      // 1 pompa air
-                // 'fan' => 1,       // 1 kipas
-                // 'valve' => 1,     // 1 valve
-                // 'led' => 1,       // 1 LED grow light
+                // Presets Otomasi
+                'sts_air_input' => 1,
+                'sts_mixing' => 1,
+                'sts_pompa' => 1,
+                'sts_fan' => 1,
+                'sts_misting' => 1,
+                'sts_lampu' => 1,
+                'sts_dosing' => 1,
+                'sts_ph_up' => 1,
+                'sts_ph_down' => 1,
+                'sts_air_baku' => 1,
+                'sts_air_pupuk' => 1,
+
+                // Legacy generic maps if needed, or remove if redundant
+                // 'ni_SUHU' => 2, // If defined in sensors
             ],
             // Tambahkan default output untuk tipe baru:
         ];
