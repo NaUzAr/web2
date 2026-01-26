@@ -37,7 +37,18 @@ class ScheduleController extends Controller
                 ->with('error', 'Device ini tidak memiliki konfigurasi penjadwalan.');
         }
 
-        return view('schedule.index', compact('userDevice', 'device', 'scheduleConfig'));
+        // Get cached schedules
+        $cacheKey = "device_schedules_{$device->id}";
+        $cachedSchedules = \Cache::get($cacheKey, []);
+
+        // Sort by slot key numerical value (sch1, sch2...)
+        uksort($cachedSchedules, function ($a, $b) {
+            $numA = (int) filter_var($a, FILTER_SANITIZE_NUMBER_INT);
+            $numB = (int) filter_var($b, FILTER_SANITIZE_NUMBER_INT);
+            return $numA - $numB;
+        });
+
+        return view('schedule.index', compact('userDevice', 'device', 'scheduleConfig', 'cachedSchedules'));
     }
 
     /**

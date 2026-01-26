@@ -48,58 +48,72 @@
             border: none;
         }
 
-        .day-checkbox {
-            display: inline-block;
-            margin-right: 0.5rem;
+        .table-glass {
+            color: #fff;
+        }
+        
+        .table-glass th,
+        .table-glass td {
+            border-color: rgba(255, 255, 255, 0.1);
+            padding: 1rem;
+            vertical-align: middle;
+        }
+        
+        .table-glass thead th {
+            border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
         }
 
-        .day-checkbox input[type="checkbox"] {
+        .badge-sector {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .modal-content-glass {
+            background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+        
+        .form-control-dark, .form-select-dark {
+            background-color: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+        
+        .form-control-dark:focus, .form-select-dark:focus {
+            background-color: rgba(0, 0, 0, 0.4);
+            border-color: #ef4444;
+            color: white;
+            box-shadow: 0 0 0 0.25rem rgba(239, 68, 68, 0.25);
+        }
+
+        .schedule-day-check {
             display: none;
         }
-
-        .day-checkbox label {
+        
+        .schedule-day-label {
             display: inline-block;
-            width: 40px;
-            height: 40px;
-            line-height: 40px;
+            width: 36px;
+            height: 36px;
+            line-height: 34px;
             text-align: center;
             border-radius: 50%;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
             cursor: pointer;
+            margin-right: 5px;
             font-size: 0.8rem;
-            font-weight: 600;
-            transition: all 0.2s ease;
+            user-select: none;
+            transition: all 0.2s;
         }
-
-        .day-checkbox input[type="checkbox"]:checked+label {
-            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        
+        .schedule-day-check:checked + .schedule-day-label {
+            background-color: #ef4444;
             border-color: #ef4444;
-        }
-
-        .schedule-slot {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .form-control,
-        .form-select {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: #fff;
-        }
-
-        .form-control:focus,
-        .form-select:focus {
-            background: rgba(255, 255, 255, 0.15);
-            border-color: #ef4444;
-            color: #fff;
-            box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2);
-        }
-
-        .form-select option {
-            background: #991b1b;
-            color: #fff;
+            color: white;
         }
     </style>
 </head>
@@ -111,8 +125,7 @@
                 <div>
                     <h3><i class="bi bi-calendar-check me-2"></i>{{ $scheduleConfig->schedule_label }}</h3>
                     <p class="text-white-50 mb-0">Device: {{ $device->name }} | Target:
-                        {{ $scheduleConfig->output_key }} | Mode:
-                        {{ ucfirst(str_replace('_', ' + ', $scheduleConfig->schedule_mode)) }}
+                        {{ $scheduleConfig->output_key }}
                     </p>
                 </div>
                 <a href="{{ route('monitoring.show', $userDevice->id) }}" class="btn-glass">
@@ -127,188 +140,317 @@
                 $isSector = str_contains($mode, 'sector');
                 $isType = str_contains($mode, 'type');
             @endphp
-
-            <div class="glass-card">
-                <h5 class="mb-3">
-                    <i class="bi bi-clock me-2"></i>Schedule Config (Max: {{ $scheduleConfig->max_slots }} slots)
-                    @if($isSector) | Sectors: {{ $scheduleConfig->max_sectors }} @endif
-                </h5>
-                <div id="scheduleContainer">
-                    @for($i = 0; $i < $scheduleConfig->max_slots; $i++)
-                        <div class="schedule-slot glass-card mb-3" id="slot-{{ $i }}">
-                            <div class="row g-3 align-items-end">
-                                <div class="col-12 col-lg-1">
-                                    <strong class="text-white-50">Slot {{ $i + 1 }}</strong>
-                                </div>
-                                <div class="col-6 col-lg-2">
-                                    <label class="form-label small">Start Time</label>
-                                    <input type="time" id="on_time_{{ $i }}" class="form-control">
-                                </div>
-                                <div class="col-6 col-lg-2">
-                                    @if($isDuration)
-                                        <label class="form-label small">Duration (Min)</label>
-                                        <input type="number" id="duration_{{ $i }}" class="form-control" placeholder="5"
-                                            min="1">
-                                    @else
-                                        <label class="form-label small">End Time</label>
-                                        <input type="time" id="off_time_{{ $i }}" class="form-control">
-                                    @endif
-                                </div>
-
-                                @if($isDays)
-                                    <div class="col-12 col-lg-3">
-                                        <label class="form-label small">Days</label>
-                                        <div class="d-flex flex-wrap">
-                                            @foreach([1 => 'Sen', 2 => 'Sel', 3 => 'Rab', 4 => 'Kam', 5 => 'Jum', 6 => 'Sab', 7 => 'Min'] as $val => $label)
-                                                <div class="day-checkbox">
-                                                    <input type="checkbox" id="day_{{ $i }}_{{ $val }}" value="{{ $val }}" checked>
-                                                    <label for="day_{{ $i }}_{{ $val }}">{{ $label }}</label>
-                                                </div>
-                                            @endforeach
-                                        </div>
-                                    </div>
-                                @endif
-
-                                @if($isSector)
-                                    <div class="col-6 col-lg-1">
-                                        <label class="form-label small">Sector</label>
-                                        <select id="sector_{{ $i }}" class="form-select">
-                                            @for($s = 1; $s <= ($scheduleConfig->max_sectors ?? 1); $s++)
-                                                <option value="{{ $s }}">{{ $s }}</option>
-                                            @endfor
-                                        </select>
-                                    </div>
-                                @endif
-
+            
+            {{-- Remove Add Button, use Fixed Slots --}}
+            
+            <div class="table-responsive">
+                <table class="table table-glass">
+                    <thead>
+                        <tr>
+                            <th>Slot</th>
+                            @if($isType) <th>Jenis</th> @endif
+                            <th>Waktu Mulai</th>
+                            @if($isDuration) 
+                                <th>Durasi</th> 
+                            @else
+                                <th>Waktu Selesai</th>
+                            @endif
+                            @if($isSector) <th>Sektor</th> @endif
+                            @if($isDays) <th>Hari</th> @endif
+                            <th>Status</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for($i = 1; $i <= ($scheduleConfig->max_slots ?? 14); $i++)
+                            @php 
+                                $key = "sch{$i}";
+                                $sch = $cachedSchedules[$key] ?? null;
+                                $isActive = $sch && ($sch['is_active'] ?? false);
+                                
+                                // Format days if exists
+                                $days = '-';
+                                if ($isActive && !empty($sch['days'])) {
+                                    $days = is_array($sch['days']) ? implode(', ', $sch['days']) : $sch['days'];
+                                }
+                            @endphp
+                            <tr id="row-slot-{{ $i }}">
+                                <td><span class="badge bg-secondary">Slot {{ $i }}</span></td>
+                                
                                 @if($isType)
-                                    {{-- Jenis (Type) Field --}}
-                                    <div class="col-6 col-lg-1">
-                                        <label class="form-label small">Jenis</label>
-                                        <select id="type_{{ $i }}" class="form-select">
-                                            <option value="BAKU">Baku</option>
-                                            <option value="PUPUK">Pupuk</option>
-                                            <option value="DRAIN">Drain</option>
-                                        </select>
-                                    </div>
+                                    <td>
+                                        @if($isActive)
+                                            @if(($sch['name'] ?? '') == 'PUPUK')
+                                                <span class="badge bg-warning text-dark">Pupuk</span>
+                                            @elseif(($sch['name'] ?? '') == 'DRAIN')
+                                                <span class="badge bg-info text-dark">Drain</span>
+                                            @elseif(($sch['name'] ?? '') == 'BAKU')
+                                                <span class="badge bg-success">Air Baku</span>
+                                            @else
+                                                <span class="badge bg-secondary">{{ $sch['name'] ?? '-' }}</span>
+                                            @endif
+                                        @else
+                                            <span class="text-white-50">-</span>
+                                        @endif
+                                    </td>
                                 @endif
-
-                                <div class="col-6 col-lg-1">
-                                    <button type="button" class="btn btn-primary w-100" onclick="sendSchedule({{ $i }})">
-                                        <i class="bi bi-send"></i>
+                                
+                                <td>{{ $isActive ? substr($sch['on_time'], 0, 5) : '-' }}</td>
+                                
+                                @if($isDuration) 
+                                    <td>{{ $isActive ? $sch['duration'] . ' Menit' : '-' }}</td> 
+                                @else
+                                    <td>{{ $isActive ? ($sch['off_time'] ?? '-') : '-' }}</td>
+                                @endif
+                                
+                                @if($isSector) 
+                                    <td>
+                                        @if($isActive)
+                                            <span class="badge badge-sector">Sektor {{ $sch['sector'] }}</span>
+                                        @else
+                                            -
+                                        @endif
+                                    </td> 
+                                @endif
+                                
+                                @if($isDays) 
+                                    <td><small>{{ $isActive ? ($days ?: 'Setiap Hari') : '-' }}</small></td> 
+                                @endif
+                                
+                                <td>
+                                    @if($isActive)
+                                        <span class="badge bg-success">Aktif</span>
+                                    @else
+                                        <span class="badge bg-secondary">Kosong</span>
+                                    @endif
+                                </td>
+                                
+                                <td>
+                                    <button class="btn btn-sm btn-outline-light" onclick='openScheduleModal({{ $i }}, @json($sch))'>
+                                        <i class="bi bi-pencil-square"></i> Edit
                                     </button>
-                                </div>
-                                <div class="col-12 col-lg-2">
-                                    <span id="status_{{ $i }}" class="badge bg-secondary">Belum dikirim</span>
-                                </div>
-                            </div>
-                        </div>
-                    @endfor
+                                </td>
+                            </tr>
+                        @endfor
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="alert alert-info mt-3 d-flex align-items-center">
+                <i class="bi bi-info-circle-fill me-2 fs-4"></i>
+                <div>
+                    Data di atas adalah sinkronisasi terakhir dari device. 
+                    <br>Jika Anda mengirim jadwal baru, data akan terupdate setelah device merespons.
                 </div>
             </div>
-
-            <div class="alert alert-info mt-3">
-                <i class="bi bi-info-circle me-1"></i> Klik tombol kirim pada setiap slot untuk set jadwal.
-            </div>
-
-            <script>
-                const mode = '{{ $mode }}';
-                const isDuration = {{ $isDuration ? 'true' : 'false' }};
-                const isDays = {{ $isDays ? 'true' : 'false' }};
-                const isSector = {{ $isSector ? 'true' : 'false' }};
-                const isType = {{ $isType ? 'true' : 'false' }};
-                // Route URL for store (without output ID now)
-                const storeUrl = '{{ route("schedule.time.store", [$userDevice->id]) }}';
-
-                async function sendSchedule(slotIndex) {
-                    const onTime = document.getElementById(`on_time_${slotIndex}`).value;
-                    let offTime = null;
-                    let duration = null;
-
-                    if (isDuration) {
-                        duration = document.getElementById(`duration_${slotIndex}`).value;
-                    } else {
-                        offTime = document.getElementById(`off_time_${slotIndex}`).value;
-                    }
-
-                    const statusBadge = document.getElementById(`status_${slotIndex}`);
-
-                    // Validation
-                    if (!onTime) { alert('Mohon isi Start Time!'); return; }
-                    if (isDuration && !duration) { alert('Mohon isi Durasi!'); return; }
-                    if (!isDuration && !offTime) { alert('Mohon isi End Time!'); return; }
-
-                    // Get days if applicable
-                    let days = '';
-                    if (isDays) {
-                        for (let d = 1; d <= 7; d++) {
-                            const checkbox = document.getElementById(`day_${slotIndex}_${d}`);
-                            if (checkbox && checkbox.checked) days += d;
-                        }
-                        if (!days) { alert('Pilih minimal satu hari!'); return; }
-                    }
-
-                    // Get sector if applicable
-                    let sector = null;
-                    if (isSector) {
-                        const sectorSelect = document.getElementById(`sector_${slotIndex}`);
-                        sector = sectorSelect ? sectorSelect.value : 1;
-                    }
-
-                    // Get schedule type (Jenis)
-                    let scheduleType = 'BAKU';
-                    if (isType) {
-                        const typeSelect = document.getElementById(`type_${slotIndex}`);
-                        scheduleType = typeSelect ? typeSelect.value : 'BAKU';
-                    }
-
-                    statusBadge.className = 'badge bg-warning';
-                    statusBadge.textContent = 'Mengirim...';
-
-                    try {
-                        const payload = {
-                            slot_id: slotIndex + 1,
-                            on_time: onTime,
-                            off_time: offTime, // can be null if duration used
-                            duration: duration,
-                            days: days || null,
-                            sector: sector,
-                            schedule_type: scheduleType
-                        };
-
-                        const response = await fetch(storeUrl, {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                                'Accept': 'application/json'
-                            },
-                            body: JSON.stringify(payload)
-                        });
-
-                        const data = await response.json();
-
-                        if (data.success) {
-                            statusBadge.className = 'badge bg-success';
-                            statusBadge.textContent = 'Terkirim ✓';
-                            // Optional: Show calculated OFF Time if returned
-                            if (data.message) {
-                                // could show toast or alert
-                            }
-                        } else {
-                            statusBadge.className = 'badge bg-danger';
-                            statusBadge.textContent = 'Gagal';
-                            alert(data.message || 'Gagal mengirim jadwal');
-                        }
-                    } catch (error) {
-                        statusBadge.className = 'badge bg-danger';
-                        statusBadge.textContent = 'Error';
-                        alert('Error: ' + error.message);
-                    }
-                }
-            </script>
         </div>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
-</body>
+    
+    <!-- Modal -->
+    <div class="modal fade" id="scheduleModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content modal-content-glass">
+                <div class="modal-header border-bottom border-secondary">
+                    <h5 class="modal-title" id="modalTitle">Set Jadwal</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="slot_id">
+                    
+                    @if($isType)
+                    <div class="mb-3">
+                        <label class="form-label text-white-50">Jenis</label>
+                        <select id="schedule_type" class="form-select form-select-dark">
+                            <option value="BAKU">Air Baku</option>
+                            <option value="PUPUK">Pupuk</option>
+                            <option value="DRAIN">Drain</option>
+                        </select>
+                    </div>
+                    @endif
+                    
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <label class="form-label text-white-50">Waktu Mulai</label>
+                            <input type="time" id="on_time" class="form-control form-control-dark">
+                        </div>
+                        <div class="col-6">
+                            @if($isDuration)
+                                <label class="form-label text-white-50">Durasi (Menit)</label>
+                                <input type="number" id="duration" class="form-control form-control-dark" min="1" value="5">
+                            @else
+                                <label class="form-label text-white-50">Waktu Selesai</label>
+                                <input type="time" id="off_time" class="form-control form-control-dark">
+                            @endif
+                        </div>
+                    </div>
+                    
+                    @if($isSector)
+                    <div class="mb-3 mt-3">
+                        <label class="form-label text-white-50">Sektor</label>
+                        <select id="sector" class="form-select form-select-dark">
+                            @for($s = 1; $s <= ($scheduleConfig->max_sectors ?? 1); $s++)
+                                <option value="{{ $s }}">Sektor {{ $s }}</option>
+                            @endfor
+                        </select>
+                    </div>
+                    @endif
+                    
+                    @if($isDays)
+                    <div class="mb-3 mt-3">
+                        <label class="form-label text-white-50 d-block">Hari Aktif</label>
+                        <div class="d-flex flex-wrap">
+                            @foreach(['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'] as $key => $day)
+                                <div class="me-2 mb-2">
+                                    <input type="checkbox" id="day_{{ $key }}" class="schedule-day-check" value="{{ $key + 1 }}"> <!-- Device usually 1=Sun or 1=Mon, need to confirm. Based on MqttService convertDaysToBinary map: 1=Mon...7=Sun. View labels: Min(0?), Sen(1?).. -->
+                                    <!-- Let's map View labels to standard 1=Mon..7=Sun or just correct the loop values. -->
+                                    <!-- MqttService expects "12345" where 1=Mon. View array was Min(0),Sen(1).. -->
+                                    <!-- Let's fix days: 1=Mon, 2=Tue, ..., 7=Sun. Min in array should be 7 -->
+                                    @php 
+                                        $val = ($day == 'Min') ? 7 : ($key); // Standardize to 1=Mon...7=Sun
+                                        if($day == 'Sen') $val = 1;
+                                        if($day == 'Sel') $val = 2;
+                                        if($day == 'Rab') $val = 3;
+                                        if($day == 'Kam') $val = 4;
+                                        if($day == 'Jum') $val = 5;
+                                        if($day == 'Sab') $val = 6;
+                                    @endphp
+                                    <label for="day_{{ $key }}" class="schedule-day-label">{{ $day }}</label>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                    @endif
+                </div>
+                <div class="modal-footer border-top border-secondary">
+                    <button type="button" class="btn btn-link text-white-50 text-decoration-none" data-bs-dismiss="modal">Batal</button>
+                    <button type="button" class="btn btn-primary" onclick="sendSchedule()">
+                        <span id="btnText">Kirim ke Device</span>
+                        <div id="btnLoading" class="spinner-border spinner-border-sm ms-2 d-none"></div>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const storeUrl = '{{ route("schedule.time.store", [$userDevice->id]) }}';
+        const csrfToken = '{{ csrf_token() }}';
+        
+        // PHP configs to JS
+        const isDuration = {{ $isDuration ? 'true' : 'false' }};
+        const isDays = {{ $isDays ? 'true' : 'false' }};
+        const isSector = {{ $isSector ? 'true' : 'false' }};
+        const isType = {{ $isType ? 'true' : 'false' }};
+        const maxSlots = {{ $scheduleConfig->max_slots ?? 14 }};
+
+        const modal = new bootstrap.Modal(document.getElementById('scheduleModal'));
+
+        function openScheduleModal(slotId, data = null) {
+            document.getElementById('slot_id').value = slotId;
+            document.getElementById('modalTitle').innerText = `Edit Slot ${slotId}`;
+            
+            // Default values
+            document.getElementById('on_time').value = '';
+            if(isDuration) document.getElementById('duration').value = 5;
+            else document.getElementById('off_time').value = '';
+            
+            if(isSector) document.getElementById('sector').value = 1;
+            if(isType) document.getElementById('schedule_type').value = 'BAKU';
+            
+            if(isDays) {
+                document.querySelectorAll('.schedule-day-check').forEach(el => el.checked = false);
+            }
+            
+            // Fill data if editing existing schedule
+            if (data && data.is_active) {
+                document.getElementById('on_time').value = data.on_time ? data.on_time.substring(0, 5) : '';
+                
+                if(isDuration) document.getElementById('duration').value = data.duration || 5;
+                else document.getElementById('off_time').value = data.off_time ? data.off_time.substring(0, 5) : '';
+                
+                if(isSector) document.getElementById('sector').value = data.sector || 1;
+                if(isType) document.getElementById('schedule_type').value = data.name || 'BAKU'; 
+                
+                if(isDays && data.days) {
+                    let daysArr = Array.isArray(data.days) ? data.days : (data.days ? data.days.split(',') : []);
+                    let map = {'Sen':1, 'Sel':2, 'Rab':3, 'Kam':4, 'Jum':5, 'Sab':6, 'Min':7};
+                    daysArr.forEach(d => {
+                        let dt = d.trim();
+                        if(map[dt]) {
+                            let el = document.querySelector(`.schedule-day-check[value="${map[dt]}"]`);
+                            if(el) el.checked = true;
+                        }
+                    });
+                }
+            } else {
+                // Should we set defaults for "New" schedule in this slot?
+                // Already set above.
+            }
+            
+            modal.show();
+        }
+
+        async function sendSchedule() {
+            const slotId = parseInt(document.getElementById('slot_id').value);
+            const onTime = document.getElementById('on_time').value;
+            
+            if(!onTime) { alert('Waktu Mulai harus diisi'); return; }
+
+            let payload = {
+                slot_id: slotId,
+                on_time: onTime,
+                _token: csrfToken
+            };
+
+            // Slot ID is always fixed now
+            
+            if(isDuration) payload.duration = document.getElementById('duration').value;
+            else payload.off_time = document.getElementById('off_time').value;
+
+            if(isSector) payload.sector = document.getElementById('sector').value;
+            if(isType) payload.schedule_type = document.getElementById('schedule_type').value;
+
+            if(isDays) {
+                let days = [];
+                document.querySelectorAll('.schedule-day-check:checked').forEach(el => days.push(el.value));
+                if(days.length === 0) { alert('Pilih minimal 1 hari'); return; }
+                payload.days = days.join('');
+            }
+
+            // UX
+            const btn = document.querySelector('.modal-footer .btn-primary');
+            const btnText = document.getElementById('btnText');
+            const loader = document.getElementById('btnLoading');
+            
+            btn.disabled = true;
+            btnText.innerText = 'Mengirim...';
+            loader.classList.remove('d-none');
+
+            try {
+                const res = await fetch(storeUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                
+                const data = await res.json();
+                
+                if(data.success) {
+                    alert(data.message);
+                    modal.hide();
+                    location.reload(); 
+                } else {
+                    alert('Gagal: ' + data.message);
+                }
+            } catch (e) {
+                alert('Error: ' + e.message);
+            } finally {
+                btn.disabled = false;
+                btnText.innerText = 'Kirim ke Device';
+                loader.classList.add('d-none');
+            }
+        }
+    </script>
+</body>
 </html>
