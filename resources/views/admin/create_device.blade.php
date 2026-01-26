@@ -391,20 +391,17 @@
 
                                                 <!-- Sensors Group -->
                                                 <div class="mb-2">
-                                                    <strong class="d-block small text-white-50 mb-1">Rekomendasi
-                                                        Sensor:</strong>
-                                                    <div class="d-flex flex-wrap gap-2">
+                                                    <strong class="d-block small text-white-50 mb-1">Sensor yang
+                                                        Dibutuhkan:</strong>
+                                                    <ul class="text-white-50 small ps-3 mb-0">
                                                         @foreach($preset['sensors'] as $sensorKey => $qty)
                                                             @if(isset($availableSensors[$sensorKey]))
-                                                                <button type="button"
-                                                                    class="btn btn-sm btn-outline-info bg-opacity-10"
-                                                                    onclick="addSensorRow('{{ $sensorKey }}')"
-                                                                    title="Tambah Sensor {{ $availableSensors[$sensorKey]['label'] }}">
-                                                                    <i class="bi {{ $availableSensors[$sensorKey]['icon'] }}"></i>
-                                                                    {{ $availableSensors[$sensorKey]['label'] }}
-                                                                </button>
+                                                                <li>{{ $availableSensors[$sensorKey]['label'] }}</li>
                                                             @endif
                                                         @endforeach
+                                                    </ul>
+                                                    <div class="mt-2 text-warning small fst-italic">
+                                                        * Silakan tambahkan sensor di atas (Step 3).
                                                     </div>
                                                 </div>
 
