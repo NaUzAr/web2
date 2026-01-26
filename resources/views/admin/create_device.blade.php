@@ -391,17 +391,21 @@
 
                                                 <!-- Sensors Group -->
                                                 <div class="mb-2">
-                                                    <strong class="d-block small text-white-50 mb-1">Sensor yang
-                                                        Dibutuhkan:</strong>
-                                                    <ul class="text-white-50 small ps-3 mb-0">
+                                                    <strong class="d-block small text-white-50 mb-1">Rekomendasi Sensor
+                                                        (Klik untuk tambah):</strong>
+                                                    <div class="d-flex flex-wrap gap-2">
                                                         @foreach($preset['sensors'] as $sensorKey => $qty)
                                                             @if(isset($availableSensors[$sensorKey]))
-                                                                <li>{{ $availableSensors[$sensorKey]['label'] }}</li>
+                                                                <button type="button"
+                                                                    class="btn btn-sm btn-outline-info bg-opacity-10"
+                                                                    onclick="addSensorRow('{{ $sensorKey }}')"
+                                                                    style="border-style: dashed;"
+                                                                    title="Tambah Sensor Otomasi {{ $availableSensors[$sensorKey]['label'] }}">
+                                                                    <i class="bi {{ $availableSensors[$sensorKey]['icon'] }}"></i>
+                                                                    {{ $availableSensors[$sensorKey]['label'] }}
+                                                                </button>
                                                             @endif
                                                         @endforeach
-                                                    </ul>
-                                                    <div class="mt-2 text-warning small fst-italic">
-                                                        * Silakan tambahkan sensor di atas (Step 3).
                                                     </div>
                                                 </div>
 
