@@ -182,8 +182,6 @@
                                         @if($isActive)
                                             @if(($sch['name'] ?? '') == 'PUPUK')
                                                 <span class="badge bg-warning text-dark">Pupuk</span>
-                                            @elseif(($sch['name'] ?? '') == 'DRAIN')
-                                                <span class="badge bg-info text-dark">Drain</span>
                                             @elseif(($sch['name'] ?? '') == 'BAKU')
                                                 <span class="badge bg-success">Air Baku</span>
                                             @else
@@ -263,7 +261,6 @@
                         <select id="schedule_type" class="form-select form-select-dark">
                             <option value="BAKU">Air Baku</option>
                             <option value="PUPUK">Pupuk</option>
-                            <option value="DRAIN">Drain</option>
                         </select>
                     </div>
                     @endif

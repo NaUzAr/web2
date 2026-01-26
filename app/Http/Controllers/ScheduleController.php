@@ -68,7 +68,7 @@ class ScheduleController extends Controller
         $rules = [
             'slot_id' => 'required|integer|min:1',
             'on_time' => 'required|date_format:H:i',
-            'schedule_type' => 'nullable|string|in:BAKU,PUPUK,DRAIN',
+            'schedule_type' => 'nullable|string|in:BAKU,PUPUK',
             'duration' => 'nullable|integer|min:1|max:1440',
             'off_time' => 'nullable|date_format:H:i',
             'days' => 'nullable|string|max:7',
