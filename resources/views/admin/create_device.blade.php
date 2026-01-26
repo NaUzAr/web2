@@ -379,39 +379,31 @@
                                     </small>
                                 </div>
 
-                                <div class="row g-3">
+                                <div class="glass-card p-3 border-0 mb-3" style="background: rgba(255,255,255,0.05);">
                                     @foreach($automationPresets as $key => $preset)
-                                        <div class="col-md-6">
-                                            <div class="glass-card p-3 h-100 border-0"
-                                                style="background: rgba(255,255,255,0.05);">
-                                                <h6 class="text-white fw-bold mb-2">
-                                                    <i class="bi {{ $preset['icon'] }} me-1"></i> {{ $preset['label'] }}
-                                                </h6>
-                                                <p class="small text-white-50 mb-3">{{ $preset['description'] }}</p>
+                                        <div class="mb-4 last:mb-0">
+                                            <h6 class="fw-bold text-white mb-2">
+                                                <i class="bi {{ $preset['icon'] }} me-1"></i> {{ $preset['label'] }}
+                                            </h6>
+                                            <p class="small text-white-50 mb-2">{{ $preset['description'] }}</p>
 
-                                                <!-- Sensors Group -->
-                                                <div class="mb-2">
-                                                    <strong class="d-block small text-white-50 mb-1">Rekomendasi Sensor
-                                                        (Klik untuk tambah):</strong>
-                                                    <div class="d-flex flex-wrap gap-2">
-                                                        @foreach($preset['sensors'] as $sensorKey => $qty)
-                                                            @if(isset($availableSensors[$sensorKey]))
-                                                                <button type="button"
-                                                                    class="btn btn-sm btn-outline-info bg-opacity-10"
-                                                                    onclick="addSensorRow('{{ $sensorKey }}')"
-                                                                    style="border-style: dashed;"
-                                                                    title="Tambah Sensor Otomasi {{ $availableSensors[$sensorKey]['label'] }}">
-                                                                    <i class="bi {{ $availableSensors[$sensorKey]['icon'] }}"></i>
-                                                                    {{ $availableSensors[$sensorKey]['label'] }}
-                                                                </button>
-                                                            @endif
-                                                        @endforeach
-                                                    </div>
-                                                </div>
-
-
+                                            <label class="small text-white-50 mb-2 d-block">Quick Add Sensor (Klik untuk
+                                                menambahkan):</label>
+                                            <div class="d-flex flex-wrap gap-2">
+                                                @foreach($preset['sensors'] as $sensorKey => $qty)
+                                                    @if(isset($availableSensors[$sensorKey]))
+                                                        <button type="button" class="btn btn-sm btn-outline-info bg-opacity-10"
+                                                            onclick="addSensorRow('{{ $sensorKey }}')" style="border-style: dashed;"
+                                                            title="Tambah Sensor Otomasi {{ $availableSensors[$sensorKey]['label'] }}">
+                                                            <i class="bi {{ $availableSensors[$sensorKey]['icon'] }}"></i>
+                                                            {{ $availableSensors[$sensorKey]['label'] }}
+                                                        </button>
+                                                    @endif
+                                                @endforeach
                                             </div>
                                         </div>
+                                        @if(!$loop->last)
+                                        <hr class="border-white-10 my-3"> @endif
                                     @endforeach
                                 </div>
                             </div>
