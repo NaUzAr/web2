@@ -739,7 +739,7 @@
             </div>
         @endif
 
-        @endif
+
     </div>
 
 
@@ -1025,7 +1025,7 @@
                     @else
                         const response = await fetch('{{ route("monitoring.status", $userDevice->id) }}');
                     @endif
-                                    const data = await response.json();
+                                        const data = await response.json();
 
                     if (data.success) {
                         if (data.outputs) {
