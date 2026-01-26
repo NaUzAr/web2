@@ -147,15 +147,15 @@
                 <table class="table table-glass">
                     <thead>
                         <tr>
-                            <th>Slot</th>
-                            @if($isType) <th>Jenis</th> @endif
+                            <th>Jadwal</th>
                             <th>Waktu Mulai</th>
                             @if($isDuration) 
                                 <th>Durasi</th> 
                             @else
                                 <th>Waktu Selesai</th>
                             @endif
-                            @if($isSector) <th>Sektor</th> @endif
+                            @if($isSector) <th>Output</th> @endif
+                            @if($isType) <th>Input</th> @endif
                             @if($isDays) <th>Hari</th> @endif
                             <th>Status</th>
                             <th>Aksi</th>
@@ -175,23 +175,7 @@
                                 }
                             @endphp
                             <tr id="row-slot-{{ $i }}">
-                                <td><span class="badge bg-secondary">Slot {{ $i }}</span></td>
-                                
-                                @if($isType)
-                                    <td>
-                                        @if($isActive)
-                                            @if(($sch['name'] ?? '') == 'PUPUK')
-                                                <span class="badge bg-warning text-dark">Pupuk</span>
-                                            @elseif(($sch['name'] ?? '') == 'BAKU')
-                                                <span class="badge bg-success">Air Baku</span>
-                                            @else
-                                                <span class="badge bg-secondary">{{ $sch['name'] ?? '-' }}</span>
-                                            @endif
-                                        @else
-                                            <span class="text-white-50">-</span>
-                                        @endif
-                                    </td>
-                                @endif
+                                <td><span class="badge bg-secondary">Jadwal {{ $i }}</span></td>
                                 
                                 <td>{{ $isActive ? substr($sch['on_time'], 0, 5) : '-' }}</td>
                                 
@@ -204,11 +188,27 @@
                                 @if($isSector) 
                                     <td>
                                         @if($isActive)
-                                            <span class="badge badge-sector">Sektor {{ $sch['sector'] }}</span>
+                                            <span class="badge badge-sector">Output {{ $sch['sector'] }}</span>
                                         @else
                                             -
                                         @endif
                                     </td> 
+                                @endif
+
+                                @if($isType)
+                                    <td>
+                                        @if($isActive)
+                                            @if(($sch['name'] ?? '') == 'PUPUK')
+                                                <span class="badge bg-warning text-dark">Air Pupuk</span>
+                                            @elseif(($sch['name'] ?? '') == 'BAKU')
+                                                <span class="badge bg-success">Air Baku</span>
+                                            @else
+                                                <span class="badge bg-secondary">{{ $sch['name'] ?? '-' }}</span>
+                                            @endif
+                                        @else
+                                            <span class="text-white-50">-</span>
+                                        @endif
+                                    </td>
                                 @endif
                                 
                                 @if($isDays) 
@@ -260,16 +260,6 @@
                 <div class="modal-body">
                     <input type="hidden" id="slot_id">
                     
-                    @if($isType)
-                    <div class="mb-3">
-                        <label class="form-label text-white-50">Jenis</label>
-                        <select id="schedule_type" class="form-select form-select-dark">
-                            <option value="BAKU">Air Baku</option>
-                            <option value="PUPUK">Pupuk</option>
-                        </select>
-                    </div>
-                    @endif
-                    
                     <div class="row g-3">
                         <div class="col-6">
                             <label class="form-label text-white-50">Waktu Mulai</label>
@@ -288,11 +278,21 @@
                     
                     @if($isSector)
                     <div class="mb-3 mt-3">
-                        <label class="form-label text-white-50">Sektor</label>
+                        <label class="form-label text-white-50">Output</label>
                         <select id="sector" class="form-select form-select-dark">
                             @for($s = 1; $s <= ($scheduleConfig->max_sectors ?? 1); $s++)
-                                <option value="{{ $s }}">Sektor {{ $s }}</option>
+                                <option value="{{ $s }}">Output {{ $s }}</option>
                             @endfor
+                        </select>
+                    </div>
+                    @endif
+                    
+                    @if($isType)
+                    <div class="mb-3">
+                        <label class="form-label text-white-50">Input</label>
+                        <select id="schedule_type" class="form-select form-select-dark">
+                            <option value="BAKU">Air Baku</option>
+                            <option value="PUPUK">Air Pupuk</option>
                         </select>
                     </div>
                     @endif
@@ -356,7 +356,7 @@
 
         function openScheduleModal(slotId, data = null) {
             document.getElementById('slot_id').value = slotId;
-            document.getElementById('modalTitle').innerText = `Edit Slot ${slotId}`;
+            document.getElementById('modalTitle').innerText = `Edit Jadwal ${slotId}`;
             
             const btnDelete = document.getElementById('btnDeleteModal');
             
@@ -403,7 +403,7 @@
         }
 
         async function deleteSchedule(slotId) {
-            if(!confirm(`Yakin ingin menghapus jadwal Slot ${slotId}?`)) return;
+            if(!confirm(`Yakin ingin menghapus Jadwal ${slotId}?`)) return;
             
             try {
                 const res = await fetch(`${deleteUrlBase}/${slotId}`, {
