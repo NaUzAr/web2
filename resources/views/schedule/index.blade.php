@@ -125,6 +125,7 @@
                 $isDuration = str_contains($mode, 'duration');
                 $isDays = str_contains($mode, 'days');
                 $isSector = str_contains($mode, 'sector');
+                $isType = str_contains($mode, 'type');
             @endphp
 
             <div class="glass-card">
@@ -179,15 +180,17 @@
                                     </div>
                                 @endif
 
-                                {{-- Jenis (Type) Field --}}
-                                <div class="col-6 col-lg-1">
-                                    <label class="form-label small">Jenis</label>
-                                    <select id="type_{{ $i }}" class="form-select">
-                                        <option value="BAKU">Baku</option>
-                                        <option value="PUPUK">Pupuk</option>
-                                        <option value="DRAIN">Drain</option>
-                                    </select>
-                                </div>
+                                @if($isType)
+                                    {{-- Jenis (Type) Field --}}
+                                    <div class="col-6 col-lg-1">
+                                        <label class="form-label small">Jenis</label>
+                                        <select id="type_{{ $i }}" class="form-select">
+                                            <option value="BAKU">Baku</option>
+                                            <option value="PUPUK">Pupuk</option>
+                                            <option value="DRAIN">Drain</option>
+                                        </select>
+                                    </div>
+                                @endif
 
                                 <div class="col-6 col-lg-1">
                                     <button type="button" class="btn btn-primary w-100" onclick="sendSchedule({{ $i }})">
@@ -212,6 +215,7 @@
                 const isDuration = {{ $isDuration ? 'true' : 'false' }};
                 const isDays = {{ $isDays ? 'true' : 'false' }};
                 const isSector = {{ $isSector ? 'true' : 'false' }};
+                const isType = {{ $isType ? 'true' : 'false' }};
                 // Route URL for store (without output ID now)
                 const storeUrl = '{{ route("schedule.time.store", [$userDevice->id]) }}';
 
@@ -251,8 +255,11 @@
                     }
 
                     // Get schedule type (Jenis)
-                    const typeSelect = document.getElementById(`type_${slotIndex}`);
-                    const scheduleType = typeSelect ? typeSelect.value : 'BAKU';
+                    let scheduleType = 'BAKU';
+                    if (isType) {
+                        const typeSelect = document.getElementById(`type_${slotIndex}`);
+                        scheduleType = typeSelect ? typeSelect.value : 'BAKU';
+                    }
 
                     statusBadge.className = 'badge bg-warning';
                     statusBadge.textContent = 'Mengirim...';
