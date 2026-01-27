@@ -34,7 +34,22 @@ class AutomasiController extends Controller
         $hasClimate = $device->hasAutomationType('climate');
         $hasFertilizer = $device->hasAutomationType('fertilizer');
 
-        return view('automasi.index', compact('device', 'hasClimate', 'hasFertilizer'));
+        // Load all settings needed for display
+        $settings = DeviceSetting::where('device_id', $device->id)
+            ->whereIn('key', [
+                'ats_suhu',
+                'bwh_suhu',
+                'ats_kelem',
+                'bwh_kelem',
+                'ats_tds',
+                'bwh_tds',
+                'ats_ph',
+                'bwh_ph'
+            ])
+            ->pluck('value', 'key')
+            ->toArray();
+
+        return view('automasi.index', compact('device', 'hasClimate', 'hasFertilizer', 'settings'));
     }
 
     public function fertilizer($deviceId)
