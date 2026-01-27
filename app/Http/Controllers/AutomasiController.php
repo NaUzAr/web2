@@ -18,10 +18,10 @@ class AutomasiController extends Controller
         $this->mqttService = $mqttService;
     }
 
-    private function getDevice($deviceId)
+    private function getDevice($userDeviceId)
     {
         $userDevice = UserDevice::where('user_id', Auth::id())
-            ->where('device_id', $deviceId)
+            ->where('id', $userDeviceId)
             ->firstOrFail();
 
         return $userDevice->device;
