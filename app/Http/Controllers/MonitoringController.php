@@ -117,7 +117,10 @@ class MonitoringController extends Controller
         // Ambil konfigurasi jadwal jika ada
         $scheduleConfig = $device->schedules()->first();
 
-        return view('monitoring.show', compact('userDevice', 'device', 'sensors', 'outputs', 'logData', 'chartData', 'latestData', 'scheduleConfig'));
+        // Cek ketersediaan otomasi (berdasarkan sensor yang ada)
+        $hasAutomation = $device->hasAnyAutomation();
+
+        return view('monitoring.show', compact('userDevice', 'device', 'sensors', 'outputs', 'logData', 'chartData', 'latestData', 'scheduleConfig', 'hasAutomation'));
     }
 
     /**

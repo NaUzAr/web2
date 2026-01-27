@@ -14,40 +14,56 @@
 
         <div class="row g-4">
             <!-- Card Pemupukan -->
-            <div class="col-md-6 col-lg-4">
-                <div class="card card-glass h-100 border-0 shadow-lg hover-scale">
-                    <div class="card-body p-4 text-center d-flex flex-column justify-content-center align-items-center">
-                        <div class="icon-circle bg-success bg-gradient text-white mb-3 shadow">
-                            <i class="bi bi-flower1 fs-1"></i>
+            @if($hasFertilizer ?? false)
+                <!-- Card Pemupukan -->
+                <div class="col-md-6 col-lg-4">
+                    <div class="card card-glass h-100 border-0 shadow-lg hover-scale">
+                        <div class="card-body p-4 text-center d-flex flex-column justify-content-center align-items-center">
+                            <div class="icon-circle bg-success bg-gradient text-white mb-3 shadow">
+                                <i class="bi bi-flower1 fs-1"></i>
+                            </div>
+                            <h3 class="card-title fw-bold text-white">Pemupukan Otomatis</h3>
+                            <p class="card-text text-white-50 mb-4">Pengaturan batas PPM untuk Pompa Mix A/B dan batas pH untuk
+                                Pompa pH.</p>
+                            <a href="{{ route('automasi.fertilizer', $device->id) }}"
+                                class="btn btn-primary w-100 py-2 fw-bold text-uppercase">
+                                Masuk Setting
+                            </a>
                         </div>
-                        <h3 class="card-title fw-bold text-white">Pemupukan Otomatis</h3>
-                        <p class="card-text text-white-50 mb-4">Pengaturan batas PPM untuk Pompa Mix A/B dan batas pH untuk
-                            Pompa pH.</p>
-                        <a href="{{ route('automasi.fertilizer', $device->id) }}"
-                            class="btn btn-primary w-100 py-2 fw-bold text-uppercase">
-                            Masuk Setting
-                        </a>
                     </div>
                 </div>
-            </div>
+            @endif
 
             <!-- Card Climate -->
-            <div class="col-md-6 col-lg-4">
-                <div class="card card-glass h-100 border-0 shadow-lg hover-scale">
-                    <div class="card-body p-4 text-center d-flex flex-column justify-content-center align-items-center">
-                        <div class="icon-circle bg-info bg-gradient text-white mb-3 shadow">
-                            <i class="bi bi-thermometer-sun fs-1"></i>
+            @if($hasClimate ?? false)
+                <!-- Card Climate -->
+                <div class="col-md-6 col-lg-4">
+                    <div class="card card-glass h-100 border-0 shadow-lg hover-scale">
+                        <div class="card-body p-4 text-center d-flex flex-column justify-content-center align-items-center">
+                            <div class="icon-circle bg-info bg-gradient text-white mb-3 shadow">
+                                <i class="bi bi-thermometer-sun fs-1"></i>
+                            </div>
+                            <h3 class="card-title fw-bold text-white">Climate Auto Setting</h3>
+                            <p class="card-text text-white-50 mb-4">Pengaturan batas Suhu dan Kelembaban (Humidity) untuk
+                                kontrol iklim.</p>
+                            <a href="{{ route('automasi.climate', $device->id) }}"
+                                class="btn btn-primary w-100 py-2 fw-bold text-uppercase">
+                                Masuk Setting
+                            </a>
                         </div>
-                        <h3 class="card-title fw-bold text-white">Climate Auto Setting</h3>
-                        <p class="card-text text-white-50 mb-4">Pengaturan batas Suhu dan Kelembaban (Humidity) untuk
-                            kontrol iklim.</p>
-                        <a href="{{ route('automasi.climate', $device->id) }}"
-                            class="btn btn-primary w-100 py-2 fw-bold text-uppercase">
-                            Masuk Setting
-                        </a>
                     </div>
                 </div>
-            </div>
+            @endif
+
+            @if(!($hasFertilizer ?? false) && !($hasClimate ?? false))
+                <div class="col-12 text-center py-5">
+                    <div class="alert alert-warning bg-opacity-10 border-warning text-warning">
+                        <i class="bi bi-exclamation-triangle me-2"></i>
+                        Device ini belum memiliki konfigurasi sensor untuk Otomasi (Climate/Fertilizer).
+                        <br><small class="text-white-50">Silakan edit device dan tambahkan sensor terkait.</small>
+                    </div>
+                </div>
+            @endif
         </div>
     </div>
 

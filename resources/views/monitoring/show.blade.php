@@ -448,6 +448,8 @@
                         <a href="{{ route('schedule.index', $userDevice->id) }}" class="btn-glass">
                             <i class="bi bi-calendar-check me-1"></i> Jadwal
                         </a>
+                    @endif
+                    @if($hasAutomation ?? false)
                         <a href="{{ route('automasi.index', $userDevice->id) }}" class="btn-glass">
                             <i class="bi bi-cpu me-1"></i> Otomasi
                         </a>
@@ -1028,7 +1030,7 @@
                     @else
                         const response = await fetch('{{ route("monitoring.status", $userDevice->id) }}');
                     @endif
-                                            const data = await response.json();
+                                                const data = await response.json();
 
                     if (data.success) {
                         if (data.outputs) {

@@ -30,7 +30,11 @@ class AutomasiController extends Controller
     public function index($deviceId)
     {
         $device = $this->getDevice($deviceId);
-        return view('automasi.index', compact('device'));
+
+        $hasClimate = $device->hasAutomationType('climate');
+        $hasFertilizer = $device->hasAutomationType('fertilizer');
+
+        return view('automasi.index', compact('device', 'hasClimate', 'hasFertilizer'));
     }
 
     public function fertilizer($deviceId)

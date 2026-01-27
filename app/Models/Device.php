@@ -347,4 +347,41 @@ class Device extends Model
             ],
         ];
     }
+
+    /**
+     * Cek apakah device memiliki sensor yang mendukung tipe otomasi tertentu
+     * @param string $type 'climate' atau 'fertilizer'
+     */
+    public function hasAutomationType($type)
+    {
+        $presets = self::getAutomationPresets();
+        if (!isset($presets[$type]))
+            return false;
+
+        $requiredSensors = array_keys($presets[$type]['sensors']);
+
+        // Fetch all sensor names for this device
+        if ($this->relationLoaded('sensors')) {
+            $sensorNames = $this->sensors->pluck('sensor_name')->toArray();
+        } else {
+            $sensorNames = $this->sensors()->pluck('sensor_name')->toArray();
+        }
+
+        foreach ($requiredSensors as $req) {
+            foreach ($sensorNames as $name) {
+                if ($name === $req || str_starts_with($name, $req . '_')) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Cek apakah device memiliki otomasi apapun
+     */
+    public function hasAnyAutomation()
+    {
+        return $this->hasAutomationType('climate') || $this->hasAutomationType('fertilizer');
+    }
 }
