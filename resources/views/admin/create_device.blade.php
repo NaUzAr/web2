@@ -4,7 +4,9 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Tambah Device - Smart Agriculture</title>
+    <title>Tambah Device - Swaratani</title>
+    @include('partials.pwa-head')
+    @include('partials.theme')
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
@@ -13,26 +15,15 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
     <style>
-        :root {
-            --primary-red: #ef4444;
-            --dark-red: #991b1b;
-            --light-red: #fca5a5;
-            --accent-orange: #f97316;
-            --light-orange: #fdba74;
-            --primary-gradient: linear-gradient(135deg, #ef4444 0%, #dc2626 50%, #f97316 100%);
-            --secondary-gradient: linear-gradient(135deg, #fca5a5 0%, #ef4444 100%);
-            --nature-gradient: linear-gradient(135deg, #450a0a 0%, #7f1d1d 50%, #991b1b 100%);
-            --glass-bg: rgba(255, 255, 255, 0.1);
-            --glass-border: rgba(255, 255, 255, 0.2);
-        }
-
+        /* Page Specific Overrides */
         * {
             font-family: 'Inter', sans-serif;
         }
 
         body {
-            background: var(--nature-gradient);
+            background: var(--gradient-bg);
             min-height: 100vh;
+            color: var(--text-main);
         }
 
         .bg-animation {
@@ -42,27 +33,27 @@
             width: 100%;
             height: 100%;
             z-index: -1;
-            background: radial-gradient(circle at 20% 80%, rgba(239, 68, 68, 0.2) 0%, transparent 50%),
-                radial-gradient(circle at 80% 20%, rgba(249, 115, 22, 0.2) 0%, transparent 50%);
+            background: radial-gradient(circle at 20% 80%, var(--glow-1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, var(--glow-2) 0%, transparent 50%);
         }
 
         .navbar-glass {
-            background: rgba(127, 29, 29, 0.95) !important;
+            background: var(--navbar-bg) !important;
             backdrop-filter: blur(20px);
             border-bottom: 1px solid var(--glass-border);
         }
 
         .navbar-brand {
             font-weight: 700;
-            color: #fca5a5 !important;
+            color: var(--primary) !important;
         }
 
         .nav-link {
-            color: rgba(255, 255, 255, 0.8) !important;
+            color: var(--text-secondary) !important;
         }
 
         .nav-link:hover {
-            color: #fca5a5 !important;
+            color: var(--primary) !important;
         }
 
         .glass-card {
@@ -80,23 +71,23 @@
 
         .form-control,
         .form-select {
-            background: rgba(255, 255, 255, 0.1);
+            background: var(--glass-bg);
             border: 1px solid var(--glass-border);
-            color: #fff;
+            color: var(--text-main);
             border-radius: 12px;
             padding: 0.75rem 1rem;
         }
 
         .form-control:focus,
         .form-select:focus {
-            background: rgba(255, 255, 255, 0.15);
-            border-color: #ef4444;
-            color: #fff;
-            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2);
+            background: var(--glass-bg);
+            border-color: var(--primary);
+            color: var(--text-main);
+            box-shadow: 0 0 0 3px rgba(var(--primary), 0.2);
         }
 
         .form-control::placeholder {
-            color: rgba(255, 255, 255, 0.5);
+            color: var(--text-secondary);
         }
 
         .form-select option {
@@ -105,12 +96,12 @@
         }
 
         .form-label {
-            color: #fca5a5;
+            color: var(--primary);
             font-weight: 600;
         }
 
         .form-text {
-            color: rgba(255, 255, 255, 0.6);
+            color: var(--text-secondary);
         }
 
         .type-card {
@@ -121,28 +112,29 @@
             padding: 1.5rem;
             text-align: center;
             transition: all 0.3s ease;
-            color: #fff;
+            color: var(--text-main);
         }
 
         .type-card:hover,
         .type-card.selected {
-            border-color: #ef4444;
-            background: rgba(239, 68, 68, 0.2);
+            border-color: var(--primary);
+            background: rgba(var(--primary), 0.1);
             transform: translateY(-5px);
         }
 
         .type-card i {
             font-size: 2.5rem;
-            color: #fca5a5;
+            color: var(--primary);
         }
 
         .type-card h6 {
             margin-top: 0.5rem;
             margin-bottom: 0;
+            color: var(--text-main);
         }
 
         .sensor-row {
-            background: rgba(255, 255, 255, 0.05);
+            background: var(--glass-bg);
             border-radius: 12px;
             padding: 1rem;
             margin-bottom: 0.75rem;
@@ -151,8 +143,8 @@
         }
 
         .sensor-row:hover {
-            background: rgba(255, 255, 255, 0.1);
-            border-color: #ef4444;
+            background: var(--glass-bg);
+            border-color: var(--primary);
         }
 
         .btn-gradient {
@@ -174,15 +166,16 @@
         .btn-glass {
             background: var(--glass-bg);
             border: 1px solid var(--glass-border);
-            color: #fff;
+            color: var(--text-main);
             padding: 0.75rem 1.5rem;
             border-radius: 50px;
             font-weight: 600;
         }
 
         .btn-glass:hover {
-            background: rgba(255, 255, 255, 0.2);
-            color: #fff;
+            background: var(--glass-bg);
+            border-color: var(--primary);
+            color: var(--primary);
         }
 
         .btn-outline-add {
@@ -202,16 +195,16 @@
         }
 
         .alert-info-custom {
-            background: rgba(14, 165, 233, 0.2);
-            border: 1px solid rgba(14, 165, 233, 0.3);
-            color: var(--light-sky);
+            background: rgba(14, 165, 233, 0.05);
+            border: 1px solid rgba(14, 165, 233, 0.2);
+            color: var(--text-main);
             border-radius: 12px;
         }
 
         .alert-warning-custom {
-            background: rgba(250, 204, 21, 0.2);
-            border: 1px solid rgba(250, 204, 21, 0.3);
-            color: #fef08a;
+            background: rgba(250, 204, 21, 0.05);
+            border: 1px solid rgba(250, 204, 21, 0.2);
+            color: var(--text-main);
             border-radius: 12px;
         }
 
@@ -232,7 +225,7 @@
     <nav class="navbar navbar-expand-lg navbar-glass">
         <div class="container">
             <a class="navbar-brand" href="{{ route('home') }}">
-                <i class="bi bi-tree-fill me-2"></i>SmartAgri
+                <i class="bi bi-tree-fill me-2"></i>Swaratani
             </a>
             <div class="navbar-nav ms-auto">
                 <a class="nav-link" href="{{ route('admin.devices.index') }}">
@@ -263,7 +256,8 @@
                         @endif
 
                         @if(session('error'))
-                            <div class="alert alert-danger bg-danger bg-opacity-25 border-danger text-white">
+                            <div class="alert alert-danger bg-danger bg-opacity-25 border-danger"
+                                style="color: var(--text-main);">
                                 {{ session('error') }}
                             </div>
                         @endif
@@ -341,13 +335,14 @@
 
                                 <!-- Quick Add Sensors -->
                                 <div class="mb-3">
-                                    <label class="small text-white-50 mb-2 d-block">Quick Add (Klik untuk
+                                    <label class="small mb-2 d-block" style="color: var(--text-secondary);">Quick Add
+                                        (Klik untuk
                                         menambahkan):</label>
                                     <div class="d-flex flex-wrap gap-2">
                                         @foreach($availableSensors as $key => $sensor)
-                                            <button type="button" class="btn btn-sm btn-outline-light bg-opacity-10"
+                                            <button type="button" class="btn btn-sm btn-outline-secondary bg-opacity-10"
                                                 onclick="addSensorRow('{{ $key }}')"
-                                                style="border-color: var(--glass-border); background: rgba(255,255,255,0.05);">
+                                                style="border-color: var(--glass-border); background: var(--glass-bg); color: var(--text-main);">
                                                 <i class="bi {{ $sensor['icon'] }} me-1"></i> {{ $sensor['label'] }}
                                             </button>
                                         @endforeach
@@ -382,30 +377,37 @@
                                 <div class="glass-card p-3 border-0 mb-3" style="background: rgba(255,255,255,0.05);">
                                     @foreach($automationPresets as $key => $preset)
                                         <div class="mb-4 last:mb-0">
-                                            <h6 class="fw-bold text-white mb-2">
+                                            <h6 class="fw-bold mb-2" style="color: var(--text-main);">
                                                 <i class="bi {{ $preset['icon'] }} me-1"></i> {{ $preset['label'] }}
                                             </h6>
-                                            <p class="small text-white-50 mb-2">{{ $preset['description'] }}</p>
+                                            <p class="small mb-2" style="color: var(--text-secondary);">
+                                                {{ $preset['description'] }}
+                                            </p>
 
-                                            <label class="small text-white-50 mb-2 d-block">Quick Add Sensor (Klik untuk menambahkan):</label>
+                                            <label class="small mb-2 d-block" style="color: var(--text-secondary);">Quick
+                                                Add Sensor (Klik untuk
+                                                menambahkan):</label>
                                             <div class="d-flex flex-wrap gap-2 mb-3">
                                                 @foreach($preset['sensors'] as $sensorKey => $qty)
                                                     @if(isset($availableSensors[$sensorKey]))
                                                         <button type="button" class="btn btn-sm btn-outline-info bg-opacity-10"
-                                                                onclick="addSensorRow('{{ $sensorKey }}', '', 'autoContainer_{{ $key }}')"
-                                                                style="border-style: dashed;"
-                                                                title="Tambah Sensor Otomasi {{ $availableSensors[$sensorKey]['label'] }}">
-                                                            <i class="bi {{ $availableSensors[$sensorKey]['icon'] }}"></i> {{ $availableSensors[$sensorKey]['label'] }}
+                                                            onclick="addSensorRow('{{ $sensorKey }}', '', 'autoContainer_{{ $key }}')"
+                                                            style="border-style: dashed;"
+                                                            title="Tambah Sensor Otomasi {{ $availableSensors[$sensorKey]['label'] }}">
+                                                            <i class="bi {{ $availableSensors[$sensorKey]['icon'] }}"></i>
+                                                            {{ $availableSensors[$sensorKey]['label'] }}
                                                         </button>
                                                     @endif
                                                 @endforeach
                                             </div>
 
                                             <!-- Container for Independent Automation Sensors -->
-                                            <div id="autoContainer_{{ $key }}" class="ps-3 border-start border-white-10"></div>
+                                            <div id="autoContainer_{{ $key }}" class="ps-3 border-start"
+                                                style="border-color: var(--glass-border) !important;">
+                                            </div>
                                         </div>
                                         @if(!$loop->last)
-                                        <hr class="border-white-10 my-3"> @endif
+                                        <hr class="my-3" style="border-color: var(--glass-border);"> @endif
                                     @endforeach
                                 </div>
                             </div>
@@ -456,13 +458,15 @@
                                 <div id="scheduleOptions" style="display: none;">
                                     <div class="row g-3">
                                         <div class="col-md-6">
-                                            <label class="form-label small text-white-50">Jumlah Slot Jadwal</label>
+                                            <label class="form-label small" style="color: var(--text-secondary);">Jumlah
+                                                Slot Jadwal</label>
                                             <input type="number" class="form-control" name="max_slots" value="8" min="1"
                                                 max="20">
                                             <div class="form-text">Berapa banyak jadwal yang bisa disimpan</div>
                                         </div>
                                         <div class="col-md-6" id="sectorField" style="display: none;">
-                                            <label class="form-label small text-white-50">Jumlah Sektor</label>
+                                            <label class="form-label small" style="color: var(--text-secondary);">Jumlah
+                                                Sektor</label>
                                             <input type="number" class="form-control" name="max_sectors" value="1"
                                                 min="1" max="10">
                                             <div class="form-text">Untuk mode multi-sektor/zona</div>
@@ -592,13 +596,13 @@
             row.innerHTML = `
             <div class="row align-items-center g-3">
                 <div class="col-md-5">
-                    <label class="form-label small text-white-50">Output Type</label>
+                    <label class="form-label small" style="color: var(--text-secondary);">Output Type</label>
                     <select class="form-select output-select" name="outputs[${outputCounter}][type]" onchange="updateSubmitButton()">
                         ${getOutputOptions(outputKey)}
                     </select>
                 </div>
                 <div class="col-md-5">
-                    <label class="form-label small text-white-50">Label (opsional)</label>
+                    <label class="form-label small" style="color: var(--text-secondary);">Label (opsional)</label>
                     <input type="text" class="form-control output-label-input" name="outputs[${outputCounter}][label]"
                            placeholder="Label custom" value="${customLabel}">
                 </div>

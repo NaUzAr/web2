@@ -1,6 +1,6 @@
 {
-    "name": "SmartAgri IoT",
-    "short_name": "SmartAgri",
+    "name": "Swaratani IoT",
+    "short_name": "Swaratani",
     "description": "Sistem monitoring pertanian cerdas berbasis IoT - Pantau kondisi lahan, cuaca, dan sensor tanaman secara real-time",
     "start_url": "/?pwa=1",
     "scope": "/",
@@ -90,14 +90,14 @@
             "sizes": "1280x720",
             "type": "image/png",
             "form_factor": "wide",
-            "label": "Dashboard Monitoring SmartAgri IoT"
+            "label": "Dashboard Monitoring Swaratani IoT"
         },
         {
             "src": "/icons/screenshot-narrow.png",
             "sizes": "720x1280",
             "type": "image/png",
             "form_factor": "narrow",
-            "label": "Mobile View SmartAgri IoT"
+            "label": "Mobile View Swaratani IoT"
         }
     ],
     "shortcuts": [

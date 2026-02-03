@@ -56,11 +56,16 @@ class AutomasiController extends Controller
             \Cache::put($cacheKey, $settings, now()->addDays(1));
         }
 
-        return view('automasi.index', compact('device', 'hasClimate', 'hasFertilizer', 'settings'));
+        return view('automasi.index', compact('device', 'hasClimate', 'hasFertilizer', 'settings', 'deviceId'));
     }
 
     public function updateSingle(Request $request, $deviceId)
     {
+        // Handle Fallback GET URL manually to redirect back
+        if ($request->isMethod('get')) {
+            return redirect()->route('automasi.index', ['id' => $deviceId]);
+        }
+
         $device = $this->getDevice($deviceId);
 
         $validated = $request->validate([
@@ -95,7 +100,7 @@ class AutomasiController extends Controller
             );
         }
 
-        return back()->with('success', "Setting {$sensorType} berhasil diperbarui!");
+        return redirect()->route('automasi.index', ['id' => $deviceId])->with('success', "Setting {$sensorType} berhasil diperbarui!");
     }
 
 }

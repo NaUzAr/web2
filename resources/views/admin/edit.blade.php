@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Edit Device - Smart Agriculture</title>
+    <title>Edit Device - Swaratani</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
@@ -235,7 +235,7 @@
     <nav class="navbar navbar-expand-lg navbar-glass">
         <div class="container">
             <a class="navbar-brand" href="{{ route('home') }}">
-                <i class="bi bi-tree-fill me-2"></i>SmartAgri
+                <i class="bi bi-tree-fill me-2"></i>Swaratani
             </a>
             <div class="navbar-nav ms-auto">
                 <a class="nav-link" href="{{ route('admin.devices.index') }}">

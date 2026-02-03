@@ -496,6 +496,11 @@ services:
       MQTT_PORT: 1883
       MQTT_USERNAME: iot
       MQTT_PASSWORD: smartgh
+      # Email Configuration (Resend API)
+      MAIL_MAILER: resend
+      MAIL_FROM_ADDRESS: "noreply@swaratani.id"
+      MAIL_FROM_NAME: "Swaratani IoT"
+      RESEND_API_KEY: YOUR_RESEND_API_KEY
     volumes:
       - ./src/storage:/var/www/html/storage
     networks:

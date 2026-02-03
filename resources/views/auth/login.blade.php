@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Login - Smart Agriculture</title>
+    <title>Login - Swaratani</title>
     @include('partials.pwa-head')
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
@@ -91,7 +91,7 @@
                 <i class="bi bi-tree-fill text-white"></i>
             </div>
             <h4 class="login-title">Selamat Datang!</h4>
-            <p class="login-subtitle">Login ke Smart Agriculture System</p>
+            <p class="login-subtitle">Login ke Swaratani System</p>
         </div>
 
         @if ($errors->any())
@@ -138,8 +138,8 @@
             <a href="{{ route('register') }}" class="link-green">Buat Akun Baru</a>
 
             @if(!request('pwa') && !session('is_pwa'))
-                <div class="mt-4 pt-3 divider">
-                    <a href="{{ route('home') }}" class="text-muted-light small text-decoration-none">
+                <div class="mt-4 pt-3" style="border-top: 1px solid rgba(0,0,0,0.1);">
+                    <a href="{{ route('home') }}" style="color: #64748b; font-size: 0.9rem; text-decoration: none;">
                         <i class="bi bi-arrow-left me-1"></i>Kembali ke Beranda
                     </a>
                 </div>

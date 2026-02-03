@@ -105,10 +105,22 @@ class MonitoringController extends Controller
                 ->orderBy('recorded_at', 'desc')
                 ->paginate(20);
 
-            // Ambil data terbaru untuk display sensor cards
-            $latestData = DB::table($device->table_name)
-                ->orderBy('recorded_at', 'desc')
-                ->first();
+            // Ambil data terbaru PER SENSOR (bukan dari satu baris)
+            // Ini memastikan setiap sensor card menampilkan nilai terbaru meskipun datang dari paket berbeda
+            $latestData = new \stdClass();
+            foreach ($sensors as $sensor) {
+                $sensorName = $sensor->sensor_name;
+                if (\Schema::hasColumn($device->table_name, $sensorName)) {
+                    $latestRow = DB::table($device->table_name)
+                        ->whereNotNull($sensorName)
+                        ->orderBy('recorded_at', 'desc')
+                        ->first();
+                    $latestData->$sensorName = $latestRow ? $latestRow->$sensorName : null;
+                }
+            }
+            // Also get the latest recorded_at timestamp
+            $lastRow = DB::table($device->table_name)->orderBy('recorded_at', 'desc')->first();
+            $latestData->recorded_at = $lastRow ? $lastRow->recorded_at : null;
         } else {
             // Buat paginator kosong jika tidak ada data
             $logData = new \Illuminate\Pagination\LengthAwarePaginator([], 0, 20);
@@ -249,8 +261,42 @@ class MonitoringController extends Controller
             $device = $userDevice->device;
             $topic = rtrim($device->mqtt_topic, '/') . '/sub';
 
-            // Format simpel: <output#value>
-            $message = sprintf('<%s#%s>', $output->output_name, $newValue);
+            // Custom format based on output name
+            $val = $newValue ? '1' : '0';
+            $name = strtolower($output->output_name);
+
+            // 1. Specific Pumps (Dosing & pH)
+            if (str_contains($name, 'pump_ab') || str_contains($name, 'dosing')) {
+                $message = "<pmpAB#{$val}#>";
+            } elseif (str_contains($name, 'ph_up') || str_contains($name, 'ph1')) {
+                $message = "<pmpPH#{$val}#>";
+            } elseif (str_contains($name, 'ph_down') || str_contains($name, 'ph2')) {
+                $message = "<pmpPH2#{$val}#>";
+            }
+            // 2. Main Pump (Pompa Utama / Irigasi)
+            elseif (str_contains($name, 'pompa') || str_contains($name, 'pump')) {
+                if ($newValue) {
+                    $message = "<PMP_ON#0#0#>";
+                } else {
+                    $message = "<PMP_OFF#>";
+                }
+            }
+            // 3. Components
+            elseif (str_contains($name, 'air_input')) {
+                $message = "<AIR#{$val}#>";
+            } elseif (str_contains($name, 'mix')) {
+                $message = "<MIX#{$val}#>";
+            } elseif (str_contains($name, 'fan')) {
+                $message = "<FAN#{$val}#>";
+            } elseif (str_contains($name, 'mist')) {
+                $message = "<MIS#{$val}#>";
+            } elseif (str_contains($name, 'lamp')) {
+                $message = "<LAM#{$val}#>";
+            }
+            // 4. Fallback
+            else {
+                $message = sprintf('<%s#%s#>', $output->output_name, $val);
+            }
 
             // MQTT Connection
             $host = config('mqtt.host', env('MQTT_HOST', 'smartagri.web.id'));
@@ -305,11 +351,42 @@ class MonitoringController extends Controller
         $cachedOutputs = \Cache::get("device_outputs_{$device->id}", []);
 
         $outputs = $device->outputs->map(function ($output) use ($cachedOutputs) {
-            // Check if value exists in cache (try output_name directly)
-            $cachedVal = $cachedOutputs[$output->output_name] ?? null;
+            $outputName = $output->output_name;
+            $cachedVal = null;
 
-            // If output_name in DB doesn't have 'sts_' prefix but cache does, try matching
-            // But MqttListener saves DB with same key as cache (from valid keys), so direct match should work.
+            // Strategy 1: Direct match
+            if (isset($cachedOutputs[$outputName])) {
+                $cachedVal = $cachedOutputs[$outputName];
+            }
+
+            // Strategy 2: Try converting between sts_ and st_ prefixes
+            if ($cachedVal === null) {
+                if (str_starts_with($outputName, 'sts_')) {
+                    // DB has sts_, cache might have st_
+                    $stKey = 'st_' . substr($outputName, 4);
+                    if (isset($cachedOutputs[$stKey])) {
+                        $cachedVal = $cachedOutputs[$stKey];
+                    }
+                } elseif (str_starts_with($outputName, 'st_')) {
+                    // DB has st_, cache might have sts_
+                    $stsKey = 'sts_' . substr($outputName, 3);
+                    if (isset($cachedOutputs[$stsKey])) {
+                        $cachedVal = $cachedOutputs[$stsKey];
+                    }
+                }
+            }
+
+            // Strategy 3: Partial match - check if any cache key contains the core name
+            if ($cachedVal === null) {
+                $coreName = preg_replace('/^(sts_|st_)/', '', $outputName);
+                foreach ($cachedOutputs as $cacheKey => $cacheValue) {
+                    $cacheCore = preg_replace('/^(sts_|st_)/', '', $cacheKey);
+                    if ($coreName === $cacheCore || str_contains($cacheCore, $coreName) || str_contains($coreName, $cacheCore)) {
+                        $cachedVal = $cacheValue;
+                        break;
+                    }
+                }
+            }
 
             $val = $cachedVal !== null ? $cachedVal : $output->current_value;
 
@@ -321,12 +398,24 @@ class MonitoringController extends Controller
             ];
         });
 
-        // Get Latest Sensor Data
+        // Get Latest Sensor Data - PER SENSOR (bukan dari satu baris)
         $latestSensorData = null;
         if ($device->table_name && \Schema::hasTable($device->table_name)) {
-            $latestSensorData = DB::table($device->table_name)
-                ->orderBy('recorded_at', 'desc')
-                ->first();
+            $latestSensorData = new \stdClass();
+            $sensors = $device->sensors;
+            foreach ($sensors as $sensor) {
+                $sensorName = $sensor->sensor_name;
+                if (\Schema::hasColumn($device->table_name, $sensorName)) {
+                    $latestRow = DB::table($device->table_name)
+                        ->whereNotNull($sensorName)
+                        ->orderBy('recorded_at', 'desc')
+                        ->first();
+                    $latestSensorData->$sensorName = $latestRow ? $latestRow->$sensorName : null;
+                }
+            }
+            // Also get the latest recorded_at timestamp
+            $lastRow = DB::table($device->table_name)->orderBy('recorded_at', 'desc')->first();
+            $latestSensorData->recorded_at = $lastRow ? $lastRow->recorded_at : null;
         }
 
         // Get Schedule Config

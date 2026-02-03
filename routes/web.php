@@ -6,9 +6,11 @@ use App\Http\Controllers\AdminDeviceController;
 use App\Http\Controllers\MonitoringController;
 use App\Http\Controllers\AutomationConfigController;
 use App\Http\Controllers\ScheduleController;
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
+use Illuminate\Http\Request;
 
 
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth', 'verified'])->group(function () {
 
     // Grouping khusus URL awalan /admin
     Route::prefix('admin')->name('admin.')->group(function () {
@@ -67,7 +69,7 @@ Route::middleware(['auth'])->group(function () {
     // === AUTOMASI CUSTOM ROUTES ===
     Route::prefix('device/{id}/automasi')->name('automasi.')->group(function () {
         Route::get('/', [App\Http\Controllers\AutomasiController::class, 'index'])->name('index');
-        Route::post('/update-single', [App\Http\Controllers\AutomasiController::class, 'updateSingle'])->name('update_single');
+        Route::match(['get', 'post'], '/update-single', [App\Http\Controllers\AutomasiController::class, 'updateSingle'])->name('update_single');
     });
 
     // === SCHEDULE MANAGEMENT ROUTES (Real-time MQTT) ===
@@ -78,6 +80,43 @@ Route::middleware(['auth'])->group(function () {
         // Route::post('/sensor', [ScheduleController::class, 'storeSensorRule'])->name('sensor.store'); // Sensor rules might need rethink or move
     });
 });
+
+// === EMAIL VERIFICATION ROUTES ===
+// Halaman notice (bisa diakses guest setelah register)
+Route::get('/email/verify', function () {
+    return view('auth.verify-email');
+})->name('verification.notice');
+
+// Handle klik link verifikasi dari email (TANPA AUTH - manual verification)
+Route::get('/email/verify/{id}/{hash}', function ($id, $hash) {
+    $user = \App\Models\User::findOrFail($id);
+
+    // Verifikasi hash
+    if (!hash_equals((string) $hash, sha1($user->getEmailForVerification()))) {
+        abort(403, 'Link verifikasi tidak valid.');
+    }
+
+    // Tandai email sebagai verified
+    if (!$user->hasVerifiedEmail()) {
+        $user->markEmailAsVerified();
+    }
+
+    return redirect()->route('login')->with('success', 'Email berhasil diverifikasi! Silakan login.');
+})->middleware('signed')->name('verification.verify');
+
+// Kirim ulang email verifikasi
+Route::post('/email/resend', function (Request $request) {
+    // Cari user berdasarkan email di session
+    $email = $request->session()->get('pending_verification_email');
+    if ($email) {
+        $user = \App\Models\User::where('email', $email)->first();
+        if ($user && !$user->hasVerifiedEmail()) {
+            $user->sendEmailVerificationNotification();
+            return back()->with('status', 'Link verifikasi telah dikirim ulang!');
+        }
+    }
+    return back()->withErrors(['email' => 'Tidak dapat mengirim ulang. Silakan register ulang.']);
+})->middleware('throttle:1,1')->name('verification.resend');
 
 // Beranda (public)
 Route::get('/', function () {
@@ -92,3 +131,4 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 // --- REGISTER ---
 Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('register');
 Route::post('/register', [AuthController::class, 'register'])->name('register.perform');
+

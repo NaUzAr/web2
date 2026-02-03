@@ -1,17 +1,6 @@
-{{--
-THEME CONFIGURATION - SmartAgri IoT
-Ubah tema di sini untuk mengubah seluruh website
-
-Tema tersedia:
-- green: Tema hijau (Agriculture/Nature)
-- red: Tema merah
-- blue: Tema biru (Ocean/Tech)
-- purple: Tema ungu (Modern/Creative)
---}}
-
 @php
     // === GANTI TEMA DI SINI ===
-    $theme = 'red';  // Pilihan: 'green', 'red', 'blue', 'purple'
+    $theme = 'maheswara';  // Pilihan: 'green', 'red', 'blue', 'purple', 'maheswara'
     // ===========================
 
     $themes = [
@@ -31,6 +20,31 @@ Tema tersedia:
             'glow_2' => 'rgba(14, 165, 233, 0.3)',
             'glow_3' => 'rgba(134, 239, 172, 0.2)',
             'mobile_nav_dark' => 'rgba(15, 60, 35, 0.95)',
+            'text_main' => '#ffffff',
+            'text_secondary' => 'rgba(255, 255, 255, 0.7)',
+            'card_bg' => 'rgba(255, 255, 255, 0.1)',
+            'navbar_text' => 'rgba(255, 255, 255, 0.9)',
+        ],
+        'maheswara' => [
+            'primary' => '#0e5f8a', // Blue from User Image
+            'primary_dark' => '#0c4a6e',
+            'primary_light' => '#38bdf8',
+            'secondary' => '#ffffff', // White Secondary (Icon Box)
+            'secondary_light' => '#f1f5f9',
+            'secondary_dark' => '#cbd5e1',
+            'gradient_primary' => 'linear-gradient(135deg, #0e5f8a 0%, #0284c7 50%, #38bdf8 100%)',
+            'gradient_secondary' => 'linear-gradient(135deg, #eff6ff 0%, #ffffff 100%)', // White/Light Gradient
+            'gradient_bg' => '#f8fafc', // Clean White Background
+            'navbar_bg' => 'rgba(255, 255, 255, 0.95)',
+            'navbar_bg_light' => 'rgba(255, 255, 255, 0.9)',
+            'glow_1' => 'rgba(14, 95, 138, 0.1)', // Blue glow
+            'glow_2' => 'rgba(56, 189, 248, 0.1)', // Light Blue glow
+            'glow_3' => 'rgba(224, 242, 254, 0.1)',
+            'mobile_nav_dark' => 'rgba(255, 255, 255, 0.95)',
+            'text_main' => '#0f172a', // Slate 900
+            'text_secondary' => '#475569', // Slate 600
+            'card_bg' => 'rgba(255, 255, 255, 0.8)',
+            'navbar_text' => '#0f172a',
         ],
         'red' => [
             'primary' => '#ef4444',
@@ -48,6 +62,10 @@ Tema tersedia:
             'glow_2' => 'rgba(249, 115, 22, 0.3)',
             'glow_3' => 'rgba(252, 165, 165, 0.2)',
             'mobile_nav_dark' => 'rgba(69, 10, 10, 0.95)',
+            'text_main' => '#ffffff',
+            'text_secondary' => 'rgba(255, 255, 255, 0.7)',
+            'card_bg' => 'rgba(255, 255, 255, 0.1)',
+            'navbar_text' => 'rgba(255, 255, 255, 0.9)',
         ],
         'blue' => [
             'primary' => '#3b82f6',
@@ -65,6 +83,10 @@ Tema tersedia:
             'glow_2' => 'rgba(6, 182, 212, 0.3)',
             'glow_3' => 'rgba(147, 197, 253, 0.2)',
             'mobile_nav_dark' => 'rgba(12, 25, 41, 0.95)',
+            'text_main' => '#ffffff',
+            'text_secondary' => 'rgba(255, 255, 255, 0.7)',
+            'card_bg' => 'rgba(255, 255, 255, 0.1)',
+            'navbar_text' => 'rgba(255, 255, 255, 0.9)',
         ],
         'purple' => [
             'primary' => '#a855f7',
@@ -82,6 +104,10 @@ Tema tersedia:
             'glow_2' => 'rgba(236, 72, 153, 0.3)',
             'glow_3' => 'rgba(216, 180, 254, 0.2)',
             'mobile_nav_dark' => 'rgba(26, 10, 46, 0.95)',
+            'text_main' => '#ffffff',
+            'text_secondary' => 'rgba(255, 255, 255, 0.7)',
+            'card_bg' => 'rgba(255, 255, 255, 0.1)',
+            'navbar_text' => 'rgba(255, 255, 255, 0.9)',
         ],
     ];
 
@@ -133,6 +159,9 @@ Tema tersedia:
         --mobile-nav-dark:
             {{ $t['mobile_nav_dark'] }}
         ;
+        --navbar-text:
+            {{ $t['navbar_text'] ?? '#ffffff' }}
+        ;
 
         /* Glow Effects */
         --glow-1:
@@ -145,9 +174,19 @@ Tema tersedia:
             {{ $t['glow_3'] }}
         ;
 
-        /* Glass */
-        --glass-bg: rgba(255, 255, 255, 0.1);
-        --glass-border: rgba(255, 255, 255, 0.2);
+        /* Dynamic Colors */
+        --text-main:
+            {{ $t['text_main'] ?? '#ffffff' }}
+        ;
+        --text-secondary:
+            {{ $t['text_secondary'] ?? 'rgba(255, 255, 255, 0.7)' }}
+        ;
+        --glass-bg:
+            {{ $t['card_bg'] ?? 'rgba(255, 255, 255, 0.1)' }}
+        ;
+        --glass-border:
+            {{ $theme === 'maheswara' ? 'rgba(14, 95, 138, 0.15)' : 'rgba(255, 255, 255, 0.2)' }}
+        ;
     }
 
     * {
@@ -157,6 +196,7 @@ Tema tersedia:
     body {
         background: var(--nature-gradient);
         min-height: 100vh;
+        color: var(--text-main);
     }
 
     /* Background Animation */
@@ -204,11 +244,13 @@ Tema tersedia:
         background: var(--navbar-bg) !important;
         backdrop-filter: blur(20px);
         border-bottom: 1px solid var(--glass-border);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        /* Added shadow for light mode visibility */
     }
 
     .navbar-brand {
         font-weight: 700;
-        color: var(--primary-light) !important;
+        color: var(--primary) !important;
     }
 
     .navbar-brand i {
@@ -216,13 +258,17 @@ Tema tersedia:
     }
 
     .nav-link {
-        color: rgba(255, 255, 255, 0.8) !important;
+        color: var(--navbar-text) !important;
         font-weight: 500;
         transition: all 0.3s ease;
     }
 
     .nav-link:hover {
-        color: var(--primary-light) !important;
+        color: var(--primary) !important;
+    }
+
+    .nav-link.active {
+        color: var(--primary) !important;
     }
 
     /* Glass Cards */
@@ -233,12 +279,29 @@ Tema tersedia:
         border-radius: 20px;
         padding: 2rem;
         transition: all 0.4s ease;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        /* Softer shadow */
+        color: var(--text-main);
     }
 
     .glass-card:hover {
         transform: translateY(-5px);
-        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);
+        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.1);
         border-color: var(--primary);
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+        color: var(--text-main);
+    }
+
+    p,
+    small {
+        color: var(--text-secondary);
     }
 
     /* Buttons */
@@ -263,7 +326,7 @@ Tema tersedia:
         background: var(--glass-bg);
         backdrop-filter: blur(10px);
         border: 1px solid var(--glass-border);
-        color: #fff;
+        color: var(--text-main);
         padding: 0.8rem 2rem;
         border-radius: 50px;
         font-weight: 600;
@@ -271,35 +334,36 @@ Tema tersedia:
     }
 
     .btn-glass:hover {
-        background: rgba(255, 255, 255, 0.2);
-        color: #fff;
+        background: rgba(var(--primary), 0.1);
+        color: var(--primary);
         transform: translateY(-3px);
     }
 
     /* Form Controls */
     .form-control,
     .form-select {
-        background: rgba(255, 255, 255, 0.1);
+        background: var(--glass-bg);
         border: 1px solid var(--glass-border);
-        color: #fff;
+        color: var(--text-main);
         border-radius: 12px;
         padding: 0.75rem 1rem;
     }
 
     .form-control:focus,
     .form-select:focus {
-        background: rgba(255, 255, 255, 0.15);
+        background: var(--glass-bg);
         border-color: var(--primary);
-        color: #fff;
-        box-shadow: 0 0 0 3px rgba(var(--primary), 0.2);
+        color: var(--text-main);
+        box-shadow: 0 0 0 3px rgba(14, 95, 138, 0.2);
+        /* Fixed opacity color */
     }
 
     .form-control::placeholder {
-        color: rgba(255, 255, 255, 0.5);
+        color: var(--text-secondary);
     }
 
     .form-label {
-        color: var(--primary-light);
+        color: var(--text-main);
         font-weight: 600;
     }
 
@@ -308,12 +372,13 @@ Tema tersedia:
         display: inline-flex;
         align-items: center;
         gap: 6px;
-        background: rgba(0, 0, 0, 0.2);
-        color: var(--primary-light);
+        background: rgba(var(--primary), 0.1);
+        color: var(--primary);
         padding: 4px 12px;
         border-radius: 20px;
         font-size: 0.85rem;
         font-weight: 600;
+        border: 1px solid rgba(var(--primary), 0.2);
     }
 
     .live-dot {
@@ -339,16 +404,20 @@ Tema tersedia:
     }
 
     /* Tables */
+    .table-glass {
+        color: var(--text-main);
+    }
+
     .table-glass thead th {
-        background: var(--navbar-bg);
-        color: var(--primary-light);
+        background: rgba(var(--primary), 0.05);
+        color: var(--primary);
         font-weight: 600;
-        border-bottom: 1px solid var(--glass-border);
+        border-bottom: 2px solid var(--glass-border);
     }
 
     .table-glass tbody td {
         border-bottom: 1px solid var(--glass-border);
-        color: rgba(255, 255, 255, 0.9);
+        color: var(--text-main);
     }
 
     /* Dropdown */
@@ -357,15 +426,16 @@ Tema tersedia:
         backdrop-filter: blur(20px);
         border: 1px solid var(--glass-border);
         border-radius: 12px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
     }
 
     .dropdown-item {
-        color: rgba(255, 255, 255, 0.8);
+        color: var(--text-main);
     }
 
     .dropdown-item:hover {
-        background: rgba(255, 255, 255, 0.1);
-        color: var(--primary-light);
+        background: var(--primary-light);
+        color: #fff;
     }
 
     /* Footer */
@@ -377,9 +447,13 @@ Tema tersedia:
     }
 
     .footer-link {
-        color: var(--primary-light);
+        color: var(--primary);
         text-decoration: none;
         font-weight: 600;
+    }
+
+    .footer-text {
+        color: var(--text-secondary);
     }
 
     /* Admin Badge */
@@ -397,13 +471,17 @@ Tema tersedia:
     }
 
     .sensor-unit {
-        color: var(--primary-light);
+        color: var(--text-secondary);
     }
 
     /* Tabs */
+    .nav-tabs-glass .nav-link {
+        color: var(--text-secondary);
+    }
+
     .nav-tabs-glass .nav-link.active {
         background: transparent;
-        color: var(--primary-light);
+        color: var(--primary);
         border-bottom: 3px solid var(--primary);
     }
 
@@ -419,22 +497,23 @@ Tema tersedia:
 
     /* Alerts */
     .alert-success-custom {
-        background: rgba(0, 0, 0, 0.15);
-        border: 1px solid var(--primary);
-        color: var(--primary-light);
+        background: rgba(34, 197, 94, 0.1);
+        border: 1px solid #22c55e;
+        color: #166534;
         border-radius: 12px;
     }
 
     /* Badge Sensor */
     .badge-sensor {
-        background: rgba(0, 0, 0, 0.15);
-        color: var(--primary-light);
+        background: var(--glass-bg);
+        color: var(--text-main);
+        border: 1px solid var(--glass-border);
     }
 
     /* Btn View */
     .btn-view {
-        background: rgba(0, 0, 0, 0.15);
-        color: var(--primary-light);
+        background: var(--glass-bg);
+        color: var(--primary);
         border: 1px solid var(--primary);
     }
 
@@ -452,28 +531,36 @@ Tema tersedia:
             margin-top: 1rem;
             padding: 1rem;
             border: 1px solid var(--glass-border);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
         }
 
         .navbar-nav .nav-link:hover {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.05);
         }
 
         .navbar-nav .dropdown-menu {
-            background: var(--mobile-nav-dark);
+            background: rgba(0, 0, 0, 0.02);
+            box-shadow: none;
         }
     }
 
     /* Navbar Toggler */
     .navbar-toggler:focus {
-        box-shadow: 0 0 0 0.2rem rgba(255, 255, 255, 0.2);
+        box-shadow: 0 0 0 0.2rem rgba(var(--primary), 0.2);
+    }
+
+    /* Inverse Icon for Light Mode if needed */
+    .navbar-toggler-icon {
+        filter: invert(1) grayscale(100%);
+        /* Make sure toggler is visible on white */
     }
 
     /* Link Styles */
     .link-primary {
-        color: var(--primary-light);
+        color: var(--primary);
     }
 
     .link-primary:hover {
-        color: var(--primary);
+        color: var(--primary-dark);
     }
 </style>

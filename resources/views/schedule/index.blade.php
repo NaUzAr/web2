@@ -4,7 +4,9 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{ $scheduleConfig->schedule_label }} - {{ $device->name }}</title>
+    <title>Jadwal Otomatis - {{ $device->name }}</title>
+    @include('partials.pwa-head')
+    @include('partials.theme')
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -14,81 +16,85 @@
         }
 
         body {
-            background: linear-gradient(135deg, #450a0a 0%, #7f1d1d 50%, #991b1b 100%);
+            background: var(--gradient-bg);
             min-height: 100vh;
-            padding: 2rem 0;
-            color: #fff;
+            color: var(--text-main);
         }
 
         .glass-card {
-            background: rgba(255, 255, 255, 0.1);
+            background: var(--glass-bg);
             backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border: 1px solid var(--glass-border);
             border-radius: 20px;
             padding: 2rem;
             margin-bottom: 2rem;
         }
 
         .btn-glass {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: #fff;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--text-main);
             padding: 0.6rem 1.25rem;
             border-radius: 50px;
             text-decoration: none;
         }
 
         .btn-glass:hover {
-            background: rgba(255, 255, 255, 0.2);
-            color: #fff;
+            background: var(--glass-bg);
+            border-color: var(--primary);
+            color: var(--primary);
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            background: var(--primary-gradient);
             border: none;
+            color: #fff;
         }
 
         .table-glass {
-            color: #fff;
+            color: var(--text-main);
         }
         
         .table-glass th,
         .table-glass td {
-            border-color: rgba(255, 255, 255, 0.1);
+            border-color: var(--glass-border);
             padding: 1rem;
             vertical-align: middle;
         }
         
         .table-glass thead th {
-            border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+            border-bottom: 2px solid var(--glass-border);
             font-weight: 600;
             text-transform: uppercase;
             font-size: 0.85rem;
             letter-spacing: 0.5px;
+            color: var(--text-secondary);
         }
 
         .badge-sector {
-            background: rgba(255, 255, 255, 0.2);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--text-main);
         }
 
         .modal-content-glass {
-            background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: white;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            color: var(--text-main);
         }
         
         .form-control-dark, .form-select-dark {
-            background-color: rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: white;
+            background-color: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--text-main);
         }
         
         .form-control-dark:focus, .form-select-dark:focus {
-            background-color: rgba(0, 0, 0, 0.4);
-            border-color: #ef4444;
-            color: white;
-            box-shadow: 0 0 0 0.25rem rgba(239, 68, 68, 0.25);
+            background-color: var(--glass-bg);
+            border-color: var(--primary);
+            color: var(--text-main);
+            box-shadow: 0 0 0 0.25rem rgba(var(--primary), 0.25);
         }
 
         .schedule-day-check {
@@ -102,7 +108,7 @@
             line-height: 34px;
             text-align: center;
             border-radius: 50%;
-            border: 1px solid rgba(255, 255, 255, 0.3);
+            border: 1px solid var(--glass-border);
             cursor: pointer;
             margin-right: 5px;
             font-size: 0.8rem;
@@ -111,26 +117,38 @@
         }
         
         .schedule-day-check:checked + .schedule-day-label {
-            background-color: #ef4444;
-            border-color: #ef4444;
+            background-color: var(--primary);
+            border-color: var(--primary);
             color: white;
         }
     </style>
 </head>
 
 <body>
-    <div class="container">
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-glass">
+        <div class="container">
+            <a class="navbar-brand" href="{{ route('home') }}">
+                <i class="bi bi-tree-fill me-2"></i>Swaratani
+            </a>
+            <div class="navbar-nav ms-auto">
+                {{-- Helper Text / Status --}}
+                <a class="nav-link" href="{{ route('monitoring.show', $userDevice->id) }}">
+                    <i class="bi bi-arrow-left me-1"></i> Kembali
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
         <div class="glass-card">
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <div>
-                    <h3><i class="bi bi-calendar-check me-2"></i>{{ $scheduleConfig->schedule_label }}</h3>
-                    <p class="text-white-50 mb-0">Device: {{ $device->name }} | Target:
+                    <h4 class="mb-1"><i class="bi bi-calendar-check me-2"></i>Jadwal Otomatis</h4>
+                    <p class="mb-0 small" style="color: var(--text-secondary);">Device: {{ $device->name }} | Target:
                         {{ $scheduleConfig->output_key }}
                     </p>
                 </div>
-                <a href="{{ route('monitoring.show', $userDevice->id) }}" class="btn-glass">
-                    <i class="bi bi-arrow-left me-1"></i> Kembali
-                </a>
             </div>
 
             @php
@@ -224,7 +242,7 @@
                                 </td>
                                 
                                 <td>
-                                    <button class="btn btn-sm btn-outline-light me-1" onclick='openScheduleModal({{ $i }}, @json($sch))'>
+                                    <button class="btn btn-sm btn-outline-primary me-1" onclick='openScheduleModal({{ $i }}, @json($sch))'>
                                         <i class="bi bi-pencil-square"></i> Edit
                                     </button>
                                     @if($isActive)

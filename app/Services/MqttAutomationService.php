@@ -32,7 +32,7 @@ class MqttAutomationService
     {
         try {
             $mqtt = $this->connect();
-            $topic = rtrim($mqttTopic, '/') . '/pub';
+            $topic = rtrim($mqttTopic, '/') . '/sub';
 
             $configPayloads = array_map(function ($config) {
                 return is_object($config) ? $config->toMqttPayload() : $config;
@@ -75,7 +75,7 @@ class MqttAutomationService
     {
         try {
             $mqtt = $this->connect();
-            $topic = rtrim($mqttTopic, '/') . '/pub';
+            $topic = rtrim($mqttTopic, '/') . '/sub';
 
             $message = json_encode([
                 'type' => 'automation_delete',
@@ -112,7 +112,7 @@ class MqttAutomationService
     {
         try {
             $mqtt = $this->connect();
-            $topic = rtrim($mqttTopic, '/') . '/pub';
+            $topic = rtrim($mqttTopic, '/') . '/sub';
 
             $message = json_encode([
                 'type' => 'status_request',
@@ -134,27 +134,39 @@ class MqttAutomationService
     }
 
     /**
-     * Send custom automation settings (key-value pairs)
+     * Send custom automation settings (key-value pairs) with specific string format
      */
     public function sendCustomAutomationConfig(string $mqttTopic, string $deviceToken, array $settings): bool
     {
         try {
             $mqtt = $this->connect();
-            $topic = rtrim($mqttTopic, '/') . '/pub';
+            $topic = rtrim($mqttTopic, '/') . '/sub';
 
-            $message = json_encode([
-                'type' => 'custom_automation',
-                'token' => $deviceToken,
-                'settings' => $settings,
-                'timestamp' => now()->toIso8601String(),
-            ]);
+            $message = '';
+
+            // Determine format based on keys
+            if (isset($settings['ats_tds']) && isset($settings['bwh_tds'])) {
+                // Fertilizer (TDS): <PPKAUT#ats#bwh#>
+                $message = "<PPKAUT#" . $settings['ats_tds'] . "#" . $settings['bwh_tds'] . "#>";
+            } elseif (isset($settings['ats_ph']) && isset($settings['bwh_ph'])) {
+                // pH: <PPKPH#ats#bwh#>
+                $message = "<PPKPH#" . $settings['ats_ph'] . "#" . $settings['bwh_ph'] . "#>";
+            } elseif (isset($settings['ats_suhu']) && isset($settings['bwh_suhu'])) {
+                // Fan (Temperature): <SUH#ats#bwh#>
+                $message = "<SUH#" . $settings['ats_suhu'] . "#" . $settings['bwh_suhu'] . "#>";
+            } elseif (isset($settings['ats_kelem']) && isset($settings['bwh_kelem'])) {
+                // Misting (Humidity): <KEL#ats#bwh#>
+                $message = "<KEL#" . $settings['ats_kelem'] . "#" . $settings['bwh_kelem'] . "#>";
+            } else {
+                Log::warning("Unknown automation setting keys: " . json_encode(array_keys($settings)));
+                return false;
+            }
 
             $mqtt->publish($topic, $message, 1);
             $mqtt->disconnect();
 
-            Log::info("Custom automation settings sent to topic {$topic}", [
+            Log::info("Custom automation settings sent to topic {$topic}: {$message}", [
                 'token' => $deviceToken,
-                'settings_count' => count($settings),
             ]);
 
             return true;
@@ -177,15 +189,46 @@ class MqttAutomationService
     {
         try {
             $mqtt = $this->connect();
-            $topic = rtrim($mqttTopic, '/') . '/pub';
+            $topic = rtrim($mqttTopic, '/') . '/sub';
 
-            $message = json_encode([
-                'type' => 'manual_control',
-                'token' => $deviceToken,
-                'output_name' => $outputName,
-                'value' => $value,
-                'timestamp' => now()->toIso8601String(),
-            ]);
+            // Custom format based on output name
+            $val = $value ? '1' : '0';
+            $name = strtolower($outputName);
+
+            // 1. Specific Pumps (Dosing & pH)
+            if (str_contains($name, 'pump_ab') || str_contains($name, 'dosing')) {
+                $message = "<pmpAB#{$val}#>";
+            } elseif (str_contains($name, 'ph_up') || str_contains($name, 'ph1')) {
+                $message = "<pmpPH#{$val}#>";
+            } elseif (str_contains($name, 'ph_down') || str_contains($name, 'ph2')) {
+                $message = "<pmpPH2#{$val}#>";
+            }
+            // 2. Main Pump (Pompa Utama / Irigasi)
+            elseif (str_contains($name, 'pompa') || str_contains($name, 'pump')) {
+                // Special case for main pump
+                if ($value) {
+                    $message = "<PMP_ON#0#0#>";
+                } else {
+                    $message = "<PMP_OFF#>";
+                }
+            }
+            // 3. Components
+            elseif (str_contains($name, 'air_input')) {
+                $message = "<AIR#{$val}#>";
+            } elseif (str_contains($name, 'mix')) {
+                $message = "<MIX#{$val}#>";
+            } elseif (str_contains($name, 'fan')) {
+                $message = "<FAN#{$val}#>";
+            } elseif (str_contains($name, 'mist')) {
+                $message = "<MIS#{$val}#>";
+            } elseif (str_contains($name, 'lamp')) {
+                $message = "<LAM#{$val}#>";
+            }
+            // 4. Fallback
+            else {
+                // Generic fallback
+                $message = sprintf('<%s#%s#>', $outputName, $val);
+            }
 
             $mqtt->publish($topic, $message, 1);
             $mqtt->disconnect();

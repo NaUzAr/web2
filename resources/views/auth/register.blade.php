@@ -10,7 +10,7 @@
         rel="stylesheet">
     @include('partials.theme')
 
-    <title>Daftar - Smart Agriculture</title>
+    <title>Daftar - Swaratani</title>
     <style>
         body {
             display: flex;
@@ -98,7 +98,7 @@
                 <i class="bi bi-person-plus-fill text-white"></i>
             </div>
             <h4 class="register-title">Buat Akun Baru</h4>
-            <p class="register-subtitle">Daftar untuk mengakses Smart Agriculture System</p>
+            <p class="register-subtitle">Daftar untuk mengakses Swaratani System</p>
         </div>
 
         @if ($errors->any())
@@ -151,9 +151,10 @@
             </div>
         </form>
 
-        <div class="text-center">
-            <span class="text-muted-light small">Sudah punya akun?</span>
-            <a href="{{ route('login') }}" class="link-green ms-1">Login disini</a>
+        <div class="text-center mt-3">
+            <span style="color: rgba(100, 116, 139, 0.8); font-size: 0.9rem;">Sudah punya akun?</span>
+            <a href="{{ route('login') }}"
+                style="color: #0ea5e9; text-decoration: none; font-weight: 500; margin-left: 4px;">Login disini</a>
         </div>
     </div>
 

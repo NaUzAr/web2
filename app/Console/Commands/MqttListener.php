@@ -107,69 +107,90 @@ class MqttListener extends Command
         $this->line("           Raw: {$message}");
 
         try {
-            // Try to parse JSON
-            $data = json_decode($message, true);
-
-            // AUTO-FIX: Attempt to fix common malformed JSON from Arduino (unquoted strings)
-            // Example: {"waktu":Jumat...} -> {"waktu":"Jumat..."}
-            if (!$data) {
-                // AUTO-FIX 1: Remove trailing commas in objects (e.g. {"a":1,})
-                // Look for comma followed immediately by }
-                $fixedMessage = preg_replace('/,(\s*})/', '$1', $message);
-                $data = json_decode($fixedMessage, true);
-
-                if (!$data) {
-                    // AUTO-FIX 2: Handle unquoted strings + trailing commas combined
-                    // First regex: wrap unquoted values (alphanumeric+symbols) in quotes
-                    $fixedMessage = preg_replace('/:\s*([a-zA-Z0-9_\-\.\:\s]+?)\s*([,}])/', ':"$1"$2', $message);
-                    // Second regex: remove trailing commas again (in case they existed)
-                    $fixedMessage = preg_replace('/,(\s*})/', '$1', $fixedMessage);
-                    $data = json_decode($fixedMessage, true);
-                }
-
-                if ($data) {
-                    $this->line("           🔧 Auto-fixed JSON");
-                }
+            // Attempt to handle concatenated JSONs (e.g. {"a":1}{"b":2})
+            // Use regex to find all JSON-like structures matching {...}
+            if (preg_match_all('/(\{.*?\})/', $message, $matches)) {
+                $jsonCandidates = $matches[1];
+            } else {
+                $jsonCandidates = [$message];
             }
 
-            if (!$data) {
-                // Fallback: Try wrapper <dat|...|>
-                if (preg_match('/<dat\|(.*?)\|>/', $message, $matches)) {
-                    $data = json_decode($matches[1], true);
-                }
+            foreach ($jsonCandidates as $candidate) {
+                $this->processJsonPayload($topic, $candidate);
             }
-
-            if (!$data) {
-                $this->warn("           ⚠️  Invalid data format");
-                return;
-            }
-
-            // Cari device berdasarkan topic ATAU token
-            // Topic yang diterima: {mqtt_topic}/sub, tapi di DB hanya {mqtt_topic}
-            $baseTopic = preg_replace('/\/pub$/', '', $topic);
-            $device = Device::where('mqtt_topic', $baseTopic)->first();
-
-            // Fallback: cari dengan topic asli
-            if (!$device) {
-                $device = Device::where('mqtt_topic', $topic)->first();
-            }
-
-            if (!$device && isset($data['token'])) {
-                $device = Device::where('token', $data['token'])->first();
-            }
-
-            if (!$device) {
-                $this->warn("           ⚠️  Device not found for topic: {$topic}");
-                return;
-            }
-
-            // Determine data type and process accordingly
-            $this->processDataByType($device, $data);
 
         } catch (\Exception $e) {
             $this->error("           ❌ Error: " . $e->getMessage());
             Log::error('MQTT Process Error: ' . $e->getMessage());
         }
+    }
+
+    /**
+     * Process a single JSON payload string
+     */
+    private function processJsonPayload($topic, $message)
+    {
+        // Try to parse JSON
+        $data = json_decode($message, true);
+
+        // AUTO-FIX: Attempt to fix common malformed JSON from Arduino (unquoted strings)
+        // Example: {"waktu":Jumat...} -> {"waktu":"Jumat..."}
+        if (!$data) {
+            // AUTO-FIX 1: Remove trailing commas in objects (e.g. {"a":1,})
+            // Look for comma followed immediately by }
+            $fixedMessage = preg_replace('/,(\s*})/', '$1', $message);
+            $data = json_decode($fixedMessage, true);
+
+            if (!$data) {
+                // AUTO-FIX 2: Handle unquoted strings + trailing commas combined
+                // First regex: wrap unquoted values (alphanumeric+symbols) in quotes
+                $fixedMessage = preg_replace('/:\s*([a-zA-Z0-9_\-\.\:\s]+?)\s*([,}])/', ':"$1"$2', $message);
+                // Second regex: remove trailing commas again (in case they existed)
+                $fixedMessage = preg_replace('/,(\s*})/', '$1', $fixedMessage);
+                $data = json_decode($fixedMessage, true);
+            }
+
+            if ($data) {
+                $this->line("           🔧 Auto-fixed JSON");
+            }
+        }
+
+        if (!$data) {
+            // Fallback: Try wrapper <dat|...|>
+            if (preg_match('/<dat\|(.*?)\|>/', $message, $matches)) {
+                $data = json_decode($matches[1], true);
+            }
+        }
+
+        if (!$data) {
+            // Only warn if it's not a heartbeat or empty/noise
+            if (strlen($message) > 5) {
+                $this->warn("           ⚠️  Invalid data format: " . substr($message, 0, 50));
+            }
+            return;
+        }
+
+        // Cari device berdasarkan topic ATAU token
+        // Topic yang diterima: {mqtt_topic}/sub, tapi di DB hanya {mqtt_topic}
+        $baseTopic = preg_replace('/\/pub$/', '', $topic);
+        $device = Device::where('mqtt_topic', $baseTopic)->first();
+
+        // Fallback: cari dengan topic asli
+        if (!$device) {
+            $device = Device::where('mqtt_topic', $topic)->first();
+        }
+
+        if (!$device && isset($data['token'])) {
+            $device = Device::where('token', $data['token'])->first();
+        }
+
+        if (!$device) {
+            $this->warn("           ⚠️  Device not found for topic: {$topic}");
+            return;
+        }
+
+        // Determine data type and process accordingly
+        $this->processDataByType($device, $data);
     }
 
     /**
@@ -197,9 +218,9 @@ class MqttListener extends Command
             return;
         }
 
-        // Counter 6: Status Output (sts_*)
-        // Check for sts_ prefix OR known status keys
-        if ($hasPrefix('sts_')) {
+        // Counter 6: Status Output (sts_ or st_)
+        // Check for sts_ or st_ prefix OR known status keys
+        if ($hasPrefix('sts_') || $hasPrefix('st_')) {
             $this->logStatusData($device, $data);
             return;
         }
@@ -255,9 +276,7 @@ class MqttListener extends Command
         }
 
         // Hardcoded mapping: ESP32 key => DB column
-        // Tambahkan mapping baru disini jika ada sensor baru
         $keyMapping = [
-            // === SENSOR DATA (Counter 1 dari ESP32) ===
             // Primary sensors
             'ni_PH' => 'ni_PH',
             'ni_EC' => 'ni_EC',
@@ -282,15 +301,13 @@ class MqttListener extends Command
             'water_level' => 'water_level',
             'co2' => 'co2',
 
-            // === ALIAS untuk multiple sensor (tambahkan angka di belakang) ===
+            // Aliases
             'ni_SUHU_2' => 'ni_SUHU_2',
             'ni_KELEM_2' => 'ni_KELEM_2',
             'ni_PH_2' => 'ni_PH_2',
             'ni_EC_2' => 'ni_EC_2',
             'ni_TDS_2' => 'ni_TDS_2',
             'ni_LUX_2' => 'ni_LUX_2',
-
-            // === Legacy/Alternative keys (jika ESP32 pakai format lain) ===
             'temperature' => 'ni_SUHU',
             'temperature_1' => 'ni_SUHU',
             'temperature_2' => 'ni_SUHU_2',
@@ -305,28 +322,44 @@ class MqttListener extends Command
             'lux' => 'ni_LUX',
         ];
 
-        $insertData = ['recorded_at' => now()];
+        // --- AGGREGATION LOGIC ---
+        // Use cache to buffer sensor data from multiple messages
+        $cacheKey = "sensor_buffer_{$device->id}";
+        $buffer = \Cache::get($cacheKey, []);
+        $bufferTimeKey = "sensor_buffer_time_{$device->id}";
+        $lastBufferTime = \Cache::get($bufferTimeKey, now());
 
-        // Cek setiap key di data, mapping ke DB column
+        // Add current data to buffer
         foreach ($data as $espKey => $value) {
-            // Cari mapping, jika tidak ada pakai key asli
             $dbColumn = $keyMapping[$espKey] ?? $espKey;
-
-            // Cek apakah kolom ada di tabel
             if (\Schema::hasColumn($tableName, $dbColumn)) {
-                $insertData[$dbColumn] = (float) $value;
+                $buffer[$dbColumn] = (float) $value;
                 $this->line("           • {$espKey} → {$dbColumn}: {$value}");
             }
         }
 
-        // Only insert if we have data beyond recorded_at
-        if (count($insertData) > 1) {
+        // Update buffer in cache (expires in 60s)
+        \Cache::put($cacheKey, $buffer, now()->addSeconds(60));
+        \Cache::put($bufferTimeKey, now(), now()->addSeconds(60));
+
+        // Check if we should flush the buffer to DB
+        // Condition: Buffer has been accumulating for at least 10 seconds
+        // OR we have 4+ sensor values (typical complete set)
+        $bufferAge = now()->diffInSeconds($lastBufferTime);
+        $shouldFlush = count($buffer) >= 4 || $bufferAge >= 10;
+
+        if ($shouldFlush && count($buffer) > 0) {
+            $insertData = $buffer;
+            $insertData['recorded_at'] = now();
+
             DB::table($tableName)->insert($insertData);
-            $this->info("           ✅ Sensor data saved to {$tableName}");
+            $this->info("           ✅ Sensor data saved to {$tableName} (" . count($buffer) . " values)");
+
+            // Clear buffer
+            \Cache::forget($cacheKey);
+            \Cache::forget($bufferTimeKey);
         } else {
-            $this->warn("           ⚠️  No matching sensor data found");
-            $this->line("           Available keys in data: " . implode(', ', array_keys($data)));
-            $this->line("           Available mappings: " . implode(', ', array_keys($keyMapping)));
+            $this->line("           📥 Buffering... (" . count($buffer) . " values, waiting for more)");
         }
     }
 
@@ -426,9 +459,6 @@ class MqttListener extends Command
     /**
      * Log status output data (Counter 6)
      */
-    /**
-     * Log status output data (Counter 6)
-     */
     private function logStatusData($device, $data)
     {
         $this->info("           🔌 Type: STATUS OUTPUT");
@@ -436,19 +466,20 @@ class MqttListener extends Command
         $updatesCount = 0;
         $cachedOutputs = \Cache::get("device_outputs_{$device->id}", []);
 
-        // Iterate any key starting with sts_
+        // Iterate any key starting with sts_ or st_
         foreach ($data as $key => $value) {
-            if (str_starts_with($key, 'sts_')) {
-                $label = ucwords(str_replace('sts_', '', str_replace('_', ' ', $key)));
+            $isSts = str_starts_with($key, 'sts_');
+            $isSt = str_starts_with($key, 'st_');
+
+            if ($isSts || $isSt) {
+                $prefix = $isSts ? 'sts_' : 'st_';
+                $label = ucwords(str_replace($prefix, '', str_replace('_', ' ', $key)));
 
                 // Allow integer/boolean values
                 $status = $value ? "🟢 ON" : "🔴 OFF";
                 $this->line("           • {$label} ({$key}): {$status}");
 
                 // Update Cache
-                // Map sts_pump to pump (remove sts_ prefix for consistency with output_name if needed)
-                // Actually MonitoringController maps output_name. 
-                // Let's store raw key-value in cache for simple mapping later
                 $cachedOutputs[$key] = $value;
 
                 // Save to Database

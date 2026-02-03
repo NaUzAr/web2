@@ -360,8 +360,42 @@ class AdminDeviceController extends Controller
         try {
             $topic = rtrim($device->mqtt_topic, '/') . '/sub';
 
-            // Format simpel: <output#value>
-            $message = sprintf('<%s#%s>', $output->output_name, $newValue);
+            // Custom format based on output name
+            $val = $newValue ? '1' : '0';
+            $name = strtolower($output->output_name);
+
+            // 1. Specific Pumps (Dosing & pH)
+            if (str_contains($name, 'pump_ab') || str_contains($name, 'dosing')) {
+                $message = "<pmpAB#{$val}#>";
+            } elseif (str_contains($name, 'ph_up') || str_contains($name, 'ph1')) {
+                $message = "<pmpPH#{$val}#>";
+            } elseif (str_contains($name, 'ph_down') || str_contains($name, 'ph2')) {
+                $message = "<pmpPH2#{$val}#>";
+            }
+            // 2. Main Pump (Pompa Utama / Irigasi)
+            elseif (str_contains($name, 'pompa') || str_contains($name, 'pump')) {
+                if ($newValue) {
+                    $message = "<PMP_ON#0#0#>";
+                } else {
+                    $message = "<PMP_OFF#>";
+                }
+            }
+            // 3. Components
+            elseif (str_contains($name, 'air_input')) {
+                $message = "<AIR#{$val}#>";
+            } elseif (str_contains($name, 'mix')) {
+                $message = "<MIX#{$val}#>";
+            } elseif (str_contains($name, 'fan')) {
+                $message = "<FAN#{$val}#>";
+            } elseif (str_contains($name, 'mist')) {
+                $message = "<MIS#{$val}#>";
+            } elseif (str_contains($name, 'lamp')) {
+                $message = "<LAM#{$val}#>";
+            }
+            // 4. Fallback
+            else {
+                $message = sprintf('<%s#%s#>', $output->output_name, $val);
+            }
 
             // MQTT Connection
             $host = config('mqtt.host', env('MQTT_HOST', 'smartagri.web.id'));

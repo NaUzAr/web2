@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Manage Devices - Smart Agriculture</title>
+    <title>Manage Devices - Swaratani</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
@@ -48,7 +48,7 @@
         }
 
         .table tbody td {
-            color: rgba(255, 255, 255, 0.9);
+            color: #1f2937;
             border-bottom: 1px solid var(--glass-border);
             padding: 1rem;
             vertical-align: middle;
@@ -64,9 +64,9 @@
         }
 
         .badge-output {
-            background: rgba(250, 204, 21, 0.2);
-            color: #fde047;
-            font-weight: 500;
+            background: #fbbf24;
+            color: #1f2937;
+            font-weight: 600;
             padding: 0.25rem 0.5rem;
             border-radius: 6px;
             margin: 2px;
@@ -75,8 +75,8 @@
         }
 
         .badge-token {
-            background: rgba(255, 255, 255, 0.1);
-            color: #fff;
+            background: rgba(100, 116, 139, 0.15);
+            color: #475569;
             font-family: monospace;
             padding: 0.35rem 0.6rem;
             border-radius: 8px;
@@ -145,7 +145,7 @@
     <nav class="navbar navbar-expand-lg navbar-glass">
         <div class="container">
             <a class="navbar-brand" href="{{ route('home') }}">
-                <i class="bi bi-tree-fill me-2"></i>SmartAgri
+                <i class="bi bi-tree-fill me-2"></i>Swaratani
             </a>
             <div class="navbar-nav ms-auto">
                 <a class="nav-link" href="{{ route('home') }}">
@@ -195,8 +195,8 @@
                                 <td>
                                     <a href="{{ route('admin.device.monitoring', $device->id) }}"
                                         class="text-decoration-none">
-                                        <div class="fw-bold text-white">{{ $device->name }}</div>
-                                        <small class="text-white-50">{{ $device->table_name }}</small>
+                                        <div class="fw-bold" style="color: #1f2937;">{{ $device->name }}</div>
+                                        <small style="color: #64748b;">{{ $device->table_name }}</small>
                                     </a>
                                 </td>
                                 <td>

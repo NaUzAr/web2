@@ -4,46 +4,21 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Tambah Device - Smart Agriculture</title>
+    <title>Tambah Device - Swaratani</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
 
+
+    @include('partials.theme')
+
     <style>
-        :root {
-            --primary-red: #ef4444;
-            --dark-red: #991b1b;
-            --light-red: #fca5a5;
-            --accent-orange: #f97316;
-            --primary-gradient: linear-gradient(135deg, #ef4444 0%, #dc2626 50%, #f97316 100%);
-            --nature-gradient: linear-gradient(135deg, #450a0a 0%, #7f1d1d 50%, #991b1b 100%);
-            --glass-bg: rgba(255, 255, 255, 0.1);
-            --glass-border: rgba(255, 255, 255, 0.2);
-        }
-
-        * {
-            font-family: 'Inter', sans-serif;
-        }
-
         body {
-            background: var(--nature-gradient);
-            min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 2rem;
-        }
-
-        .bg-animation {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-            background: radial-gradient(circle at 20% 80%, rgba(239, 68, 68, 0.3) 0%, transparent 50%),
-                radial-gradient(circle at 80% 20%, rgba(249, 115, 22, 0.3) 0%, transparent 50%);
         }
 
         .add-card {
@@ -54,7 +29,7 @@
             background: var(--glass-bg);
             backdrop-filter: blur(20px);
             border: 1px solid var(--glass-border);
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.1);
         }
 
         .card-icon {
@@ -70,27 +45,27 @@
         }
 
         .card-title {
-            color: #fff;
+            color: #1f2937;
             font-weight: 700;
             text-align: center;
             margin-bottom: 0.5rem;
         }
 
         .card-subtitle {
-            color: rgba(255, 255, 255, 0.6);
+            color: #64748b;
             text-align: center;
             margin-bottom: 2rem;
         }
 
         .form-label {
-            color: #fca5a5;
+            color: var(--primary-dark);
             font-weight: 600;
         }
 
         .form-control {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.8);
             border: 1px solid var(--glass-border);
-            color: #fff;
+            color: #1f2937;
             border-radius: 12px;
             padding: 0.85rem 1rem;
             transition: all 0.3s ease;
@@ -101,14 +76,14 @@
         }
 
         .form-control:focus {
-            background: rgba(255, 255, 255, 0.15);
-            border-color: #ef4444;
-            color: #fff;
-            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2);
+            background: #fff;
+            border-color: var(--primary-color);
+            color: #1f2937;
+            box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.2);
         }
 
         .form-control::placeholder {
-            color: rgba(255, 255, 255, 0.4);
+            color: #94a3b8;
             letter-spacing: 1px;
         }
 
@@ -118,53 +93,36 @@
             text-align: left;
         }
 
-        .btn-gradient {
-            background: var(--primary-gradient);
-            border: none;
-            color: #fff;
-            padding: 0.85rem;
+        .alert-danger-custom {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #dc2626;
             border-radius: 12px;
-            font-weight: 700;
-            font-size: 1rem;
-            transition: all 0.3s ease;
         }
 
-        .btn-gradient:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(239, 68, 68, 0.4);
-            color: #fff;
+        .alert-info-custom {
+            background: rgba(14, 165, 233, 0.1);
+            border: 1px solid rgba(14, 165, 233, 0.3);
+            color: #0284c7;
+            border-radius: 12px;
+        }
+
+        .form-text-light {
+            color: #64748b;
         }
 
         .btn-glass {
             background: var(--glass-bg);
             border: 1px solid var(--glass-border);
-            color: #fff;
+            color: #475569;
             padding: 0.85rem;
             border-radius: 12px;
             font-weight: 600;
         }
 
         .btn-glass:hover {
-            background: rgba(255, 255, 255, 0.2);
-            color: #fff;
-        }
-
-        .alert-danger-custom {
-            background: rgba(239, 68, 68, 0.2);
-            border: 1px solid rgba(239, 68, 68, 0.3);
-            color: #fca5a5;
-            border-radius: 12px;
-        }
-
-        .alert-info-custom {
-            background: rgba(14, 165, 233, 0.15);
-            border: 1px solid rgba(14, 165, 233, 0.3);
-            color: var(--light-sky);
-            border-radius: 12px;
-        }
-
-        .form-text-light {
-            color: rgba(255, 255, 255, 0.5);
+            background: rgba(0, 0, 0, 0.05);
+            color: #1f2937;
         }
     </style>
 </head>

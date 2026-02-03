@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash; // [TAMBAHAN PENTING] Untuk hashing password
-use App\Models\User;                 // [TAMBAHAN PENTING] Untuk memanggil model User
+use Illuminate\Support\Facades\Hash;
+use App\Models\User;
 
 class AuthController extends Controller
 {
@@ -29,23 +29,35 @@ class AuthController extends Controller
             'password' => ['required'],
         ]);
 
-        // 2. Cek ke Database otomatis
-        if (Auth::attempt($credentials)) {
-            $request->session()->regenerate(); // Mencegah Session Fixation attack
+        // 2. Cek apakah user ada
+        $user = User::where('username', $credentials['username'])->first();
 
-            // Detect PWA mode and store in session
-            if ($request->has('pwa') || $request->session()->get('is_pwa')) {
-                $request->session()->put('is_pwa', true);
-                return redirect()->route('monitoring.index'); // PWA → langsung ke monitoring
-            }
-
-            return redirect()->intended('/'); // Web biasa → halaman yang dituju
+        if (!$user || !Hash::check($credentials['password'], $user->password)) {
+            return back()->withErrors([
+                'username' => 'Username atau password salah.',
+            ])->onlyInput('username');
         }
 
-        // 3. Jika gagal, kembalikan error
-        return back()->withErrors([
-            'username' => 'Username atau password salah.',
-        ])->onlyInput('username');
+        // 3. Cek apakah email sudah diverifikasi
+        if (!$user->hasVerifiedEmail()) {
+            // Simpan email di session untuk resend
+            $request->session()->put('pending_verification_email', $user->email);
+
+            return redirect()->route('verification.notice')
+                ->with('warning', 'Email belum diverifikasi. Silakan cek email atau kirim ulang verifikasi.');
+        }
+
+        // 4. Login jika sudah verified
+        Auth::login($user);
+        $request->session()->regenerate();
+
+        // Detect PWA mode
+        if ($request->has('pwa') || $request->session()->get('is_pwa')) {
+            $request->session()->put('is_pwa', true);
+            return redirect()->route('monitoring.index');
+        }
+
+        return redirect()->intended('/');
     }
 
     // Memproses Registrasi
@@ -57,7 +69,6 @@ class AuthController extends Controller
             'username' => 'required|string|max:50|unique:users',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:6|confirmed',
-            // 'confirmed' mewajibkan adanya field 'password_confirmation' di form HTML
         ]);
 
         // B. Buat User Baru di Database
@@ -65,14 +76,15 @@ class AuthController extends Controller
             'name' => $request->name,
             'username' => $request->username,
             'email' => $request->email,
-            'password' => Hash::make($request->password), // Enkripsi password
+            'password' => Hash::make($request->password),
         ]);
 
-        // C. Langsung Login otomatis setelah daftar
-        Auth::login($user);
+        // C. Simpan email di session untuk ditampilkan di halaman verify
+        $request->session()->put('pending_verification_email', $user->email);
 
-        // D. Lempar ke Dashboard
-        return redirect()->route('home'); // Pastikan route dengan nama 'home' ada di web.php
+        // D. TIDAK auto-login dan TIDAK auto-send email, user harus klik manual
+        return redirect()->route('verification.notice')
+            ->with('status', 'Akun berhasil dibuat! Klik tombol dibawah untuk mengirim email verifikasi.');
     }
 
     // Logout

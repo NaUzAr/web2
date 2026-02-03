@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{{ ($isAdminView ?? false) ? $device->name : $userDevice->custom_name }} - Monitoring</title>
     @include('partials.pwa-head')
+    @include('partials.theme')
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
@@ -13,24 +14,15 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
-        :root {
-            --primary-red: #ef4444;
-            --dark-red: #991b1b;
-            --light-red: #fca5a5;
-            --accent-orange: #f97316;
-            --light-orange: #fdba74;
-            --primary-gradient: linear-gradient(135deg, #ef4444 0%, #dc2626 50%, #f97316 100%);
-            --nature-gradient: linear-gradient(135deg, #450a0a 0%, #7f1d1d 50%, #991b1b 100%);
-            --glass-bg: rgba(255, 255, 255, 0.1);
-            --glass-border: rgba(255, 255, 255, 0.2);
-        }
+        /* Page Specific Overrides */
+
 
         * {
             font-family: 'Inter', sans-serif;
         }
 
         body {
-            background: var(--nature-gradient);
+            background: var(--gradient-bg);
             min-height: 100vh;
         }
 
@@ -41,27 +33,27 @@
             width: 100%;
             height: 100%;
             z-index: -1;
-            background: radial-gradient(circle at 20% 80%, rgba(239, 68, 68, 0.2) 0%, transparent 50%),
-                radial-gradient(circle at 80% 20%, rgba(249, 115, 22, 0.2) 0%, transparent 50%);
+            background: radial-gradient(circle at 20% 80%, var(--glow-1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, var(--glow-2) 0%, transparent 50%);
         }
 
         .navbar-glass {
-            background: rgba(127, 29, 29, 0.95) !important;
+            background: var(--navbar-bg) !important;
             backdrop-filter: blur(20px);
             border-bottom: 1px solid var(--glass-border);
         }
 
         .navbar-brand {
             font-weight: 700;
-            color: #fca5a5 !important;
+            color: var(--primary) !important;
         }
 
         .nav-link {
-            color: rgba(255, 255, 255, 0.8) !important;
+            color: var(--text-secondary) !important;
         }
 
         .nav-link:hover {
-            color: #fca5a5 !important;
+            color: var(--primary) !important;
         }
 
         .page-header {
@@ -74,14 +66,14 @@
         }
 
         .device-title {
-            color: #fff;
+            color: var(--text-main);
             font-weight: 700;
             font-size: 1.5rem;
             margin: 0;
         }
 
         .device-type-badge {
-            background: linear-gradient(135deg, #0ea5e9 0%, #0369a1 100%);
+            background: var(--primary-gradient);
             color: #fff;
             padding: 0.35rem 1rem;
             border-radius: 20px;
@@ -102,7 +94,7 @@
 
         .sensor-card:hover {
             transform: translateY(-5px);
-            border-color: #ef4444;
+            border-color: var(--primary);
         }
 
         .sensor-icon {
@@ -115,23 +107,24 @@
             justify-content: center;
             margin: 0 auto 1rem;
             font-size: 1.3rem;
+            color: white;
         }
 
         .sensor-label {
-            color: rgba(255, 255, 255, 0.7);
+            color: var(--text-secondary);
             font-size: 0.85rem;
             margin-bottom: 0.5rem;
         }
 
         .sensor-value {
-            color: #fff;
+            color: var(--text-main);
             font-size: 2rem;
             font-weight: 800;
             line-height: 1;
         }
 
         .sensor-unit {
-            color: #fca5a5;
+            color: var(--primary);
             font-size: 1rem;
             font-weight: 600;
         }
@@ -146,18 +139,18 @@
         }
 
         .card-title {
-            color: #fff;
+            color: var(--text-main);
             font-weight: 700;
             margin-bottom: 1rem;
         }
 
         .last-update {
-            color: rgba(255, 255, 255, 0.5);
+            color: var(--text-secondary);
             font-size: 0.85rem;
         }
 
         .no-data {
-            color: rgba(255, 255, 255, 0.5);
+            color: var(--text-secondary);
             text-align: center;
             padding: 3rem;
         }
@@ -165,7 +158,7 @@
         .btn-glass {
             background: var(--glass-bg);
             border: 1px solid var(--glass-border);
-            color: #fff;
+            color: var(--text-main);
             padding: 0.6rem 1.25rem;
             border-radius: 50px;
             font-weight: 500;
@@ -173,14 +166,15 @@
         }
 
         .btn-glass:hover {
-            background: rgba(255, 255, 255, 0.2);
-            color: #fff;
+            background: var(--glass-bg);
+            border-color: var(--primary);
+            color: var(--primary);
         }
 
         .live-dot {
             width: 10px;
             height: 10px;
-            background: #ef4444;
+            background: var(--primary);
             border-radius: 50%;
             display: inline-block;
             animation: pulse 2s ease-in-out infinite;
@@ -200,12 +194,12 @@
 
         /* Table Styles */
         .table-glass {
-            color: #fff;
+            color: var(--text-main);
         }
 
         .table-glass thead th {
-            background: rgba(127, 29, 29, 0.8);
-            color: #fca5a5;
+            background: rgba(var(--primary), 0.1);
+            color: var(--primary);
             font-weight: 600;
             border-bottom: 1px solid var(--glass-border);
             padding: 1rem;
@@ -214,33 +208,34 @@
         .table-glass tbody td {
             border-bottom: 1px solid var(--glass-border);
             padding: 0.75rem 1rem;
-            color: rgba(255, 255, 255, 0.9);
+            color: var(--text-main);
         }
 
         .table-glass tbody tr:hover {
-            background: rgba(255, 255, 255, 0.05);
+            background: rgba(var(--primary), 0.05);
         }
 
         /* Pagination */
         .pagination-glass .page-link {
             background: var(--glass-bg);
             border: 1px solid var(--glass-border);
-            color: #fff;
+            color: var(--text-main);
         }
 
         .pagination-glass .page-link:hover {
-            background: rgba(255, 255, 255, 0.2);
+            background: var(--primary-light);
             color: #fff;
         }
 
         .pagination-glass .page-item.active .page-link {
             background: var(--primary-gradient);
             border-color: transparent;
+            color: #fff;
         }
 
         .pagination-glass .page-item.disabled .page-link {
-            background: rgba(255, 255, 255, 0.05);
-            color: rgba(255, 255, 255, 0.3);
+            background: rgba(0, 0, 0, 0.05);
+            color: var(--text-secondary);
         }
 
         /* Tabs */
@@ -249,27 +244,27 @@
         }
 
         .nav-tabs-glass .nav-link {
-            color: rgba(255, 255, 255, 0.6);
+            color: var(--text-secondary);
             border: none;
             padding: 1rem 1.5rem;
             font-weight: 600;
         }
 
         .nav-tabs-glass .nav-link:hover {
-            color: #fff;
+            color: var(--primary);
             border: none;
         }
 
         .nav-tabs-glass .nav-link.active {
             background: transparent;
-            color: #fca5a5;
-            border-bottom: 3px solid #ef4444;
+            color: var(--primary);
+            border-bottom: 3px solid var(--primary);
         }
 
         /* Output Control Styles */
         .output-card {
-            background: rgba(250, 204, 21, 0.1);
-            border: 1px solid rgba(250, 204, 21, 0.3);
+            background: rgba(250, 204, 21, 0.05);
+            border: 1px solid rgba(250, 204, 21, 0.2);
             border-radius: 16px;
             padding: 1.25rem;
             text-align: center;
@@ -283,6 +278,7 @@
         .output-card:hover {
             border-color: #fde047;
             transform: translateY(-3px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
         }
 
         .output-icon {
@@ -295,10 +291,11 @@
             justify-content: center;
             margin: 0 auto 0.75rem;
             font-size: 1.2rem;
+            color: white;
         }
 
         .output-label {
-            color: rgba(255, 255, 255, 0.8);
+            color: var(--text-main);
             font-size: 0.85rem;
             margin-bottom: 0.75rem;
         }
@@ -324,9 +321,10 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background-color: rgba(255, 255, 255, 0.2);
+            background-color: var(--text-secondary);
             transition: 0.3s;
             border-radius: 32px;
+            opacity: 0.3;
         }
 
         .toggle-slider:before {
@@ -342,7 +340,8 @@
         }
 
         .toggle-switch input:checked+.toggle-slider {
-            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            background: var(--primary-gradient);
+            opacity: 1;
         }
 
         .toggle-switch input:checked+.toggle-slider:before {
@@ -356,11 +355,11 @@
         }
 
         .output-status.on {
-            color: #ef4444;
+            color: var(--primary);
         }
 
         .output-status.off {
-            color: rgba(255, 255, 255, 0.5);
+            color: var(--text-secondary);
         }
 
         /* Range Slider */
@@ -368,7 +367,7 @@
             width: 100%;
             height: 8px;
             border-radius: 4px;
-            background: rgba(255, 255, 255, 0.2);
+            background: rgba(0, 0, 0, 0.1);
             outline: none;
             -webkit-appearance: none;
         }
@@ -378,12 +377,13 @@
             width: 20px;
             height: 20px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            background: var(--primary-gradient);
             cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
         }
 
         .range-value {
-            color: #fde047;
+            color: #f59e0b;
             font-size: 1.25rem;
             font-weight: 700;
         }
@@ -397,7 +397,7 @@
     <nav class="navbar navbar-expand-lg navbar-glass">
         <div class="container">
             <a class="navbar-brand" href="{{ session('is_pwa') ? route('monitoring.index') : route('home') }}">
-                <i class="bi bi-tree-fill me-2"></i>SmartAgri
+                <i class="bi bi-tree-fill me-2"></i>Swaratani
             </a>
             <div class="navbar-nav ms-auto">
                 @if($isAdminView ?? false)
@@ -425,7 +425,7 @@
                         {{ $userDevice->custom_name }}
                     @endif
                 </h1>
-                <p class="text-white-50 mb-0 mt-1">
+                <p class="mb-0 mt-1" style="color: var(--text-secondary);">
                     <span class="live-dot me-2"></span>
                     @if($latestData)
                         Terakhir update: {{ \Carbon\Carbon::parse($latestData->recorded_at)->diffForHumans() }}
@@ -574,6 +574,18 @@
                 <!-- Chart Tab -->
                 <div class="tab-pane fade {{ !$isTableActive ? 'show active' : '' }}" id="chartTab">
                     <div class="glass-card mt-0" style="border-radius: 0 0 20px 20px;">
+                        <!-- Sensor Dropdown -->
+                        <div class="d-flex align-items-center mb-3">
+                            <label class="me-2" style="color: var(--text-main);"><i
+                                    class="bi bi-bar-chart-line me-1"></i>Pilih Sensor:</label>
+                            <select id="chartSensorSelect" class="form-select form-select-sm"
+                                style="width: auto; background: var(--glass-bg); color: var(--text-main); border: 1px solid var(--glass-border);">
+                                @foreach($sensors as $index => $sensor)
+                                    <option value="{{ $index }}" style="color: #333;">{{ $sensor->sensor_label }}
+                                        ({{ $sensor->unit }})</option>
+                                @endforeach
+                            </select>
+                        </div>
                         <canvas id="sensorChart" height="100"></canvas>
                     </div>
                 </div>
@@ -581,14 +593,29 @@
                 <!-- Table Tab -->
                 <div class="tab-pane fade {{ $isTableActive ? 'show active' : '' }}" id="tableTab">
                     <div class="glass-card mt-0" style="border-radius: 0 0 20px 20px;">
+                        <!-- Sensor Dropdown for Table -->
+                        <div class="d-flex align-items-center mb-3">
+                            <label class="me-2" style="color: var(--text-main);"><i class="bi bi-filter me-1"></i>Filter
+                                Sensor:</label>
+                            <select id="tableSensorSelect" class="form-select form-select-sm"
+                                style="width: auto; background: var(--glass-bg); color: var(--text-main); border: 1px solid var(--glass-border);">
+                                <option value="all" style="color: #333;">Semua Sensor</option>
+                                @foreach($sensors as $index => $sensor)
+                                    <option value="{{ $index }}" style="color: #333;">{{ $sensor->sensor_label }}
+                                        ({{ $sensor->unit }})</option>
+                                @endforeach
+                            </select>
+                        </div>
                         <div class="table-responsive">
-                            <table class="table table-glass mb-0">
+                            <table class="table table-glass mb-0" id="sensorDataTable">
                                 <thead>
                                     <tr>
                                         <th>#</th>
                                         <th>Waktu</th>
-                                        @foreach($sensors as $sensor)
-                                            <th>{{ $sensor->sensor_label }} ({{ $sensor->unit }})</th>
+                                        @foreach($sensors as $sensorIndex => $sensor)
+                                            <th class="sensor-col" data-sensor-index="{{ $sensorIndex }}">
+                                                {{ $sensor->sensor_label }} ({{ $sensor->unit }})
+                                            </th>
                                         @endforeach
                                     </tr>
                                 </thead>
@@ -597,8 +624,8 @@
                                         <tr>
                                             <td>{{ $logData->firstItem() + $index }}</td>
                                             <td>{{ \Carbon\Carbon::parse($row->recorded_at)->format('d/m/Y H:i:s') }}</td>
-                                            @foreach($sensors as $sensor)
-                                                <td>
+                                            @foreach($sensors as $sensorIndex => $sensor)
+                                                <td class="sensor-col" data-sensor-index="{{ $sensorIndex }}">
                                                     @if(isset($row->{$sensor->sensor_name}))
                                                         {{ number_format($row->{$sensor->sensor_name}, 2) }}
                                                     @else
@@ -645,7 +672,7 @@
                                     </ul>
                                 </nav>
                             </div>
-                            <p class="text-center text-white-50 mt-2 small">
+                            <p class="text-center mt-2 small" style="color: var(--text-secondary);">
                                 Showing {{ $logData->firstItem() }} - {{ $logData->lastItem() }} of {{ $logData->total() }}
                                 records
                             </p>
@@ -657,7 +684,7 @@
             <script>
                 const ctx = document.getElementById('sensorChart').getContext('2d');
 
-                // Data dari PHP - hanya 50 terbaru untuk chart
+                // Data dari PHP
                 const chartData = @json($chartData);
                 const sensors = @json($sensors);
 
@@ -667,50 +694,120 @@
                 });
 
                 const colors = [
-                    { border: '#22c55e', bg: 'rgba(34, 197, 94, 0.2)' },
-                    { border: '#0ea5e9', bg: 'rgba(14, 165, 233, 0.2)' },
-                    { border: '#f59e0b', bg: 'rgba(245, 158, 11, 0.2)' },
-                    { border: '#8b5cf6', bg: 'rgba(139, 92, 246, 0.2)' },
-                    { border: '#ef4444', bg: 'rgba(239, 68, 68, 0.2)' },
-                    { border: '#06b6d4', bg: 'rgba(6, 182, 212, 0.2)' },
-                    { border: '#84cc16', bg: 'rgba(132, 204, 22, 0.2)' },
-                    { border: '#ec4899', bg: 'rgba(236, 72, 153, 0.2)' },
+                    { border: '#22c55e', bg: 'rgba(34, 197, 94, 0.3)' },
+                    { border: '#0ea5e9', bg: 'rgba(14, 165, 233, 0.3)' },
+                    { border: '#f59e0b', bg: 'rgba(245, 158, 11, 0.3)' },
+                    { border: '#8b5cf6', bg: 'rgba(139, 92, 246, 0.3)' },
+                    { border: '#ef4444', bg: 'rgba(239, 68, 68, 0.3)' },
+                    { border: '#06b6d4', bg: 'rgba(6, 182, 212, 0.3)' },
+                    { border: '#84cc16', bg: 'rgba(132, 204, 22, 0.3)' },
+                    { border: '#ec4899', bg: 'rgba(236, 72, 153, 0.3)' },
                 ];
 
-                const datasets = sensors.map((sensor, index) => {
-                    const colorIndex = index % colors.length;
-                    return {
+                // Function to build filtered data for a single sensor
+                function getFilteredData(sensorIndex) {
+                    const sensor = sensors[sensorIndex];
+                    const sensorName = sensor.sensor_name;
+
+                    // Filter to only include rows with valid data for this sensor
+                    const filteredRows = chartData.filter(row =>
+                        row[sensorName] !== null && row[sensorName] !== undefined
+                    );
+
+                    const filteredLabels = filteredRows.map(row => {
+                        const date = new Date(row.recorded_at);
+                        return date.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+                    });
+
+                    const filteredData = filteredRows.map(row => row[sensorName]);
+
+                    const colorIndex = sensorIndex % colors.length;
+                    const dataset = {
                         label: sensor.sensor_label + (sensor.unit ? ` (${sensor.unit})` : ''),
-                        data: chartData.map(row => row[sensor.sensor_name]),
+                        data: filteredData,
                         borderColor: colors[colorIndex].border,
                         backgroundColor: colors[colorIndex].bg,
-                        borderWidth: 2,
+                        borderWidth: 3,
                         tension: 0.4,
-                        fill: false,
+                        fill: true,
+                        pointRadius: 4,
+                        pointBackgroundColor: colors[colorIndex].border,
                     };
-                });
 
-                new Chart(ctx, {
+                    return { labels: filteredLabels, dataset };
+                }
+
+                // Initialize chart with first sensor (filtered)
+                const initialData = getFilteredData(0);
+                let sensorChart = new Chart(ctx, {
                     type: 'line',
-                    data: { labels, datasets },
+                    data: { labels: initialData.labels, datasets: [initialData.dataset] },
                     options: {
                         responsive: true,
                         plugins: {
                             legend: {
-                                labels: { color: 'rgba(255,255,255,0.8)' }
+                                display: false
                             }
                         },
                         scales: {
                             x: {
-                                ticks: { color: 'rgba(255,255,255,0.6)' },
-                                grid: { color: 'rgba(255,255,255,0.1)' }
+                                ticks: { color: getComputedStyle(document.body).getPropertyValue('--text-secondary').trim() },
+                                grid: { color: getComputedStyle(document.body).getPropertyValue('--glass-border').trim() }
                             },
                             y: {
-                                ticks: { color: 'rgba(255,255,255,0.6)' },
-                                grid: { color: 'rgba(255,255,255,0.1)' }
+                                ticks: { color: getComputedStyle(document.body).getPropertyValue('--text-secondary').trim() },
+                                grid: { color: getComputedStyle(document.body).getPropertyValue('--glass-border').trim() }
                             }
                         }
                     }
+                });
+
+                // Dropdown change listener for chart
+                document.getElementById('chartSensorSelect').addEventListener('change', function () {
+                    const selectedIndex = parseInt(this.value);
+                    const filteredData = getFilteredData(selectedIndex);
+                    sensorChart.data.labels = filteredData.labels;
+                    sensorChart.data.datasets = [filteredData.dataset];
+                    sensorChart.update();
+                });
+
+                // Table column and row filter listener
+                document.getElementById('tableSensorSelect')?.addEventListener('change', function () {
+                    const selectedValue = this.value;
+                    const sensorCols = document.querySelectorAll('.sensor-col');
+                    const tableRows = document.querySelectorAll('#sensorDataTable tbody tr');
+
+                    // Show/hide columns
+                    sensorCols.forEach(col => {
+                        if (selectedValue === 'all') {
+                            col.style.display = '';
+                        } else {
+                            if (col.dataset.sensorIndex === selectedValue) {
+                                col.style.display = '';
+                            } else {
+                                col.style.display = 'none';
+                            }
+                        }
+                    });
+
+                    // Show/hide rows based on data availability
+                    tableRows.forEach(row => {
+                        if (selectedValue === 'all') {
+                            row.style.display = '';
+                        } else {
+                            // Find the cell for this sensor in this row
+                            const sensorCell = row.querySelector(`.sensor-col[data-sensor-index="${selectedValue}"]`);
+                            if (sensorCell) {
+                                const cellValue = sensorCell.textContent.trim();
+                                // Hide row if value is '-' (no data)
+                                if (cellValue === '-') {
+                                    row.style.display = 'none';
+                                } else {
+                                    row.style.display = '';
+                                }
+                            }
+                        }
+                    });
                 });
             </script>
         @else
@@ -1030,7 +1127,7 @@
                     @else
                         const response = await fetch('{{ route("monitoring.status", $userDevice->id) }}');
                     @endif
-                                                const data = await response.json();
+                                                                                    const data = await response.json();
 
                     if (data.success) {
                         if (data.outputs) {
