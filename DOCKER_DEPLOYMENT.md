@@ -519,11 +519,27 @@ git clone https://github.com/USERNAME/REPO.git .
 # 8. Build & start
 cd /opt/docker-apps/NAMA_PROJECT && docker compose up -d --build
 
-# 9. Setup Laravel
+# 9. Setup Laravel (PENTING: Jalankan berurutan)
+
+# Copy .env (wajib agar key:generate jalan)
+docker exec NAMA_PROJECT_app cp .env.example .env
+
+# Generate Application Key
 docker exec NAMA_PROJECT_app php artisan key:generate
+
+# Fix Permissions (PENTING untuk error 500)
+docker exec NAMA_PROJECT_app chown -R www-data:www-data storage bootstrap/cache
+docker exec NAMA_PROJECT_app chmod -R 775 storage bootstrap/cache
+
+# Migrate & Link Storage
 docker exec NAMA_PROJECT_app php artisan migrate --force
 docker exec NAMA_PROJECT_app php artisan storage:link
-docker exec NAMA_PROJECT_app php artisan package:discover
+
+# Cache Config (agar app cepat & env terbaca)
+docker exec NAMA_PROJECT_app php artisan config:cache
+
+# Restart (optional, untuk pastikan semua load)
+docker restart NAMA_PROJECT_app
 
 # 10. Cek MQTT Listener berjalan
 docker exec NAMA_PROJECT_app supervisorctl status mqtt-listener

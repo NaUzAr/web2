@@ -359,8 +359,8 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        const storeUrl = '{{ route("schedule.time.store", [$userDevice->id]) }}';
-        const deleteUrlBase = '{{ url("/device/" . $userDevice->id . "/schedule") }}';
+        const storeUrl = '{{ route("schedule.time.store", [$userDevice->id], false) }}';
+        const deleteUrlBase = '/device/{{ $userDevice->id }}/schedule';
         const csrfToken = '{{ csrf_token() }}';
         
         // PHP configs to JS

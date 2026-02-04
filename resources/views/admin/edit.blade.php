@@ -283,9 +283,11 @@
                             </div>
 
                             <!-- Sensors Info -->
+                            <!-- Sensors Info -->
                             <div class="mb-4">
                                 <label class="form-label">
-                                    <i class="bi bi-thermometer-half me-1"></i> Sensors ({{ $device->sensors->count() }}
+                                    <i class="bi bi-thermometer-half me-1"></i> Sensors
+                                    ({{ $device->sensors->count() }}
                                     sensor)
                                 </label>
                                 <div class="sensors-container">
@@ -399,7 +401,6 @@
         </div>
     </div>
 
-    <!-- Leaflet JS for Map Picker -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {

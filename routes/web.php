@@ -35,6 +35,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // Toggle Output (Admin)
         Route::post('/device/{deviceId}/output/{outputId}/toggle', [AdminDeviceController::class, 'toggleOutput'])->name('device.output.toggle');
 
+
+
         // Status (Admin Polling)
         Route::get('/device/{id}/status', [AdminDeviceController::class, 'getStatus'])->name('device.status');
     });

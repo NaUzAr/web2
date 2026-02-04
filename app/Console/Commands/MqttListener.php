@@ -323,6 +323,8 @@ class MqttListener extends Command
         ];
 
         // --- AGGREGATION LOGIC ---
+
+        // --- AGGREGATION LOGIC ---
         // Use cache to buffer sensor data from multiple messages
         $cacheKey = "sensor_buffer_{$device->id}";
         $buffer = \Cache::get($cacheKey, []);
