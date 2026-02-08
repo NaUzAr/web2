@@ -333,6 +333,72 @@ class MonitoringController extends Controller
             'message' => "Output {$output->output_label} berhasil diupdate!",
         ]);
     }
+
+    /**
+     * Control special pump with zone and input type selection
+     * MQTT Format: <PMP_ON#zone#inputType#> or <PMP_OFF#>
+     */
+    public function controlPump(Request $request, $userDeviceId)
+    {
+        // Validasi user punya akses ke device ini
+        $userDevice = UserDevice::where('user_id', Auth::id())
+            ->where('id', $userDeviceId)
+            ->with('device')
+            ->firstOrFail();
+
+        $device = $userDevice->device;
+        $action = $request->input('action', 'off');
+
+        try {
+            $topic = rtrim($device->mqtt_topic, '/') . '/sub';
+
+            if ($action === 'on') {
+                $zone = $request->input('zone', 1);
+                $inputType = $request->input('input_type', 0); // 0 = Air Baku, 1 = Air Pupuk
+                $message = "<PMP_ON#{$zone}#{$inputType}#>";
+            } else {
+                $message = "<PMP_OFF#>";
+            }
+
+            // MQTT Connection
+            $host = config('mqtt.host', env('MQTT_HOST', 'smartagri.web.id'));
+            $port = config('mqtt.port', env('MQTT_PORT', 1883));
+            $username = config('mqtt.username', env('MQTT_USERNAME'));
+            $password = config('mqtt.password', env('MQTT_PASSWORD'));
+
+            $connectionSettings = new \PhpMqtt\Client\ConnectionSettings();
+            if ($username && $password) {
+                $connectionSettings = $connectionSettings
+                    ->setUsername($username)
+                    ->setPassword($password);
+            }
+            $connectionSettings = $connectionSettings
+                ->setKeepAliveInterval(60)
+                ->setConnectTimeout(10);
+
+            $mqtt = new \PhpMqtt\Client\MqttClient($host, $port, 'laravel-pump-' . uniqid());
+            $mqtt->connect($connectionSettings, true);
+            $mqtt->publish($topic, $message, 1);
+            $mqtt->disconnect();
+
+            \Log::info("MQTT Pump Control sent", ['topic' => $topic, 'message' => $message]);
+
+            return response()->json([
+                'success' => true,
+                'action' => $action,
+                'message' => $message,
+                'zone' => $request->input('zone'),
+                'input_type' => $request->input('input_type'),
+            ]);
+        } catch (\Exception $e) {
+            \Log::error("MQTT Pump Control failed: " . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal mengirim perintah: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
     /**
      * Get real-time status (outputs & latest sensor data)
      * Polled by frontend

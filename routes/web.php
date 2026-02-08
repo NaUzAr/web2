@@ -50,6 +50,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::delete('/device/{id}', [MonitoringController::class, 'destroy'])->name('destroy');
         Route::post('/device/{id}/export', [MonitoringController::class, 'exportCsv'])->name('export');
         Route::post('/device/{id}/output/{outputId}/toggle', [MonitoringController::class, 'toggleOutput'])->name('output.toggle');
+        Route::post('/device/{id}/pump/control', [MonitoringController::class, 'controlPump'])->name('pump.control');
         Route::get('/device/{id}/status', [MonitoringController::class, 'getStatus'])->name('status');
     });
 

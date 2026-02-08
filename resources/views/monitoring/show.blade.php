@@ -270,6 +270,7 @@
             text-align: center;
             transition: all 0.3s ease;
             min-height: 180px;
+            height: 100%;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
@@ -387,6 +388,103 @@
             font-size: 1.25rem;
             font-weight: 700;
         }
+
+        /* Special Pump Card Styles */
+        .output-card-special {
+            background: rgba(14, 165, 233, 0.1);
+            border: 2px solid rgba(14, 165, 233, 0.3);
+            border-radius: 16px;
+            padding: 1.25rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            min-height: 180px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .output-card-special:hover {
+            border-color: #0ea5e9;
+            transform: translateY(-3px);
+            box-shadow: 0 4px 15px rgba(14, 165, 233, 0.2);
+        }
+
+        .output-icon-special {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 0.75rem;
+            font-size: 1.2rem;
+            color: white;
+        }
+
+        .btn-pump-special {
+            background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+            border: none;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-pump-special:hover {
+            background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+            color: white;
+            transform: scale(1.05);
+        }
+
+        /* Modal styles for pump */
+        .modal-content-pump {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(14, 165, 233, 0.3);
+            color: var(--text-main);
+        }
+
+        .form-control-pump,
+        .form-select-pump {
+            background-color: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--text-main);
+        }
+
+        .form-control-pump:focus,
+        .form-select-pump:focus {
+            background-color: var(--glass-bg);
+            border-color: #0ea5e9;
+            color: var(--text-main);
+            box-shadow: 0 0 0 0.25rem rgba(14, 165, 233, 0.25);
+        }
+
+        .btn-pump-send {
+            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+            border: none;
+            color: white;
+            font-weight: 600;
+        }
+
+        .btn-pump-send:hover {
+            background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+            color: white;
+        }
+
+        .btn-pump-off {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            border: none;
+            color: white;
+            font-weight: 600;
+        }
+
+        .btn-pump-off:hover {
+            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+            color: white;
+        }
     </style>
 </head>
 
@@ -495,8 +593,61 @@
                 <h5 class="card-title" style="color: #fde047;">
                     <i class="bi bi-sliders me-2"></i>Kontrol Output
                 </h5>
-                <div class="row g-3 mt-2">
-                    @foreach($outputs as $output)
+                <div class="row g-4 mt-2">
+                    @php
+                        // Custom sort order based on priority
+                        $sortedOutputs = $outputs->sortBy(function ($output) {
+                            $name = strtolower($output->output_name);
+
+                            // Priority Mapping
+                            if (str_contains($name, 'pompa') || str_contains($name, 'pump') && !str_contains($name, 'ab') && !str_contains($name, 'ph'))
+                                return 10;
+                            if (str_contains($name, 'pump_ab') || str_contains($name, 'dosing'))
+                                return 20;
+                            if (str_contains($name, 'ph_up') || str_contains($name, 'ph1'))
+                                return 30; // pH Up (pmpPH)
+                            if (str_contains($name, 'ph_down') || str_contains($name, 'ph2'))
+                                return 31; // pH Down (pmpPH2)
+
+                            // Environment controls
+                            if (str_contains($name, 'mist'))
+                                return 50;
+                            if (str_contains($name, 'fan'))
+                                return 51;
+                            if (str_contains($name, 'air'))
+                                return 52;
+                            if (str_contains($name, 'lamp'))
+                                return 53;
+                            if (str_contains($name, 'mix'))
+                                return 54;
+
+                            return 99; // Default priority
+                        })->values();
+                    @endphp
+
+                    {{-- Special Pump Card with Popup --}}
+                    <div class="col-6 col-md-4 col-lg-3">
+                        <div class="output-card-special" id="output-card-special-pump">
+                            <div class="output-icon-special">
+                                <i class="bi bi-droplet-fill text-white"></i>
+                            </div>
+                            <div class="output-label">Pompa Irigasi</div>
+                            <div class="d-flex gap-2 justify-content-center">
+                                <button type="button" class="btn btn-sm btn-pump-special" data-bs-toggle="modal"
+                                    data-bs-target="#pumpModal">
+                                    <i class="bi bi-play-fill"></i> ON
+                                </button>
+                                <button type="button" class="btn btn-sm btn-pump-off" onclick="sendPumpOff()">
+                                    <i class="bi bi-stop-fill"></i> OFF
+                                </button>
+                            </div>
+                            <div class="output-status" id="pump-special-status" style="color: var(--text-secondary);">
+                                Pilih zona & tipe
+                            </div>
+                        </div>
+                    </div>
+
+                    @foreach($sortedOutputs as $output)
                         <div class="col-6 col-md-4 col-lg-3">
                             <div class="output-card" id="output-card-{{ $output->id }}">
                                 <div class="output-icon">
@@ -539,9 +690,6 @@
                                         {{ $output->output_type === 'percentage' ? '0-100%' : '0-180°' }}
                                     </div>
                                 @endif
-
-                                {{-- Schedule button was here, now in header --}}
-                                <div class="mt-2" style="height: 31px;"></div>
                             </div>
                         </div>
                     @endforeach
@@ -577,7 +725,8 @@
                         <!-- Sensor Dropdown -->
                         <div class="d-flex align-items-center mb-3">
                             <label class="me-2" style="color: var(--text-main);"><i
-                                    class="bi bi-bar-chart-line me-1"></i>Pilih Sensor:</label>
+                                    class="bi bi-bar-chart-line me-1"></i>Pilih
+                                Sensor:</label>
                             <select id="chartSensorSelect" class="form-select form-select-sm"
                                 style="width: auto; background: var(--glass-bg); color: var(--text-main); border: 1px solid var(--glass-border);">
                                 @foreach($sensors as $index => $sensor)
@@ -658,7 +807,8 @@
                                                 <li class="page-item active"><span class="page-link">{{ $page }}</span></li>
                                             @else
                                                 <li class="page-item"><a class="page-link"
-                                                        href="{{ $url }}#data-section">{{ $page }}</a></li>
+                                                        href="{{ $url }}#data-section">{{ $page }}</a>
+                                                </li>
                                             @endif
                                         @endforeach
 
@@ -900,6 +1050,50 @@
             </div>
         </div>
 
+        <!-- Pump Control Modal -->
+        <div class="modal fade" id="pumpModal" tabindex="-1" aria-labelledby="pumpModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content modal-content-pump">
+                    <div class="modal-header border-0">
+                        <h5 class="modal-title" id="pumpModalLabel">
+                            <i class="bi bi-droplet-fill me-2" style="color: #0ea5e9;"></i>Kontrol Pompa Irigasi
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p class="mb-4" style="color: var(--text-secondary);">Pilih jenis input air dan zona irigasi:</p>
+
+                        <div class="mb-3">
+                            <label class="form-label">
+                                <i class="bi bi-water me-1" style="color: #0ea5e9;"></i> Jenis Input
+                            </label>
+                            <select id="pumpInputType" class="form-select form-select-pump">
+                                <option value="0">Air Baku</option>
+                                <option value="1">Air Pupuk</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">
+                                <i class="bi bi-geo-alt me-1" style="color: #0ea5e9;"></i> Zona / Blok
+                            </label>
+                            <select id="pumpZone" class="form-select form-select-pump">
+                                @for($z = 1; $z <= 8; $z++)
+                                    <option value="{{ $z }}">Zona {{ $z }}</option>
+                                @endfor
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer border-0">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Batal</button>
+                        <button type="button" class="btn btn-pump-send" onclick="sendPumpOn()">
+                            <i class="bi bi-play-fill me-1"></i> Nyalakan Pompa
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <script>
             // Setup CSRF token for AJAX requests
             const csrfToken = '{{ csrf_token() }}';
@@ -1020,6 +1214,110 @@
                 document.querySelector('input[name="end_date"]').value = endDate.toISOString().split('T')[0];
             }
 
+            // Special Pump Control Functions
+            function sendPumpOn() {
+                const zone = document.getElementById('pumpZone').value;
+                const inputType = document.getElementById('pumpInputType').value;
+                const url = `/monitoring/device/${userDeviceId}/pump/control`;
+
+                // Show loading state
+                const btn = document.querySelector('#pumpModal .btn-pump-send');
+                const originalText = btn.innerHTML;
+                btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Mengirim...';
+                btn.disabled = true;
+
+                fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken
+                    },
+                    body: JSON.stringify({
+                        action: 'on',
+                        zone: zone,
+                        input_type: inputType
+                    })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Update status display
+                            const statusEl = document.getElementById('pump-special-status');
+                            const typeName = inputType == '0' ? 'Air Baku' : 'Air Pupuk';
+                            if (statusEl) {
+                                statusEl.textContent = `ON - Zona ${zone} (${typeName})`;
+                                statusEl.style.color = '#22c55e';
+                            }
+
+                            // Visual feedback
+                            const card = document.getElementById('output-card-special-pump');
+                            if (card) {
+                                card.style.borderColor = '#22c55e';
+                                setTimeout(() => {
+                                    card.style.borderColor = 'rgba(14, 165, 233, 0.3)';
+                                }, 1000);
+                            }
+
+                            // Close modal
+                            const modal = bootstrap.Modal.getInstance(document.getElementById('pumpModal'));
+                            modal.hide();
+
+                            console.log('Pump ON sent:', data.message);
+                        } else {
+                            alert('Gagal mengirim perintah pompa: ' + (data.message || 'Unknown error'));
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Terjadi kesalahan saat mengirim perintah pompa.');
+                    })
+                    .finally(() => {
+                        btn.innerHTML = originalText;
+                        btn.disabled = false;
+                    });
+            }
+
+            function sendPumpOff() {
+                const url = `/monitoring/device/${userDeviceId}/pump/control`;
+
+                fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken
+                    },
+                    body: JSON.stringify({ action: 'off' })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Update status display
+                            const statusEl = document.getElementById('pump-special-status');
+                            if (statusEl) {
+                                statusEl.textContent = 'OFF';
+                                statusEl.style.color = 'var(--text-secondary)';
+                            }
+
+                            // Visual feedback
+                            const card = document.getElementById('output-card-special-pump');
+                            if (card) {
+                                card.style.borderColor = '#ef4444';
+                                setTimeout(() => {
+                                    card.style.borderColor = 'rgba(14, 165, 233, 0.3)';
+                                }, 1000);
+                            }
+
+                            console.log('Pump OFF sent:', data.message);
+                        } else {
+                            alert('Gagal mengirim perintah pompa: ' + (data.message || 'Unknown error'));
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Terjadi kesalahan saat mengirim perintah pompa.');
+                    });
+            }
+
 
         </script>
     @endif
@@ -1127,7 +1425,7 @@
                     @else
                         const response = await fetch('{{ route("monitoring.status", $userDevice->id) }}');
                     @endif
-                                                                                    const data = await response.json();
+                                                                                                                    const data = await response.json();
 
                     if (data.success) {
                         if (data.outputs) {
