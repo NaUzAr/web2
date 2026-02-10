@@ -197,13 +197,21 @@ class AdminDeviceController extends Controller
                     $label .= " {$outputCounter[$type]}";
                 }
 
-                \App\Models\DeviceOutput::create([
+                // Prepare output data
+                $outputData = [
                     'device_id' => $device->id,
                     'output_name' => $outputName,
                     'output_label' => $label,
                     'output_type' => $outputConfig['type'],
                     'unit' => $outputConfig['unit'],
-                ]);
+                ];
+
+                // Handle multi-zone irrigation pump - simpan jumlah zona
+                if ($type === 'irrigation_pump' && isset($output['zones']) && $output['zones'] > 0) {
+                    $outputData['max_sectors'] = min((int) $output['zones'], 20); // Max 20 zones
+                }
+
+                \App\Models\DeviceOutput::create($outputData);
             }
         }
 

@@ -149,6 +149,46 @@
             font-size: 0.85rem;
         }
 
+        /* Glassmorphism Classes (From Schedule) */
+        .modal-content-glass {
+            background: var(--glass-bg, rgba(30, 41, 59, 0.85));
+            /* Fallback to dark glass if variable missing */
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.1));
+            color: var(--text-main, #fff);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        .form-control-dark,
+        .form-select-dark {
+            background-color: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--text-main);
+        }
+
+        .form-control-dark:focus,
+        .form-select-dark:focus {
+            background-color: var(--glass-bg);
+            border-color: var(--primary);
+            color: var(--text-main);
+            box-shadow: 0 0 0 0.25rem rgba(var(--primary), 0.25);
+        }
+
+        .btn-glass {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--text-main);
+            padding: 0.6rem 1.25rem;
+            border-radius: 50px;
+            text-decoration: none;
+        }
+
+        .btn-glass:hover {
+            background: var(--glass-bg);
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
         .no-data {
             color: var(--text-secondary);
             text-align: center;
@@ -397,11 +437,40 @@
             padding: 1.25rem;
             text-align: center;
             transition: all 0.3s ease;
-            min-height: 180px;
             height: 100%;
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
+            justify-content: center;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        /* Mobile responsive adjustments */
+        @media (max-width: 576px) {
+            .output-card-special {
+                padding: 1rem;
+            }
+
+            .output-card-special .badge {
+                font-size: 0.7rem;
+                padding: 0.35rem 0.6rem !important;
+            }
+
+            .output-card-special .btn-sm {
+                font-size: 0.75rem;
+                padding: 0.25rem 0.5rem;
+                min-width: 45px !important;
+            }
+
+            .output-card {
+                padding: 1rem;
+            }
+
+            .output-card .btn-sm {
+                font-size: 0.75rem;
+                padding: 0.25rem 0.5rem;
+                min-width: 45px !important;
+            }
         }
 
         .output-card-special:hover {
@@ -532,7 +601,7 @@
                     @endif
                 </p>
             </div>
-            <div class="d-flex gap-2 align-items-center">
+            <div class="d-flex gap-2 align-items-center flex-wrap justify-content-md-end">
                 @if($isAdminView ?? false)
                     <span class="device-type-badge" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);">
                         <i class="bi bi-shield-check me-1"></i> Admin View
@@ -595,8 +664,8 @@
                 </h5>
                 <div class="row g-4 mt-2">
                     @php
-                        // Custom sort order based on priority
-                        $sortedOutputs = $outputs->sortBy(function ($output) {
+                        // Sort outputs by priority then name (excluding multi_zone)
+                        $sortedOutputs = $outputs->where('output_type', '!=', 'multi_zone')->sortBy(function ($output) {
                             $name = strtolower($output->output_name);
 
                             // Priority Mapping
@@ -625,27 +694,45 @@
                         })->values();
                     @endphp
 
-                    {{-- Special Pump Card with Popup --}}
-                    <div class="col-6 col-md-4 col-lg-3">
-                        <div class="output-card-special" id="output-card-special-pump">
-                            <div class="output-icon-special">
-                                <i class="bi bi-droplet-fill text-white"></i>
-                            </div>
-                            <div class="output-label">Pompa Irigasi</div>
-                            <div class="d-flex gap-2 justify-content-center">
-                                <button type="button" class="btn btn-sm btn-pump-special" data-bs-toggle="modal"
-                                    data-bs-target="#pumpModal">
-                                    <i class="bi bi-play-fill"></i> ON
-                                </button>
-                                <button type="button" class="btn btn-sm btn-pump-off" onclick="sendPumpOff()">
-                                    <i class="bi bi-stop-fill"></i> OFF
-                                </button>
-                            </div>
-                            <div class="output-status" id="pump-special-status" style="color: var(--text-secondary);">
-                                Pilih zona & tipe
+                    {{-- Dynamic Irrigation Pump Cards (from database) --}}
+                    @php
+                        $irrigationPumps = $outputs->where('output_type', 'multi_zone');
+                    @endphp
+
+                    @foreach($irrigationPumps as $pump)
+                        <div class="col-6 col-md-4 col-lg-3">
+                            <div class="output-card-special" id="output-card-irrigation-{{ $pump->id }}">
+                                <div class="output-icon-special mb-3">
+                                    <i class="bi bi-droplet-fill text-white"></i>
+                                </div>
+                                <div class="output-label">{{ $pump->output_label }}</div>
+
+                                @if($pump->max_sectors > 1)
+                                    <div class="mb-3 text-center">
+                                        <span class="badge bg-primary text-white rounded-pill px-3 py-2">
+                                            <i class="bi bi-grid-3x3-gap-fill me-1"></i> {{ $pump->max_sectors }} Zona Tersedia
+                                        </span>
+                                    </div>
+                                @endif
+
+                                <div class="d-flex gap-2 justify-content-center mt-3">
+                                    <button type="button" class="btn btn-sm btn-outline-success"
+                                        onclick="openIrrigationModal({{ $pump->id }}, {{ $pump->max_sectors ?? 1 }})"
+                                        id="btn-on-{{ $pump->id }}" style="min-width: 50px;">
+                                        <i class="bi bi-power"></i> ON
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-outline-danger"
+                                        onclick="sendIrrigationPumpOff({{ $pump->id }})" id="btn-off-{{ $pump->id }}"
+                                        style="min-width: 50px;">
+                                        <i class="bi bi-x-lg"></i> OFF
+                                    </button>
+                                </div>
+                                <div class="output-status off mt-2" id="pump-status-{{ $pump->id }}">
+                                    OFF
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    @endforeach
 
                     @foreach($sortedOutputs as $output)
                         <div class="col-6 col-md-4 col-lg-3">
@@ -832,134 +919,134 @@
             </div>
 
             <script>
-                const ctx = document.getElementById('sensorChart').getContext('2d');
+                        const ctx = document.getElementById             ('sen            sorChart').getContext('2d');
 
-                // Data dari PHP
-                const chartData = @json($chartData);
-                const sensors = @json($sensors);
+                        // Data dari PHP
+                        const chartData = @json($chartData);
+                        const sensors = @json($sensors);
 
-                const labels = chartData.map(row => {
-                    const date = new Date(row.recorded_at);
-                    return date.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
-                });
+                        const labels = chartData.map(row => {
+                            const date = new Date(row.recorded_at);
+                            return date.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+                        });
 
-                const colors = [
-                    { border: '#22c55e', bg: 'rgba(34, 197, 94, 0.3)' },
-                    { border: '#0ea5e9', bg: 'rgba(14, 165, 233, 0.3)' },
-                    { border: '#f59e0b', bg: 'rgba(245, 158, 11, 0.3)' },
-                    { border: '#8b5cf6', bg: 'rgba(139, 92, 246, 0.3)' },
-                    { border: '#ef4444', bg: 'rgba(239, 68, 68, 0.3)' },
-                    { border: '#06b6d4', bg: 'rgba(6, 182, 212, 0.3)' },
-                    { border: '#84cc16', bg: 'rgba(132, 204, 22, 0.3)' },
-                    { border: '#ec4899', bg: 'rgba(236, 72, 153, 0.3)' },
-                ];
+                        const colors = [
+                            { border: '#22c55e', bg: 'rgba(34, 197, 94, 0.3)' },
+                            { border: '#0ea5e9', bg: 'rgba(14, 165, 233, 0.3)' },
+                            { border: '#f59e0b', bg: 'rgba(245, 158, 11, 0.3)' },
+                            { border: '#8b5cf6', bg: 'rgba(139, 92, 246, 0.3)' },
+                            { border: '#ef4444', bg: 'rgba(239, 68, 68, 0.3)' },
+                            { border: '#06b6d4', bg: 'rgba(6, 182, 212, 0.3)' },
+                            { border: '#84cc16', bg: 'rgba(132, 204, 22, 0.3)' },
+                            { border: '#ec4899', bg: 'rgba(236, 72, 153, 0.3)' },
+                        ];
 
-                // Function to build filtered data for a single sensor
-                function getFilteredData(sensorIndex) {
-                    const sensor = sensors[sensorIndex];
-                    const sensorName = sensor.sensor_name;
+                        // Function to build filtered data for a single sensor
+                        function getFilteredData(sensorIndex) {
+                            const sensor = sensors[sensorIndex];
+                            const sensorName = sensor.sensor_name;
 
-                    // Filter to only include rows with valid data for this sensor
-                    const filteredRows = chartData.filter(row =>
-                        row[sensorName] !== null && row[sensorName] !== undefined
-                    );
+                            // Filter to only include rows with valid data for this sensor
+                            const filteredRows = chartData.filter(row =>
+                                row[sensorName] !== null && row[sensorName] !== undefined
+                            );
 
-                    const filteredLabels = filteredRows.map(row => {
-                        const date = new Date(row.recorded_at);
-                        return date.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
-                    });
+                            const filteredLabels = filteredRows.map(row => {
+                                const date = new Date(row.recorded_at);
+                                return date.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+                            });
 
-                    const filteredData = filteredRows.map(row => row[sensorName]);
+                            const filteredData = filteredRows.map(row => row[sensorName]);
 
-                    const colorIndex = sensorIndex % colors.length;
-                    const dataset = {
-                        label: sensor.sensor_label + (sensor.unit ? ` (${sensor.unit})` : ''),
-                        data: filteredData,
-                        borderColor: colors[colorIndex].border,
-                        backgroundColor: colors[colorIndex].bg,
-                        borderWidth: 3,
-                        tension: 0.4,
-                        fill: true,
-                        pointRadius: 4,
-                        pointBackgroundColor: colors[colorIndex].border,
-                    };
+                            const colorIndex = sensorIndex % colors.length;
+                            const dataset = {
+                                label: sensor.sensor_label + (sensor.unit ? ` (${sensor.unit})` : ''),
+                                data: filteredData,
+                                borderColor: colors[colorIndex].border,
+                                backgroundColor: colors[colorIndex].bg,
+                                borderWidth: 3,
+                                tension: 0.4,
+                                fill: true,
+                                pointRadius: 4,
+                                pointBackgroundColor: colors[colorIndex].border,
+                            };
 
-                    return { labels: filteredLabels, dataset };
-                }
-
-                // Initialize chart with first sensor (filtered)
-                const initialData = getFilteredData(0);
-                let sensorChart = new Chart(ctx, {
-                    type: 'line',
-                    data: { labels: initialData.labels, datasets: [initialData.dataset] },
-                    options: {
-                        responsive: true,
-                        plugins: {
-                            legend: {
-                                display: false
-                            }
-                        },
-                        scales: {
-                            x: {
-                                ticks: { color: getComputedStyle(document.body).getPropertyValue('--text-secondary').trim() },
-                                grid: { color: getComputedStyle(document.body).getPropertyValue('--glass-border').trim() }
-                            },
-                            y: {
-                                ticks: { color: getComputedStyle(document.body).getPropertyValue('--text-secondary').trim() },
-                                grid: { color: getComputedStyle(document.body).getPropertyValue('--glass-border').trim() }
-                            }
+                            return { labels: filteredLabels, dataset };
                         }
-                    }
-                });
 
-                // Dropdown change listener for chart
-                document.getElementById('chartSensorSelect').addEventListener('change', function () {
-                    const selectedIndex = parseInt(this.value);
-                    const filteredData = getFilteredData(selectedIndex);
-                    sensorChart.data.labels = filteredData.labels;
-                    sensorChart.data.datasets = [filteredData.dataset];
-                    sensorChart.update();
-                });
-
-                // Table column and row filter listener
-                document.getElementById('tableSensorSelect')?.addEventListener('change', function () {
-                    const selectedValue = this.value;
-                    const sensorCols = document.querySelectorAll('.sensor-col');
-                    const tableRows = document.querySelectorAll('#sensorDataTable tbody tr');
-
-                    // Show/hide columns
-                    sensorCols.forEach(col => {
-                        if (selectedValue === 'all') {
-                            col.style.display = '';
-                        } else {
-                            if (col.dataset.sensorIndex === selectedValue) {
-                                col.style.display = '';
-                            } else {
-                                col.style.display = 'none';
-                            }
-                        }
-                    });
-
-                    // Show/hide rows based on data availability
-                    tableRows.forEach(row => {
-                        if (selectedValue === 'all') {
-                            row.style.display = '';
-                        } else {
-                            // Find the cell for this sensor in this row
-                            const sensorCell = row.querySelector(`.sensor-col[data-sensor-index="${selectedValue}"]`);
-                            if (sensorCell) {
-                                const cellValue = sensorCell.textContent.trim();
-                                // Hide row if value is '-' (no data)
-                                if (cellValue === '-') {
-                                    row.style.display = 'none';
-                                } else {
-                                    row.style.display = '';
+                        // Initialize chart with first sensor (filtered)
+                        const initialData = getFilteredData(0);
+                        let sensorChart = new Chart(ctx, {
+                            type: 'line',
+                            data: { labels: initialData.labels, datasets: [initialData.dataset] },
+                            options: {
+                                responsive: true,
+                                plugins: {
+                                    legend: {
+                                        display: false
+                                    }
+                                },
+                                scales: {
+                                    x: {
+                                        ticks: { color: getComputedStyle(document.body).getPropertyValue('--text-secondary').trim() },
+                                        grid: { color: getComputedStyle(document.body).getPropertyValue('--glass-border').trim() }
+                                    },
+                                    y: {
+                                        ticks: { color: getComputedStyle(document.body).getPropertyValue('--text-secondary').trim() },
+                                        grid: { color: getComputedStyle(document.body).getPropertyValue('--glass-border').trim() }
+                                    }
                                 }
                             }
-                        }
-                    });
-                });
-            </script>
+                        });
+
+                        // Dropdown change listener for chart
+                        document.getElementById('chartSensorSelect').addEventListener('change', function () {
+                            const selectedIndex = parseInt(this.value);
+                            const filteredData = getFilteredData(selectedIndex);
+                            sensorChart.data.labels = filteredData.labels;
+                            sensorChart.data.datasets = [filteredData.dataset];
+                            sensorChart.update();
+                        });
+
+                        // Table column and row filter listener
+                        document.getElementById('tableSensorSelect')?.addEventListener('change', function () {
+                            const selectedValue = this.value;
+                            const sensorCols = document.querySelectorAll('.sensor-col');
+                            const tableRows = document.querySelectorAll('#sensorDataTable tbody tr');
+
+                            // Show/hide columns
+                            sensorCols.forEach(col => {
+                                if (selectedValue === 'all') {
+                                    col.style.display = '';
+                                } else {
+                                    if (col.dataset.sensorIndex === selectedValue) {
+                                        col.style.display = '';
+                                    } else {
+                                        col.style.display = 'none';
+                                    }
+                                }
+                            });
+
+                            // Show/hide rows based on data availability
+                            tableRows.forEach(row => {
+                                if (selectedValue === 'all') {
+                                    row.style.display = '';
+                                } else {
+                                    // Find the cell for this sensor in this row
+                                    const sensorCell = row.querySelector(`.sensor-col[data-sensor-index="${selectedValue}"]`);
+                                    if (sensorCell) {
+                                        const cellValue = sensorCell.textContent.trim();
+                                        // Hide row if value is '-' (no data)
+                                        if (cellValue === '-') {
+                                            row.style.display = 'none';
+                                        } else {
+                                            row.style.display = '';
+                                        }
+                                    }
+                                }
+                            });
+                        });
+                    </script>
         @else
             <!-- No Data -->
             <div class="glass-card">
@@ -1050,43 +1137,46 @@
             </div>
         </div>
 
-        <!-- Pump Control Modal -->
-        <div class="modal fade" id="pumpModal" tabindex="-1" aria-labelledby="pumpModalLabel" aria-hidden="true">
+        <!-- Irrigation Pump Control Modal (Dynamic & Glass Style) -->
+        <div class="modal fade" id="irrigationPumpModal" tabindex="-1" aria-labelledby="irrigationPumpModalLabel"
+            aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content modal-content-pump">
-                    <div class="modal-header border-0">
-                        <h5 class="modal-title" id="pumpModalLabel">
+                <div class="modal-content modal-content-glass">
+                    <div class="modal-header border-bottom border-secondary">
+                        <h5 class="modal-title" id="irrigationPumpModalLabel">
                             <i class="bi bi-droplet-fill me-2" style="color: #0ea5e9;"></i>Kontrol Pompa Irigasi
                         </h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <p class="mb-4" style="color: var(--text-secondary);">Pilih jenis input air dan zona irigasi:</p>
+                        <p class="mb-4 text-secondary">Pilih jenis input air dan zona irigasi:</p>
+
+                        <!-- Hidden field for output ID -->
+                        <input type="hidden" id="irrigationOutputId" value="">
 
                         <div class="mb-3">
-                            <label class="form-label">
-                                <i class="bi bi-water me-1" style="color: #0ea5e9;"></i> Jenis Input
+                            <label class="form-label text-secondary">
+                                <i class="bi bi-water me-1" style="color: #0ea5e9;"></i> Jenis Air
                             </label>
-                            <select id="pumpInputType" class="form-select form-select-pump">
+                            <select id="irrigationWaterType" class="form-select form-select-dark">
                                 <option value="0">Air Baku</option>
                                 <option value="1">Air Pupuk</option>
                             </select>
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label">
+                            <label class="form-label text-secondary">
                                 <i class="bi bi-geo-alt me-1" style="color: #0ea5e9;"></i> Zona / Blok
                             </label>
-                            <select id="pumpZone" class="form-select form-select-pump">
-                                @for($z = 1; $z <= 8; $z++)
-                                    <option value="{{ $z }}">Zona {{ $z }}</option>
-                                @endfor
+                            <select id="irrigationZone" class="form-select form-select-dark">
+                                <!-- Dynamically populated by JavaScript -->
                             </select>
                         </div>
                     </div>
-                    <div class="modal-footer border-0">
-                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Batal</button>
-                        <button type="button" class="btn btn-pump-send" onclick="sendPumpOn()">
+                    <div class="modal-footer border-top border-secondary">
+                        <button type="button" class="btn btn-link text-secondary text-decoration-none"
+                            data-bs-dismiss="modal">Batal</button>
+                        <button type="button" class="btn btn-primary" onclick="sendIrrigationPumpOn()">
                             <i class="bi bi-play-fill me-1"></i> Nyalakan Pompa
                         </button>
                     </div>
@@ -1150,6 +1240,133 @@
                     .catch(error => {
                         console.error('Error:', error);
                         alert('Terjadi kesalahan saat mengupdate output.');
+                    });
+            }
+
+            // ============= IRRIGATION PUMP MODAL FUNCTIONS =============
+
+            // Open irrigation modal with dynamic zone selection
+            function openIrrigationModal(outputId, maxZones) {
+                // Set output ID in hidden field
+                document.getElementById('irrigationOutputId').value = outputId;
+
+                // Populate zone dropdown dynamically
+                const zoneSelect = document.getElementById('irrigationZone');
+                zoneSelect.innerHTML = '';
+                for (let z = 1; z <= maxZones; z++) {
+                    const option = document.createElement('option');
+                    option.value = z;
+                    option.textContent = `Zona ${z}`;
+                    zoneSelect.appendChild(option);
+                }
+
+                // Reset to default values
+                document.getElementById('irrigationWaterType').value = '0'; // Default Air Baku (0)
+
+                // Show modal
+                const modal = new bootstrap.Modal(document.getElementById('irrigationPumpModal'));
+                modal.show();
+            }
+
+            // Send pump ON command from modal
+            function sendIrrigationPumpOn() {
+                const outputId = document.getElementById('irrigationOutputId').value;
+                const zone = document.getElementById('irrigationZone').value;
+                const waterType = document.getElementById('irrigationWaterType').value;
+
+                // Send via AJAX
+                const url = `/monitoring/device/${userDeviceId}/output/${outputId}/irrigation-pump`;
+
+                fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken
+                    },
+                    body: JSON.stringify({
+                        zone: zone,
+                        turnOn: true,
+                        waterType: waterType
+                    })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Close modal
+                            const modal = bootstrap.Modal.getInstance(document.getElementById('irrigationPumpModal'));
+                            modal.hide();
+
+                            // Update status display
+                            const statusEl = document.getElementById(`pump-status-${outputId}`);
+                            if (statusEl) {
+                                const waterTypeName = waterType === '1' ? 'Air Baku' : 'Air Pupuk';
+                                statusEl.textContent = `Zona ${zone} - ${waterTypeName} - ON`;
+                                statusEl.style.color = '#22c55e';
+                            }
+
+                            // Flash card border for feedback
+                            const card = document.getElementById(`output-card-irrigation-${outputId}`);
+                            if (card) {
+                                card.style.borderColor = '#22c55e';
+                                setTimeout(() => {
+                                    card.style.borderColor = 'rgba(14, 165, 233, 0.3)';
+                                }, 1000);
+                            }
+
+                            console.log('Irrigation pump ON:', data.message);
+                        } else {
+                            alert('Gagal mengirim perintah pompa. Silakan coba lagi.');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Terjadi kesalahan saat mengirim perintah.');
+                    });
+            }
+
+            // Send pump OFF command (direct, no modal needed)
+            function sendIrrigationPumpOff(outputId) {
+                const url = `/monitoring/device/${userDeviceId}/output/${outputId}/irrigation-pump`;
+
+                fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken
+                    },
+                    body: JSON.stringify({
+                        zone: '0', // 0 = all zones
+                        turnOn: false,
+                        waterType: '1'
+                    })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Update status display
+                            const statusEl = document.getElementById(`pump-status-${outputId}`);
+                            if (statusEl) {
+                                statusEl.textContent = 'OFF';
+                                statusEl.style.color = 'var(--text-secondary)';
+                            }
+
+                            // Flash card border for feedback
+                            const card = document.getElementById(`output-card-irrigation-${outputId}`);
+                            if (card) {
+                                card.style.borderColor = '#ef4444';
+                                setTimeout(() => {
+                                    card.style.borderColor = 'rgba(14, 165, 233, 0.3)';
+                                }, 1000);
+                            }
+
+                            console.log('Irrigation pump OFF:', data.message);
+                        } else {
+                            alert('Gagal mematikan pompa. Silakan coba lagi.');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Terjadi kesalahan saat mengirim perintah.');
                     });
             }
 
@@ -1425,7 +1642,7 @@
                     @else
                         const response = await fetch('{{ route("monitoring.status", $userDevice->id) }}');
                     @endif
-                                                                                                                    const data = await response.json();
+                                                                                                                                                                const data = await response.json();
 
                     if (data.success) {
                         if (data.outputs) {

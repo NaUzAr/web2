@@ -209,6 +209,16 @@ class Device extends Model
             'sts_ph_down' => ['label' => 'pH Down Pump', 'type' => 'boolean', 'unit' => '', 'icon' => 'bi-arrow-down-circle'],
             'sts_air_baku' => ['label' => 'Air Baku Valve', 'type' => 'boolean', 'unit' => '', 'icon' => 'bi-water'],
             'sts_air_pupuk' => ['label' => 'Air Pupuk Valve', 'type' => 'boolean', 'unit' => '', 'icon' => 'bi-flower1'],
+
+            // Pompa Irigasi Multi-Zona (Khusus dengan setting jumlah zona)
+            'irrigation_pump' => [
+                'label' => 'Pompa Irigasi (Multi-Zona)',
+                'type' => 'multi_zone',
+                'unit' => '',
+                'icon' => 'bi-droplet-fill',
+                'supports_zones' => true,
+                'default_water_type' => 1  // 1 = Air Baku, 2 = Air Pupuk
+            ],
         ];
     }
 

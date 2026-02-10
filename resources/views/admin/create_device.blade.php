@@ -586,27 +586,36 @@
             updateSubmitButton();
         }
 
-        function addOutputRow(outputKey = '', customLabel = '') {
+        function addOutputRow(outputKey = '', customLabel = '', zoneCount = 4) {
             outputCounter++;
             const container = document.getElementById('outputContainer');
             const row = document.createElement('div');
             row.className = 'sensor-row output-row';
             row.id = `outputRow_${outputCounter}`;
 
+            // Check if this is irrigation_pump to show zone input
+            const showZones = outputKey === 'irrigation_pump';
+
             row.innerHTML = `
             <div class="row align-items-center g-3">
-                <div class="col-md-5">
+                <div class="col-md-4">
                     <label class="form-label small" style="color: var(--text-secondary);">Output Type</label>
-                    <select class="form-select output-select" name="outputs[${outputCounter}][type]" onchange="updateSubmitButton()">
+                    <select class="form-select output-select" name="outputs[${outputCounter}][type]" 
+                            onchange="updateSubmitButton(); toggleZoneInput(${outputCounter}, this.value)">
                         ${getOutputOptions(outputKey)}
                     </select>
                 </div>
-                <div class="col-md-5">
+                <div class="col-md-4">
                     <label class="form-label small" style="color: var(--text-secondary);">Label (opsional)</label>
                     <input type="text" class="form-control output-label-input" name="outputs[${outputCounter}][label]"
                            placeholder="Label custom" value="${customLabel}">
                 </div>
-                <div class="col-md-2 text-end">
+                <div class="col-md-3 zone-input-wrapper" id="zoneWrapper_${outputCounter}" style="display: ${showZones ? 'block' : 'none'};">
+                    <label class="form-label small" style="color: var(--text-secondary);">Jumlah Zona</label>
+                    <input type="number" class="form-control" name="outputs[${outputCounter}][zones]"
+                           value="${zoneCount}" min="1" max="20" placeholder="1-20">
+                </div>
+                <div class="col-md-1 text-end">
                     <button type="button" class="btn btn-outline-danger"
                             onclick="removeOutputRow(${outputCounter})" style="border-radius: 12px;">
                         <i class="bi bi-trash"></i>
@@ -616,6 +625,14 @@
         `;
             container.appendChild(row);
             updateOutputCount();
+        }
+
+        // Toggle zone input visibility based on output type selection
+        function toggleZoneInput(outputId, outputType) {
+            const zoneWrapper = document.getElementById(`zoneWrapper_${outputId}`);
+            if (zoneWrapper) {
+                zoneWrapper.style.display = outputType === 'irrigation_pump' ? 'block' : 'none';
+            }
         }
 
         function removeSensorRow(id) {

@@ -400,6 +400,84 @@ class MonitoringController extends Controller
     }
 
     /**
+     * Control irrigation pump with zone selection (multi-zone)
+     * MQTT Format: <PMP_ON#zone#waterType#> or <PMP_OFF#zone#>
+     * Water Type: 1 = Air Baku (default), 2 = Air Pupuk
+     */
+    public function controlIrrigationPump(Request $request, $userDeviceId, $outputId)
+    {
+        // Validasi user punya akses ke device ini
+        $userDevice = UserDevice::where('user_id', Auth::id())
+            ->where('id', $userDeviceId)
+            ->with('device')
+            ->firstOrFail();
+
+        // Verify the output belongs to this device
+        $output = DeviceOutput::where('id', $outputId)
+            ->where('device_id', $userDevice->device_id)
+            ->firstOrFail();
+
+        $device = $userDevice->device;
+        $turnOn = filter_var($request->input('turnOn', false), FILTER_VALIDATE_BOOLEAN);
+        $zone = $request->input('zone', 1);
+        $waterType = $request->input('waterType', 1); // 1 = Air Baku, 2 = Air Pupuk
+
+        try {
+            $topic = rtrim($device->mqtt_topic, '/') . '/sub';
+
+            if ($turnOn) {
+                $message = "<PMP_ON#{$zone}#{$waterType}#>";
+            } else {
+                $message = "<PMP_OFF#{$zone}#>";
+            }
+
+            // MQTT Connection
+            $host = config('mqtt.host', env('MQTT_HOST', 'smartagri.web.id'));
+            $port = config('mqtt.port', env('MQTT_PORT', 1883));
+            $username = config('mqtt.username', env('MQTT_USERNAME'));
+            $password = config('mqtt.password', env('MQTT_PASSWORD'));
+
+            $connectionSettings = new \PhpMqtt\Client\ConnectionSettings();
+            if ($username && $password) {
+                $connectionSettings = $connectionSettings
+                    ->setUsername($username)
+                    ->setPassword($password);
+            }
+            $connectionSettings = $connectionSettings
+                ->setKeepAliveInterval(60)
+                ->setConnectTimeout(10);
+
+            $mqtt = new \PhpMqtt\Client\MqttClient($host, $port, 'laravel-irrigation-' . uniqid());
+            $mqtt->connect($connectionSettings, true);
+            $mqtt->publish($topic, $message, 1);
+            $mqtt->disconnect();
+
+            \Log::info("MQTT Irrigation Pump Control sent", [
+                'topic' => $topic,
+                'message' => $message,
+                'output_id' => $outputId,
+                'zone' => $zone,
+                'water_type' => $waterType
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'turnOn' => $turnOn,
+                'message' => $message,
+                'zone' => $zone,
+                'waterType' => $waterType,
+                'output_id' => $outputId,
+            ]);
+        } catch (\Exception $e) {
+            \Log::error("MQTT Irrigation Pump Control failed: " . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal mengirim perintah: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
      * Get real-time status (outputs & latest sensor data)
      * Polled by frontend
      */

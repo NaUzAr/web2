@@ -51,6 +51,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/device/{id}/export', [MonitoringController::class, 'exportCsv'])->name('export');
         Route::post('/device/{id}/output/{outputId}/toggle', [MonitoringController::class, 'toggleOutput'])->name('output.toggle');
         Route::post('/device/{id}/pump/control', [MonitoringController::class, 'controlPump'])->name('pump.control');
+        Route::post('/device/{id}/output/{outputId}/irrigation-pump', [MonitoringController::class, 'controlIrrigationPump'])->name('irrigation.pump');
         Route::get('/device/{id}/status', [MonitoringController::class, 'getStatus'])->name('status');
     });
 
