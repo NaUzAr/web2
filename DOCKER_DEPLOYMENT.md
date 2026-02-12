@@ -482,20 +482,32 @@ services:
     container_name: NAMA_PROJECT_app
     restart: always
     environment:
+      # App (PENTING: APP_KEY harus ada agar tidak error 500!)
+      APP_NAME: Swaratani
       APP_ENV: production
+      APP_KEY: base64:YOUR_APP_KEY_HERE
       APP_DEBUG: "false"
       APP_URL: https://DOMAIN.com
+      # Database
       DB_CONNECTION: pgsql
-      DB_HOST: shared_postgres
+      DB_HOST: DB_SERVER_IP
       DB_PORT: 5432
       DB_DATABASE: db_NAMA_PROJECT
       DB_USERNAME: webadmin
       DB_PASSWORD: YOUR_PASSWORD
+      # Session & Cache (PENTING: pakai file, bukan database!)
+      SESSION_DRIVER: file
+      CACHE_STORE: file
+      QUEUE_CONNECTION: sync
+      LOG_CHANNEL: stack
+      FILESYSTEM_DISK: local
       # MQTT Configuration
       MQTT_HOST: YOUR_VPS_IP
       MQTT_PORT: 1883
       MQTT_USERNAME: iot
       MQTT_PASSWORD: smartgh
+      MQTT_TOPIC_PUB: /smartgh01/pub
+      MQTT_TOPIC_SUB: /smartgh01/sub
       # Email Configuration (Resend API)
       MAIL_MAILER: resend
       MAIL_FROM_ADDRESS: "noreply@swaratani.id"
@@ -510,6 +522,9 @@ networks:
   webapps:
     external: true
 ```
+
+> ⚠️ **PENTING:** Jika `APP_KEY`, `SESSION_DRIVER`, atau `CACHE_STORE` tidak ada,
+> Laravel akan **500 Internal Server Error** setiap kali rebuild!
 
 ```bash
 # 7. Clone source code
@@ -875,6 +890,8 @@ ufw status
 
 # 🔄 Update Project dari GitHub
 
+## Cara Manual
+
 ```bash
 cd /opt/docker-apps/NAMA_PROJECT/src
 git pull origin main
@@ -882,9 +899,24 @@ git pull origin main
 cd /opt/docker-apps/NAMA_PROJECT
 docker compose up -d --build
 
-# Jika ada migrasi baru
+# Wajib setelah rebuild:
 docker exec NAMA_PROJECT_app php artisan migrate --force
-docker exec NAMA_PROJECT_app php artisan config:clear
+docker exec NAMA_PROJECT_app php artisan config:cache
+docker exec NAMA_PROJECT_app php artisan route:cache
+docker exec NAMA_PROJECT_app php artisan view:cache
+docker restart NAMA_PROJECT_app
+```
+
+## Cara Otomatis (Recommended)
+
+Gunakan `deploy.sh` yang ada di repo:
+
+```bash
+# Upload deploy.sh ke server (sekali saja)
+scp deploy.sh root@YOUR_VPS_IP:/opt/docker-apps/NAMA_PROJECT/deploy.sh
+
+# Setiap update, tinggal jalankan:
+ssh root@YOUR_VPS_IP "cd /opt/docker-apps/NAMA_PROJECT && bash deploy.sh"
 ```
 
 ---
