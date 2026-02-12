@@ -32,25 +32,24 @@
         }
 
         .login-icon {
-            width: 80px;
-            height: 80px;
-            background: var(--primary-gradient);
-            border-radius: 20px;
+            width: auto;
+            height: 150px;
+            background: none;
+            border-radius: 0;
             display: flex;
             align-items: center;
             justify-content: center;
             margin: 0 auto 1.5rem;
-            font-size: 2.5rem;
         }
 
         .login-title {
-            color: #fff;
+            color: var(--text-main, #333);
             font-weight: 700;
             margin-bottom: 0.5rem;
         }
 
         .login-subtitle {
-            color: rgba(255, 255, 255, 0.6);
+            color: var(--text-secondary, #666);
             font-size: 0.9rem;
         }
 
@@ -88,10 +87,10 @@
     <div class="login-card">
         <div class="text-center mb-4">
             <div class="login-icon">
-                <i class="bi bi-tree-fill text-white"></i>
+                <img src="{{ asset('images/logo.png') }}" alt="Swaratani" style="height: 100%; width: auto;">
             </div>
             <h4 class="login-title">Selamat Datang!</h4>
-            <p class="login-subtitle">Login ke Swaratani System</p>
+            <p class="login-subtitle">Login ke Swaratani</p>
         </div>
 
         @if ($errors->any())

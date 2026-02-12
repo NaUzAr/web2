@@ -9,11 +9,9 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Swaratani">
-    <link rel="icon" type="image/png" sizes="32x32" href="/icons/icon-72.png">
-    <link rel="icon" type="image/png" sizes="96x96" href="/icons/icon-96.png">
-    <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png">
+    <link rel="icon" href="{{ asset('images/logo.png') }}">
     <link rel="manifest" href="/manifest.json">
-    <link rel="apple-touch-icon" href="/icons/icon-192.png">
+    <link rel="apple-touch-icon" href="{{ asset('images/logo.png') }}">
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
@@ -96,17 +94,15 @@
         }
 
         .brand-logo {
-            width: 80px;
-            height: 80px;
-            background: var(--primary-gradient);
-            border-radius: 24px;
+            width: auto;
+            height: 200px;
+            background: none;
+            border-radius: 0;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 1.5rem;
-            font-size: 2.5rem;
-            color: white;
-            box-shadow: 0 20px 40px rgba(220, 38, 38, 0.3);
+            margin: 0 auto 0.5rem;
+            box-shadow: none;
             animation: pulse 2s ease-in-out infinite;
         }
 
@@ -443,13 +439,8 @@
             <!-- Header -->
             <div class="page-header">
                 <div class="brand-logo">
-                    <i class="bi bi-tree-fill"></i>
+                    <img src="{{ asset('images/logo.png') }}" alt="Swaratani" style="height: 100%; width: auto;">
                 </div>
-                <div class="live-badge">
-                    <span class="live-dot"></span>
-                    System Online
-                </div>
-                <h1 class="page-title">Swaratani IoT</h1>
                 <p class="page-subtitle">Pilih menu untuk memulai</p>
             </div>
 

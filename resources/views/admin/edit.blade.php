@@ -234,8 +234,9 @@
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-glass">
         <div class="container">
-            <a class="navbar-brand" href="{{ route('home') }}">
-                <i class="bi bi-tree-fill me-2"></i>Swaratani
+            <a class="navbar-brand d-flex align-items-center" href="{{ route('home') }}">
+                <img src="{{ asset('images/logo.png') }}" alt="Swaratani" height="40" class="me-2">
+                <span class="fw-bold" style="color: #fca5a5 !important;">Swaratani IoT</span>
             </a>
             <div class="navbar-nav ms-auto">
                 <a class="nav-link" href="{{ route('admin.devices.index') }}">

@@ -31,13 +31,13 @@
         }
 
         .register-title {
-            color: #fff;
+            color: var(--text-main, #333);
             font-weight: 700;
             margin-bottom: 0.5rem;
         }
 
         .register-subtitle {
-            color: rgba(255, 255, 255, 0.6);
+            color: var(--text-secondary, #666);
             font-size: 0.9rem;
         }
 
@@ -60,15 +60,14 @@
         }
 
         .logo-icon {
-            width: 70px;
-            height: 70px;
-            background: var(--primary-gradient);
-            border-radius: 20px;
+            width: auto;
+            height: 150px;
+            background: none;
+            border-radius: 0;
             display: flex;
             align-items: center;
             justify-content: center;
             margin: 0 auto 1.5rem;
-            font-size: 2rem;
         }
 
         .register-icon {
@@ -95,10 +94,10 @@
     <div class="register-card">
         <div class="text-center mb-4">
             <div class="logo-icon">
-                <i class="bi bi-person-plus-fill text-white"></i>
+                <img src="{{ asset('images/logo.png') }}" alt="Swaratani" style="height: 100%; width: auto;">
             </div>
             <h4 class="register-title">Buat Akun Baru</h4>
-            <p class="register-subtitle">Daftar untuk mengakses Swaratani System</p>
+            <p class="register-subtitle">Daftar untuk mengakses Swaratani</p>
         </div>
 
         @if ($errors->any())

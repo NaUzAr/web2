@@ -211,6 +211,12 @@
         .device-card:hover::before {
             opacity: 1;
         }
+
+        @media (max-width: 576px) {
+            .page-title {
+                font-size: 1.5rem;
+            }
+        }
     </style>
 </head>
 
@@ -220,8 +226,10 @@
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-glass">
         <div class="container">
-            <a class="navbar-brand" href="{{ session('is_pwa') ? route('monitoring.index') : route('home') }}">
-                <i class="bi bi-tree-fill me-2"></i>Swaratani
+            <a class="navbar-brand d-flex align-items-center"
+                href="{{ session('is_pwa') ? route('monitoring.index') : route('home') }}">
+                <img src="{{ asset('images/logo.png') }}" alt="Swaratani" height="40" class="me-2">
+                <span class="fw-bold" style="color: var(--navbar_text, #333);">Swaratani IoT</span>
             </a>
             <div class="navbar-nav ms-auto">
                 @if(!session('is_pwa'))
@@ -240,7 +248,7 @@
     </nav>
 
     <div class="container py-5">
-        <div class="d-flex justify-content-between align-items-center mb-4">
+        <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
             <h2 class="page-title mb-0">
                 <i class="bi bi-graph-up-arrow me-2"></i>Monitoring Devices
             </h2>

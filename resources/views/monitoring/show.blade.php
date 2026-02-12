@@ -563,8 +563,10 @@
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-glass">
         <div class="container">
-            <a class="navbar-brand" href="{{ session('is_pwa') ? route('monitoring.index') : route('home') }}">
-                <i class="bi bi-tree-fill me-2"></i>Swaratani
+            <a class="navbar-brand d-flex align-items-center"
+                href="{{ session('is_pwa') ? route('monitoring.index') : route('home') }}">
+                <img src="{{ asset('images/logo.png') }}" alt="Swaratani" height="40" class="me-2">
+                <span class="fw-bold" style="color: var(--navbar_text, #333);">Swaratani IoT</span>
             </a>
             <div class="navbar-nav ms-auto">
                 @if($isAdminView ?? false)
@@ -815,14 +817,18 @@
                                     class="bi bi-bar-chart-line me-1"></i>Pilih
                                 Sensor:</label>
                             <select id="chartSensorSelect" class="form-select form-select-sm"
-                                style="width: auto; background: var(--glass-bg); color: var(--text-main); border: 1px solid var(--glass-border);">
+                                style="width: auto; background: #ffffff; color: var(--text-main); border: 1px solid var(--glass-border);">
                                 @foreach($sensors as $index => $sensor)
-                                    <option value="{{ $index }}" style="color: #333;">{{ $sensor->sensor_label }}
-                                        ({{ $sensor->unit }})</option>
+                                    <option value="{{ $index }}" style="color: #333; background-color: #ffffff;">
+                                        {{ $sensor->sensor_label }}
+                                        ({{ $sensor->unit }})
+                                    </option>
                                 @endforeach
                             </select>
                         </div>
-                        <canvas id="sensorChart" height="100"></canvas>
+                        <div style="position: relative; height: 50vh; min-height: 300px; max-height: 500px; width: 100%;">
+                            <canvas id="sensorChart"></canvas>
+                        </div>
                     </div>
                 </div>
 
@@ -834,10 +840,11 @@
                             <label class="me-2" style="color: var(--text-main);"><i class="bi bi-filter me-1"></i>Filter
                                 Sensor:</label>
                             <select id="tableSensorSelect" class="form-select form-select-sm"
-                                style="width: auto; background: var(--glass-bg); color: var(--text-main); border: 1px solid var(--glass-border);">
-                                <option value="all" style="color: #333;">Semua Sensor</option>
+                                style="width: auto; background: #ffffff; color: var(--text-main); border: 1px solid var(--glass-border);">
+                                <option value="all" style="color: #333; background-color: #ffffff;">Semua Sensor</option>
                                 @foreach($sensors as $index => $sensor)
-                                    <option value="{{ $index }}" style="color: #333;">{{ $sensor->sensor_label }}
+                                    <option value="{{ $index }}" style="color: #333; background-color: #ffffff;">
+                                        {{ $sensor->sensor_label }}
                                         ({{ $sensor->unit }})</option>
                                 @endforeach
                             </select>
@@ -918,135 +925,136 @@
                 </div>
             </div>
 
-            <script>
-                        const ctx = document.getElementById             ('sen            sorChart').getContext('2d');
+            <script>             const ctx = document.getElementById('sensorChart').getContext('2d');
 
-                        // Data dari PHP
-                        const chartData = @json($chartData);
-                        const sensors = @json($sensors);
+                // Data dari PHP
+                const chartData = @json($chartData);
+                const sensors = @json($sensors);
 
-                        const labels = chartData.map(row => {
-                            const date = new Date(row.recorded_at);
-                            return date.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
-                        });
+                const labels = chartData.map(row => {
+                    const date = new Date(row.recorded_at);
+                    return date.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+                });
 
-                        const colors = [
-                            { border: '#22c55e', bg: 'rgba(34, 197, 94, 0.3)' },
-                            { border: '#0ea5e9', bg: 'rgba(14, 165, 233, 0.3)' },
-                            { border: '#f59e0b', bg: 'rgba(245, 158, 11, 0.3)' },
-                            { border: '#8b5cf6', bg: 'rgba(139, 92, 246, 0.3)' },
-                            { border: '#ef4444', bg: 'rgba(239, 68, 68, 0.3)' },
-                            { border: '#06b6d4', bg: 'rgba(6, 182, 212, 0.3)' },
-                            { border: '#84cc16', bg: 'rgba(132, 204, 22, 0.3)' },
-                            { border: '#ec4899', bg: 'rgba(236, 72, 153, 0.3)' },
-                        ];
+                const colors = [
+                    { border: '#22c55e', bg: 'rgba(34, 197, 94, 0.3)' },
+                    { border: '#0ea5e9', bg: 'rgba(14, 165, 233, 0.3)' },
+                    { border: '#f59e0b', bg: 'rgba(245, 158, 11, 0.3)' },
+                    { border: '#8b5cf6', bg: 'rgba(139, 92, 246, 0.3)' },
+                    { border: '#ef4444', bg: 'rgba(239, 68, 68, 0.3)' },
+                    { border: '#06b6d4', bg: 'rgba(6, 182, 212, 0.3)' },
+                    { border: '#84cc16', bg: 'rgba(132, 204, 22, 0.3)' },
+                    { border: '#ec4899', bg: 'rgba(236, 72, 153, 0.3)' },
+                ];
 
-                        // Function to build filtered data for a single sensor
-                        function getFilteredData(sensorIndex) {
-                            const sensor = sensors[sensorIndex];
-                            const sensorName = sensor.sensor_name;
+                // Function to build filtered data for a single sensor
+                function getFilteredData(sensorIndex) {
+                    const sensor = sensors[sensorIndex];
+                    const sensorName = sensor.sensor_name;
 
-                            // Filter to only include rows with valid data for this sensor
-                            const filteredRows = chartData.filter(row =>
-                                row[sensorName] !== null && row[sensorName] !== undefined
-                            );
+                    // Filter to only include rows with valid data for this sensor
+                    const filteredRows = chartData.filter(row =>
+                        row[sensorName] !== null && row[sensorName] !== undefined
+                    );
 
-                            const filteredLabels = filteredRows.map(row => {
-                                const date = new Date(row.recorded_at);
-                                return date.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
-                            });
+                    const filteredLabels = filteredRows.map(row => {
+                        const date = new Date(row.recorded_at);
+                        return date.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+                    });
 
-                            const filteredData = filteredRows.map(row => row[sensorName]);
+                    const filteredData = filteredRows.map(row => row[sensorName]);
 
-                            const colorIndex = sensorIndex % colors.length;
-                            const dataset = {
-                                label: sensor.sensor_label + (sensor.unit ? ` (${sensor.unit})` : ''),
-                                data: filteredData,
-                                borderColor: colors[colorIndex].border,
-                                backgroundColor: colors[colorIndex].bg,
-                                borderWidth: 3,
-                                tension: 0.4,
-                                fill: true,
-                                pointRadius: 4,
-                                pointBackgroundColor: colors[colorIndex].border,
-                            };
+                    const colorIndex = sensorIndex % colors.length;
+                    const dataset = {
+                        label: sensor.sensor_label + (sensor.unit ? ` (${sensor.unit})` : ''),
+                        data: filteredData,
+                        borderColor: colors[colorIndex].border,
+                        backgroundColor: colors[colorIndex].bg,
+                        borderWidth: 3,
+                        tension: 0.4,
+                        fill: true,
+                        pointRadius: 4,
+                        pointBackgroundColor: colors[colorIndex].border,
+                        pointHoverRadius: 6,
+                    };
 
-                            return { labels: filteredLabels, dataset };
+                    return { labels: filteredLabels, dataset };
+                }
+
+                // Initialize chart with first sensor (filtered)
+                const initialData = getFilteredData(0);
+                let sensorChart = new Chart(ctx, {
+                    type: 'line',
+                    data: { labels: initialData.labels, datasets: [initialData.dataset] },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        },
+                        scales: {
+                            x: {
+                                ticks: { color: getComputedStyle(document.body).getPropertyValue('--text-secondary').trim() },
+                                grid: { color: getComputedStyle(document.body).getPropertyValue('--glass-border').trim() }
+                            },
+                            y: {
+                                ticks: { color: getComputedStyle(document.body).getPropertyValue('--text-secondary').trim() },
+                                grid: { color: getComputedStyle(document.body).getPropertyValue('--glass-border').trim() }
+                            }
                         }
+                    }
+                });
 
-                        // Initialize chart with first sensor (filtered)
-                        const initialData = getFilteredData(0);
-                        let sensorChart = new Chart(ctx, {
-                            type: 'line',
-                            data: { labels: initialData.labels, datasets: [initialData.dataset] },
-                            options: {
-                                responsive: true,
-                                plugins: {
-                                    legend: {
-                                        display: false
-                                    }
-                                },
-                                scales: {
-                                    x: {
-                                        ticks: { color: getComputedStyle(document.body).getPropertyValue('--text-secondary').trim() },
-                                        grid: { color: getComputedStyle(document.body).getPropertyValue('--glass-border').trim() }
-                                    },
-                                    y: {
-                                        ticks: { color: getComputedStyle(document.body).getPropertyValue('--text-secondary').trim() },
-                                        grid: { color: getComputedStyle(document.body).getPropertyValue('--glass-border').trim() }
-                                    }
+                // Dropdown change listener for chart
+                document.getElementById('chartSensorSelect').addEventListener('change', function () {
+                    const selectedIndex = parseInt(this.value);
+                    const filteredData = getFilteredData(selectedIndex);
+                    sensorChart.data.labels = filteredData.labels;
+                    sensorChart.data.datasets = [filteredData.dataset];
+                    sensorChart.update();
+                });
+
+                // Table column and row filter listener
+                document.getElementById('tableSensorSelect')?.addEventListener('change', function () {
+                    const selectedValue = this.value;
+                    const sensorCols = document.querySelectorAll('.sensor-col');
+                    const tableRows = document.querySelectorAll('#sensorDataTable tbody tr');
+
+                    // Show/hide columns
+                    sensorCols.forEach(col => {
+                        if (selectedValue === 'all') {
+                            col.style.display = '';
+                        } else {
+                            if (col.dataset.sensorIndex === selectedValue) {
+                                col.style.display = '';
+                            } else {
+                                col.style.display = 'none';
+                            }
+                        }
+                    });
+
+                    // Show/hide rows based on data availability
+                    tableRows.forEach(row => {
+                        if (selectedValue === 'all') {
+                            row.style.display = '';
+                        } else {
+                            // Find the cell for this sensor in this row
+                            const sensorCell = row.querySelector(`.sensor-col[data-sensor-index="${selectedValue}"]`);
+                            if (sensorCell) {
+                                const cellValue = sensorCell.textContent.trim();
+                                // Hide row if value is '-' (no data)
+                                if (cellValue === '-') {
+                                    row.style.display = 'none';
+                                } else {
+                                    row.style.display = '';
                                 }
                             }
-                        });
-
-                        // Dropdown change listener for chart
-                        document.getElementById('chartSensorSelect').addEventListener('change', function () {
-                            const selectedIndex = parseInt(this.value);
-                            const filteredData = getFilteredData(selectedIndex);
-                            sensorChart.data.labels = filteredData.labels;
-                            sensorChart.data.datasets = [filteredData.dataset];
-                            sensorChart.update();
-                        });
-
-                        // Table column and row filter listener
-                        document.getElementById('tableSensorSelect')?.addEventListener('change', function () {
-                            const selectedValue = this.value;
-                            const sensorCols = document.querySelectorAll('.sensor-col');
-                            const tableRows = document.querySelectorAll('#sensorDataTable tbody tr');
-
-                            // Show/hide columns
-                            sensorCols.forEach(col => {
-                                if (selectedValue === 'all') {
-                                    col.style.display = '';
-                                } else {
-                                    if (col.dataset.sensorIndex === selectedValue) {
-                                        col.style.display = '';
-                                    } else {
-                                        col.style.display = 'none';
-                                    }
-                                }
-                            });
-
-                            // Show/hide rows based on data availability
-                            tableRows.forEach(row => {
-                                if (selectedValue === 'all') {
-                                    row.style.display = '';
-                                } else {
-                                    // Find the cell for this sensor in this row
-                                    const sensorCell = row.querySelector(`.sensor-col[data-sensor-index="${selectedValue}"]`);
-                                    if (sensorCell) {
-                                        const cellValue = sensorCell.textContent.trim();
-                                        // Hide row if value is '-' (no data)
-                                        if (cellValue === '-') {
-                                            row.style.display = 'none';
-                                        } else {
-                                            row.style.display = '';
-                                        }
-                                    }
-                                }
-                            });
-                        });
-                    </script>
+                        }
+                    });
+                });
+            </script>
         @else
             <!-- No Data -->
             <div class="glass-card">
@@ -1642,7 +1650,7 @@
                     @else
                         const response = await fetch('{{ route("monitoring.status", $userDevice->id) }}');
                     @endif
-                                                                                                                                                                const data = await response.json();
+                                                                                                                                                                        const data = await response.json();
 
                     if (data.success) {
                         if (data.outputs) {
