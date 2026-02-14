@@ -592,6 +592,47 @@ docker compose -f /opt/docker-apps/nginx-proxy/docker-compose.yml restart
 
 ---
 
+## E. Script Deploy Otomatis (Opsional)
+
+Agar update lebih mudah, buat file `deploy.sh` di folder project:
+
+```bash
+nano /opt/docker-apps/NAMA_PROJECT/deploy.sh
+```
+
+```bash
+#!/bin/bash
+set -e
+
+# --- KONFIGURASI ---
+PROJECT_DIR="/opt/docker-apps/NAMA_PROJECT"
+CONTAINER="NAMA_PROJECT_app"
+# -------------------
+
+echo "🔄 Pulling latest code..."
+cd "$PROJECT_DIR/src"
+git pull origin main
+
+echo "🔨 Rebuilding container..."
+cd "$PROJECT_DIR"
+docker compose up -d --build
+
+echo "⚡ Running Laravel commands..."
+docker exec $CONTAINER php artisan migrate --force
+docker exec $CONTAINER php artisan config:cache
+docker exec $CONTAINER php artisan route:cache
+docker exec $CONTAINER php artisan view:cache
+docker restart $CONTAINER
+
+echo "✅ Deploy selesai!"
+```
+
+```bash
+chmod +x /opt/docker-apps/NAMA_PROJECT/deploy.sh
+```
+
+---
+
 ## D. Setup Cloudflare
 
 1. Login Cloudflare → Pilih domain

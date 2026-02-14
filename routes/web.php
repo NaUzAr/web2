@@ -127,8 +127,13 @@ Route::get('/', function () {
     return view('page.beranda');
 })->name('home');
 
+// Privacy Policy
+Route::get('/privacy-policy', function () {
+    return view('page.privacy');
+})->name('privacy.policy');
+
 // --- LOGIN ---
-Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
+route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->name('login.perform');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
