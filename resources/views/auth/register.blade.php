@@ -61,13 +61,13 @@
 
         .logo-icon {
             width: auto;
-            height: 150px;
+            height: 120px;
             background: none;
             border-radius: 0;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 1.5rem;
+            margin: 0 auto 1.25rem;
         }
 
         .register-icon {
@@ -83,7 +83,69 @@
         }
 
         .text-muted-light {
-            color: rgba(255, 255, 255, 0.5);
+            color: var(--text-secondary);
+        }
+
+        /* Mobile input touch-friendly */
+        .register-card .form-control {
+            font-size: 16px;
+            min-height: 48px;
+            padding: 0.75rem 1rem;
+            border-radius: 12px;
+        }
+
+        .register-card .btn-gradient {
+            min-height: 48px;
+            font-size: 1rem;
+            border-radius: 50px;
+        }
+
+        /* Mobile responsive adjustments */
+        @media (max-width: 576px) {
+            body {
+                padding: 1rem;
+                align-items: flex-start;
+                padding-top: 1.5rem;
+            }
+
+            .register-card {
+                padding: 1.75rem 1.5rem;
+                border-radius: 20px;
+                box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+            }
+
+            .logo-icon {
+                height: 70px;
+                margin-bottom: 0.75rem;
+            }
+
+            .register-title {
+                font-size: 1.25rem;
+            }
+
+            .register-subtitle {
+                font-size: 0.85rem;
+            }
+
+            .register-card .form-label {
+                font-size: 0.85rem;
+            }
+        }
+
+        @media (max-width: 400px) {
+            body {
+                padding: 0.75rem;
+                padding-top: 1rem;
+            }
+
+            .register-card {
+                padding: 1.5rem 1.25rem;
+            }
+
+            .logo-icon {
+                height: 55px;
+                margin-bottom: 0.5rem;
+            }
         }
     </style>
 </head>

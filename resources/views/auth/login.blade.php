@@ -33,13 +33,13 @@
 
         .login-icon {
             width: auto;
-            height: 150px;
+            height: 120px;
             background: none;
             border-radius: 0;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 1.5rem;
+            margin: 0 auto 1.25rem;
         }
 
         .login-title {
@@ -72,11 +72,73 @@
         }
 
         .text-muted-light {
-            color: rgba(255, 255, 255, 0.5);
+            color: var(--text-secondary);
         }
 
         .divider {
             border-top: 1px solid var(--glass-border);
+        }
+
+        /* Mobile input touch-friendly */
+        .login-card .form-control {
+            font-size: 16px;
+            min-height: 48px;
+            padding: 0.75rem 1rem;
+            border-radius: 12px;
+        }
+
+        .login-card .btn-gradient {
+            min-height: 48px;
+            font-size: 1rem;
+            border-radius: 50px;
+        }
+
+        /* Mobile responsive adjustments */
+        @media (max-width: 576px) {
+            body {
+                padding: 1rem;
+                align-items: flex-start;
+                padding-top: 2rem;
+            }
+
+            .login-card {
+                padding: 1.75rem 1.5rem;
+                border-radius: 20px;
+                box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+            }
+
+            .login-icon {
+                height: 80px;
+                margin-bottom: 1rem;
+            }
+
+            .login-title {
+                font-size: 1.25rem;
+            }
+
+            .login-subtitle {
+                font-size: 0.85rem;
+            }
+
+            .login-card .form-label {
+                font-size: 0.85rem;
+            }
+        }
+
+        @media (max-width: 400px) {
+            body {
+                padding: 0.75rem;
+                padding-top: 1.5rem;
+            }
+
+            .login-card {
+                padding: 1.5rem 1.25rem;
+            }
+
+            .login-icon {
+                height: 65px;
+                margin-bottom: 0.75rem;
+            }
         }
     </style>
 </head>

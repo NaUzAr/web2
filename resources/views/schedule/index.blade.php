@@ -121,6 +121,90 @@
             border-color: var(--primary);
             color: white;
         }
+
+        /* ========= Mobile Responsive ========= */
+        @media (max-width: 768px) {
+            .glass-card {
+                padding: 1.25rem;
+                border-radius: 16px;
+            }
+
+            .glass-card h4 {
+                font-size: 1.15rem;
+            }
+
+            /* Table → Card Layout */
+            .table-glass thead {
+                display: none;
+            }
+
+            .table-glass tbody tr {
+                display: block;
+                background: var(--glass-bg);
+                border: 1px solid var(--glass-border);
+                border-radius: 12px;
+                padding: 0.75rem;
+                margin-bottom: 0.75rem;
+            }
+
+            .table-glass tbody td {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 0.4rem 0.5rem;
+                border: none;
+                font-size: 0.9rem;
+            }
+
+            .table-glass tbody td::before {
+                content: attr(data-label);
+                font-weight: 600;
+                font-size: 0.8rem;
+                color: var(--text-secondary);
+                margin-right: 1rem;
+                flex-shrink: 0;
+            }
+
+            .table-glass tbody td:last-child {
+                justify-content: flex-end;
+                padding-top: 0.5rem;
+                border-top: 1px solid var(--glass-border);
+                margin-top: 0.25rem;
+            }
+
+            /* Day selector bigger for touch */
+            .schedule-day-label {
+                width: 42px;
+                height: 42px;
+                line-height: 40px;
+                font-size: 0.85rem;
+                margin-right: 4px;
+                margin-bottom: 4px;
+            }
+
+            /* Modal form touch-friendly */
+            .form-control-dark, .form-select-dark {
+                font-size: 16px;
+                min-height: 48px;
+            }
+
+            /* Alert compact */
+            .alert {
+                font-size: 0.85rem;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .glass-card {
+                padding: 1rem;
+            }
+
+            .schedule-day-label {
+                width: 38px;
+                height: 38px;
+                line-height: 36px;
+            }
+        }
     </style>
 </head>
 
@@ -194,18 +278,18 @@
                                 }
                             @endphp
                             <tr id="row-slot-{{ $i }}">
-                                <td><span class="badge bg-secondary">Jadwal {{ $i }}</span></td>
+                                <td data-label="Jadwal"><span class="badge bg-secondary">Jadwal {{ $i }}</span></td>
                                 
-                                <td>{{ $isActive ? substr($sch['on_time'], 0, 5) : '-' }}</td>
+                                <td data-label="Waktu Mulai">{{ $isActive ? substr($sch['on_time'], 0, 5) : '-' }}</td>
                                 
                                 @if($isDuration) 
-                                    <td>{{ $isActive ? $sch['duration'] . ' Menit' : '-' }}</td> 
+                                    <td data-label="Durasi">{{ $isActive ? $sch['duration'] . ' Menit' : '-' }}</td> 
                                 @else
-                                    <td>{{ $isActive ? ($sch['off_time'] ?? '-') : '-' }}</td>
+                                    <td data-label="Waktu Selesai">{{ $isActive ? ($sch['off_time'] ?? '-') : '-' }}</td>
                                 @endif
                                 
                                 @if($isSector) 
-                                    <td>
+                                    <td data-label="Output">
                                         @if($isActive)
                                             <span class="badge badge-sector">Output {{ $sch['sector'] }}</span>
                                         @else
@@ -215,7 +299,7 @@
                                 @endif
 
                                 @if($isType)
-                                    <td>
+                                    <td data-label="Input">
                                         @if($isActive)
                                             @if(($sch['name'] ?? '') == 'PUPUK')
                                                 <span class="badge bg-warning text-dark">Air Pupuk</span>
@@ -225,16 +309,16 @@
                                                 <span class="badge bg-secondary">{{ $sch['name'] ?? '-' }}</span>
                                             @endif
                                         @else
-                                            <span class="text-white-50">-</span>
+                                            <span style="color: var(--text-secondary);">-</span>
                                         @endif
                                     </td>
                                 @endif
                                 
                                 @if($isDays) 
-                                    <td><small>{{ $isActive ? ($days ?: 'Setiap Hari') : '-' }}</small></td> 
+                                    <td data-label="Hari"><small>{{ $isActive ? ($days ?: 'Setiap Hari') : '-' }}</small></td> 
                                 @endif
                                 
-                                <td>
+                                <td data-label="Status">
                                     @if($isActive)
                                         <span class="badge bg-success">Aktif</span>
                                     @else
@@ -242,7 +326,7 @@
                                     @endif
                                 </td>
                                 
-                                <td>
+                                <td data-label="">
                                     <button class="btn btn-sm btn-outline-primary me-1" onclick='openScheduleModal({{ $i }}, @json($sch))'>
                                         <i class="bi bi-pencil-square"></i> Edit
                                     </button>
@@ -281,15 +365,15 @@
                     
                     <div class="row g-3">
                         <div class="col-6">
-                            <label class="form-label text-white-50">Waktu Mulai</label>
+                            <label class="form-label" style="color: var(--text-secondary);">Waktu Mulai</label>
                             <input type="time" id="on_time" class="form-control form-control-dark">
                         </div>
                         <div class="col-6">
                             @if($isDuration)
-                                <label class="form-label text-white-50">Durasi (Menit)</label>
+                                <label class="form-label" style="color: var(--text-secondary);">Durasi (Menit)</label>
                                 <input type="number" id="duration" class="form-control form-control-dark" min="1" value="5">
                             @else
-                                <label class="form-label text-white-50">Waktu Selesai</label>
+                                <label class="form-label" style="color: var(--text-secondary);">Waktu Selesai</label>
                                 <input type="time" id="off_time" class="form-control form-control-dark">
                             @endif
                         </div>
@@ -297,7 +381,7 @@
                     
                     @if($isSector)
                     <div class="mb-3 mt-3">
-                        <label class="form-label text-white-50">Output</label>
+                        <label class="form-label" style="color: var(--text-secondary);">Output</label>
                         <select id="sector" class="form-select form-select-dark">
                             @for($s = 1; $s <= ($scheduleConfig->max_sectors ?? 1); $s++)
                                 <option value="{{ $s }}">Output {{ $s }}</option>
@@ -308,7 +392,7 @@
                     
                     @if($isType)
                     <div class="mb-3">
-                        <label class="form-label text-white-50">Input</label>
+                        <label class="form-label" style="color: var(--text-secondary);">Input</label>
                         <select id="schedule_type" class="form-select form-select-dark">
                             <option value="BAKU">Air Baku</option>
                             <option value="PUPUK">Air Pupuk</option>
@@ -318,7 +402,7 @@
                     
                     @if($isDays)
                     <div class="mb-3 mt-3">
-                        <label class="form-label text-white-50 d-block">Hari Aktif</label>
+                        <label class="form-label d-block" style="color: var(--text-secondary);">Hari Aktif</label>
                         <div class="d-flex flex-wrap">
                             @foreach(['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'] as $key => $day)
                                 <div class="me-2 mb-2">
@@ -347,7 +431,7 @@
                         <i class="bi bi-trash me-1"></i> Hapus
                     </button>
                     <div>
-                        <button type="button" class="btn btn-link text-white-50 text-decoration-none" data-bs-dismiss="modal">Batal</button>
+                        <button type="button" class="btn btn-link text-decoration-none" style="color: var(--text-secondary);" data-bs-dismiss="modal">Batal</button>
                         <button type="button" class="btn btn-primary" onclick="sendSchedule()">
                             <span id="btnText">Kirim ke Device</span>
                             <div id="btnLoading" class="spinner-border spinner-border-sm ms-2 d-none"></div>
