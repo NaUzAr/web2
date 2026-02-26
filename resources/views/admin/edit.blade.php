@@ -5,6 +5,8 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Edit Device - Swaratani</title>
+    @include('partials.pwa-head')
+    @include('partials.theme')
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
@@ -13,19 +15,6 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
     <style>
-        :root {
-            --primary-red: #ef4444;
-            --dark-red: #991b1b;
-            --light-red: #fca5a5;
-            --accent-orange: #f97316;
-            --light-orange: #fdba74;
-            --primary-gradient: linear-gradient(135deg, #ef4444 0%, #dc2626 50%, #f97316 100%);
-            --secondary-gradient: linear-gradient(135deg, #fca5a5 0%, #ef4444 100%);
-            --nature-gradient: linear-gradient(135deg, #450a0a 0%, #7f1d1d 50%, #991b1b 100%);
-            --glass-bg: rgba(255, 255, 255, 0.1);
-            --glass-border: rgba(255, 255, 255, 0.2);
-        }
-
         * {
             font-family: 'Inter', sans-serif;
         }
@@ -33,6 +22,7 @@
         body {
             background: var(--nature-gradient);
             min-height: 100vh;
+            color: var(--text-main);
         }
 
         .bg-animation {
@@ -42,27 +32,27 @@
             width: 100%;
             height: 100%;
             z-index: -1;
-            background: radial-gradient(circle at 20% 80%, rgba(239, 68, 68, 0.2) 0%, transparent 50%),
-                radial-gradient(circle at 80% 20%, rgba(249, 115, 22, 0.2) 0%, transparent 50%);
+            background: radial-gradient(circle at 20% 80%, var(--glow-1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, var(--glow-2) 0%, transparent 50%);
         }
 
         .navbar-glass {
-            background: rgba(127, 29, 29, 0.95) !important;
+            background: var(--navbar-bg) !important;
             backdrop-filter: blur(20px);
             border-bottom: 1px solid var(--glass-border);
         }
 
         .navbar-brand {
             font-weight: 700;
-            color: #fca5a5 !important;
+            color: var(--primary) !important;
         }
 
         .nav-link {
-            color: rgba(255, 255, 255, 0.8) !important;
+            color: var(--text-secondary) !important;
         }
 
         .nav-link:hover {
-            color: #fca5a5 !important;
+            color: var(--primary) !important;
         }
 
         .glass-card {
@@ -73,42 +63,42 @@
         }
 
         .card-header-gradient {
-            background: linear-gradient(135deg, #facc15 0%, #f59e0b 100%);
+            background: var(--primary-gradient);
             border-radius: 24px 24px 0 0 !important;
             padding: 1.5rem 2rem;
         }
 
         .form-control {
-            background: rgba(255, 255, 255, 0.1);
+            background: var(--glass-bg);
             border: 1px solid var(--glass-border);
-            color: #fff;
+            color: var(--text-main);
             border-radius: 12px;
             padding: 0.75rem 1rem;
         }
 
         .form-control:focus {
-            background: rgba(255, 255, 255, 0.15);
-            border-color: #ef4444;
-            color: #fff;
-            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2);
+            background: var(--glass-bg);
+            border-color: var(--primary);
+            color: var(--text-main);
+            box-shadow: 0 0 0 3px rgba(14, 95, 138, 0.2);
         }
 
         .form-control::placeholder {
-            color: rgba(255, 255, 255, 0.5);
+            color: var(--text-secondary);
         }
 
         .form-control-readonly {
-            background: rgba(255, 255, 255, 0.05) !important;
-            color: rgba(255, 255, 255, 0.6) !important;
+            background: rgba(0, 0, 0, 0.03) !important;
+            color: var(--text-secondary) !important;
         }
 
         .form-label {
-            color: #fca5a5;
+            color: var(--primary);
             font-weight: 600;
         }
 
         .form-text {
-            color: rgba(255, 255, 255, 0.6);
+            color: var(--text-secondary);
         }
 
         .btn-gradient {
@@ -123,45 +113,46 @@
 
         .btn-gradient:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(239, 68, 68, 0.4);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
             color: #fff;
         }
 
         .btn-glass {
             background: var(--glass-bg);
             border: 1px solid var(--glass-border);
-            color: #fff;
+            color: var(--text-main);
             padding: 0.75rem 1.5rem;
             border-radius: 50px;
             font-weight: 600;
         }
 
         .btn-glass:hover {
-            background: rgba(255, 255, 255, 0.2);
-            color: #fff;
+            background: var(--glass-bg);
+            border-color: var(--primary);
+            color: var(--primary);
         }
 
         .info-box {
-            background: rgba(255, 255, 255, 0.05);
+            background: rgba(0, 0, 0, 0.03);
             border: 1px solid var(--glass-border);
             border-radius: 12px;
             padding: 1rem;
         }
 
         .info-label {
-            color: rgba(255, 255, 255, 0.5);
+            color: var(--text-secondary);
             font-size: 0.8rem;
             margin-bottom: 0.25rem;
         }
 
         .info-value {
-            color: #fff;
+            color: var(--text-main);
             font-weight: 600;
         }
 
         .badge-sensor {
-            background: rgba(239, 68, 68, 0.2);
-            color: #fca5a5;
+            background: rgba(14, 95, 138, 0.1);
+            color: var(--primary);
             font-weight: 500;
             padding: 0.5rem 0.75rem;
             border-radius: 10px;
@@ -174,30 +165,31 @@
         .badge-sensor-name {
             font-size: 0.85rem;
             font-weight: 600;
+            color: var(--text-main);
         }
 
         .badge-sensor-column {
             font-size: 0.7rem;
-            color: rgba(255, 255, 255, 0.5);
+            color: var(--text-secondary);
             font-family: monospace;
         }
 
         .sensors-container {
-            background: rgba(255, 255, 255, 0.05);
+            background: rgba(0, 0, 0, 0.02);
             border: 1px solid var(--glass-border);
             border-radius: 16px;
             padding: 1rem;
         }
 
         .alert-info-custom {
-            background: rgba(14, 165, 233, 0.15);
-            border: 1px solid rgba(14, 165, 233, 0.3);
-            color: var(--light-sky);
+            background: rgba(14, 165, 233, 0.05);
+            border: 1px solid rgba(14, 165, 233, 0.2);
+            color: var(--text-main);
             border-radius: 12px;
         }
 
         .badge-type {
-            background: linear-gradient(135deg, #0ea5e9 0%, #0369a1 100%);
+            background: var(--primary-gradient);
             color: #fff;
             font-weight: 600;
             padding: 0.35rem 0.75rem;
@@ -205,8 +197,8 @@
         }
 
         .badge-output {
-            background: rgba(250, 204, 21, 0.2);
-            color: #fde047;
+            background: rgba(250, 204, 21, 0.1);
+            color: #d97706;
             font-weight: 500;
             padding: 0.5rem 0.75rem;
             border-radius: 10px;
@@ -223,7 +215,7 @@
 
         .badge-output-type {
             font-size: 0.7rem;
-            color: rgba(255, 255, 255, 0.5);
+            color: var(--text-secondary);
         }
     </style>
 </head>
@@ -236,7 +228,7 @@
         <div class="container">
             <a class="navbar-brand d-flex align-items-center" href="{{ route('home') }}">
                 <img src="{{ asset('images/logo.png') }}" alt="Swaratani" height="40" class="me-2">
-                <span class="fw-bold" style="color: #fca5a5 !important;">Swaratani IoT</span>
+                <span class="fw-bold" style="color: var(--primary) !important;">Swaratani IoT</span>
             </a>
             <div class="navbar-nav ms-auto">
                 <a class="nav-link" href="{{ route('admin.devices.index') }}">
@@ -251,7 +243,7 @@
             <div class="col-lg-8">
                 <div class="glass-card shadow-lg">
                     <div class="card-header-gradient">
-                        <h4 class="mb-0 text-dark">
+                        <h4 class="mb-0 text-white">
                             <i class="bi bi-pencil-square me-2"></i>Edit Device
                         </h4>
                     </div>
@@ -300,7 +292,7 @@
                                             </span>
                                         @endforeach
                                     @else
-                                        <span class="text-white-50">Tidak ada sensor</span>
+                                        <span style="color: var(--text-secondary);">Tidak ada sensor</span>
                                     @endif
                                 </div>
                                 <div class="alert alert-info-custom mt-2 mb-0 py-2">
@@ -312,7 +304,7 @@
 
                             <!-- Outputs Info -->
                             <div class="mb-4">
-                                <label class="form-label" style="color: #fde047;">
+                                <label class="form-label">
                                     <i class="bi bi-toggle-on me-1"></i> Outputs ({{ $device->outputs->count() }}
                                     output)
                                 </label>
@@ -327,12 +319,12 @@
                                             </span>
                                         @endforeach
                                     @else
-                                        <span class="text-white-50">Tidak ada output</span>
+                                        <span style="color: var(--text-secondary);">Tidak ada output</span>
                                     @endif
                                 </div>
                                 <div class="alert alert-info-custom mt-2 mb-0 py-2"
-                                    style="background: rgba(250, 204, 21, 0.15); border-color: rgba(250, 204, 21, 0.3);">
-                                    <small style="color: #fde047;"><i class="bi bi-info-circle me-1"></i>
+                                    style="background: rgba(250, 204, 21, 0.05); border-color: rgba(250, 204, 21, 0.2);">
+                                    <small style="color: var(--text-main);"><i class="bi bi-info-circle me-1"></i>
                                         Output dapat dikontrol melalui MQTT topic:
                                         <code>{{ $device->mqtt_topic }}/control</code>
                                     </small>

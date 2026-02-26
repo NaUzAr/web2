@@ -100,7 +100,6 @@ class Device extends Model
         return [
             'aws' => 'AWS (Automatic Weather Station)',
             'smart_gh' => 'Smart GH (Smart Greenhouse)',
-            'smart_gh_auto' => 'Smart GH (Full Automation)',
             // Tambahkan tipe baru di sini:
             // 'water_quality' => 'Water Quality Sensor',
             // 'air_quality' => 'Air Quality Sensor',

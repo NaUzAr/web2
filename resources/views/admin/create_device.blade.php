@@ -91,8 +91,8 @@
         }
 
         .form-select option {
-            background: #991b1b;
-            color: #fff;
+            background: #ffffff;
+            color: #333;
         }
 
         .form-label {
@@ -159,7 +159,7 @@
 
         .btn-gradient:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(239, 68, 68, 0.4);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
             color: #fff;
         }
 
@@ -180,8 +180,8 @@
 
         .btn-outline-add {
             background: transparent;
-            border: 2px dashed #ef4444;
-            color: #fca5a5;
+            border: 2px dashed var(--primary);
+            color: var(--primary);
             border-radius: 12px;
             padding: 0.75rem;
             font-weight: 600;
@@ -189,8 +189,8 @@
         }
 
         .btn-outline-add:hover {
-            background: rgba(239, 68, 68, 0.2);
-            color: #fff;
+            background: rgba(14, 95, 138, 0.1);
+            color: var(--primary-dark);
             border-style: solid;
         }
 
@@ -210,7 +210,7 @@
 
         .badge-count {
             background: var(--secondary-gradient);
-            color: #991b1b;
+            color: var(--primary-dark);
             font-weight: 700;
             padding: 0.25rem 0.75rem;
             border-radius: 20px;
@@ -425,6 +425,22 @@
                                     <small><i class="bi bi-info-circle me-1"></i>
                                         Output adalah aktuator yang dapat dikontrol via MQTT (relay, pompa, kipas, dll).
                                     </small>
+                                </div>
+
+                                <!-- Quick Add Outputs -->
+                                <div class="mb-3">
+                                    <label class="small mb-2 d-block" style="color: var(--text-secondary);">Quick Add
+                                        (Klik untuk
+                                        menambahkan):</label>
+                                    <div class="d-flex flex-wrap gap-2">
+                                        @foreach($availableOutputs as $key => $output)
+                                            <button type="button" class="btn btn-sm btn-outline-secondary bg-opacity-10"
+                                                onclick="addOutputRow('{{ $key }}')"
+                                                style="border-color: var(--glass-border); background: var(--glass-bg); color: var(--text-main);">
+                                                <i class="bi {{ $output['icon'] }} me-1"></i> {{ $output['label'] }}
+                                            </button>
+                                        @endforeach
+                                    </div>
                                 </div>
 
                                 <div id="outputContainer"></div>
@@ -678,20 +694,9 @@
             document.querySelector(`[data-type="${type}"]`).classList.add('selected');
             document.getElementById('deviceType').value = type;
 
-            // Reset sensors
-            document.getElementById('sensorContainer').innerHTML = '';
-            sensorCounter = 0;
-
-            // Reset outputs
-            document.getElementById('outputContainer').innerHTML = '';
-            outputCounter = 0;
-
-            // Reset schedule dropdown
-            document.getElementById('scheduleType').value = '';
-            toggleScheduleOptions('');
-
-            // Add default sensors
-            if (defaultSensors[type]) {
+            // Only add default sensors if no sensors exist yet
+            const sensorContainer = document.getElementById('sensorContainer');
+            if (sensorContainer.children.length === 0 && defaultSensors[type]) {
                 for (const [sensorKey, count] of Object.entries(defaultSensors[type])) {
                     for (let i = 0; i < count; i++) {
                         const label = count > 1 ? `${availableSensors[sensorKey].label} ${i + 1}` : '';
@@ -700,11 +705,9 @@
                 }
             }
 
-            // Uncheck automation switches when changing type
-            document.querySelectorAll('input[type="checkbox"][id^="auto_"]').forEach(el => el.checked = false);
-
-            // Add default outputs
-            if (defaultOutputs[type]) {
+            // Only add default outputs if no outputs exist yet
+            const outputContainer = document.getElementById('outputContainer');
+            if (outputContainer.children.length === 0 && defaultOutputs[type]) {
                 for (const [outputKey, count] of Object.entries(defaultOutputs[type])) {
                     for (let i = 0; i < count; i++) {
                         const label = count > 1 ? `${availableOutputs[outputKey].label} ${i + 1}` : '';

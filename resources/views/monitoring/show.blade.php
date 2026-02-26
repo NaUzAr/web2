@@ -685,12 +685,18 @@
                                 return 50;
                             if (str_contains($name, 'fan'))
                                 return 51;
-                            if (str_contains($name, 'air'))
-                                return 52;
                             if (str_contains($name, 'lamp'))
                                 return 53;
                             if (str_contains($name, 'mix'))
                                 return 54;
+
+                            // Display-only valves (paling bawah)
+                            if ($name === 'sts_air_baku' || $name === 'sts_air_pupuk')
+                                return 95;
+
+                            // Other air-related
+                            if (str_contains($name, 'air'))
+                                return 52;
 
                             return 99; // Default priority
                         })->values();
@@ -738,32 +744,56 @@
 
                     @foreach($sortedOutputs as $output)
                         <div class="col-6 col-md-4 col-lg-3">
-                            <div class="output-card" id="output-card-{{ $output->id }}">
-                                <div class="output-icon">
-                                    <i class="bi bi-toggle-on text-white"></i>
+                            <div class="output-card" id="output-card-{{ $output->id }}"
+                                @if(in_array($output->output_name, ['sts_air_baku', 'sts_air_pupuk']))
+                                    style="background: rgba(34, 197, 94, 0.08); border-color: rgba(34, 197, 94, 0.3);"
+                                @endif
+                            >
+                                <div class="output-icon"
+                                    @if(in_array($output->output_name, ['sts_air_baku', 'sts_air_pupuk']))
+                                        style="background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);"
+                                    @endif
+                                >
+                                    <i class="bi {{ in_array($output->output_name, ['sts_air_baku', 'sts_air_pupuk']) ? 'bi-water' : 'bi-toggle-on' }} text-white"></i>
                                 </div>
                                 <div class="output-label">{{ $output->output_label }}</div>
 
                                 @if($output->output_type === 'boolean')
-                                    {{-- ON/OFF Buttons for Boolean --}}
-                                    <div class="d-flex gap-2 justify-content-center">
-                                        <button type="button"
-                                            class="btn btn-sm {{ $output->current_value ? 'btn-success' : 'btn-outline-success' }}"
-                                            onclick="setOutput({{ $output->id }}, true)" id="btn-on-{{ $output->id }}"
-                                            style="min-width: 50px;">
-                                            <i class="bi bi-power"></i> ON
-                                        </button>
-                                        <button type="button"
-                                            class="btn btn-sm {{ !$output->current_value ? 'btn-danger' : 'btn-outline-danger' }}"
-                                            onclick="setOutput({{ $output->id }}, false)" id="btn-off-{{ $output->id }}"
-                                            style="min-width: 50px;">
-                                            <i class="bi bi-x-lg"></i> OFF
-                                        </button>
-                                    </div>
-                                    <div class="output-status {{ $output->current_value ? 'on' : 'off' }}"
-                                        id="output-status-{{ $output->id }}">
-                                        {{ $output->current_value ? 'ON' : 'OFF' }}
-                                    </div>
+                                    @if(in_array($output->output_name, ['sts_air_baku', 'sts_air_pupuk']))
+                                        {{-- Display-only status for Air Baku & Air Pupuk Valve --}}
+                                        <div class="d-flex justify-content-center mt-1">
+                                            <span
+                                                class="badge rounded-pill px-3 py-2 {{ $output->current_value ? 'bg-success' : 'bg-secondary' }}"
+                                                id="badge-status-{{ $output->id }}" style="font-size: 0.85rem;">
+                                                <i class="bi {{ $output->current_value ? 'bi-check-circle' : 'bi-x-circle' }} me-1"></i>
+                                                {{ $output->current_value ? 'ON' : 'OFF' }}
+                                            </span>
+                                        </div>
+                                        <div class="output-status {{ $output->current_value ? 'on' : 'off' }} mt-1"
+                                            id="output-status-{{ $output->id }}" style="font-size: 0.7rem;">
+                                            Dikontrol otomatis
+                                        </div>
+                                    @else
+                                        {{-- ON/OFF Buttons for Boolean --}}
+                                        <div class="d-flex gap-2 justify-content-center">
+                                            <button type="button"
+                                                class="btn btn-sm {{ $output->current_value ? 'btn-success' : 'btn-outline-success' }}"
+                                                onclick="setOutput({{ $output->id }}, true)" id="btn-on-{{ $output->id }}"
+                                                style="min-width: 50px;">
+                                                <i class="bi bi-power"></i> ON
+                                            </button>
+                                            <button type="button"
+                                                class="btn btn-sm {{ !$output->current_value ? 'btn-danger' : 'btn-outline-danger' }}"
+                                                onclick="setOutput({{ $output->id }}, false)" id="btn-off-{{ $output->id }}"
+                                                style="min-width: 50px;">
+                                                <i class="bi bi-x-lg"></i> OFF
+                                            </button>
+                                        </div>
+                                        <div class="output-status {{ $output->current_value ? 'on' : 'off' }}"
+                                            id="output-status-{{ $output->id }}">
+                                            {{ $output->current_value ? 'ON' : 'OFF' }}
+                                        </div>
+                                    @endif
                                 @else
                                     <!-- Range Slider for Number/Percentage -->
                                     <div class="range-value" id="output-value-{{ $output->id }}">
@@ -845,7 +875,8 @@
                                 @foreach($sensors as $index => $sensor)
                                     <option value="{{ $index }}" style="color: #333; background-color: #ffffff;">
                                         {{ $sensor->sensor_label }}
-                                        ({{ $sensor->unit }})</option>
+                                        ({{ $sensor->unit }})
+                                    </option>
                                 @endforeach
                             </select>
                         </div>
@@ -1095,47 +1126,56 @@
         <div class="modal fade" id="exportModal" tabindex="-1" aria-labelledby="exportModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content"
-                    style="background: linear-gradient(135deg, #134e4a 0%, #166534 100%); border: 1px solid rgba(255,255,255,0.2);">
+                    style="background: var(--glass-bg); backdrop-filter: blur(20px); border: 1px solid var(--glass-border);">
                     <div class="modal-header border-0">
-                        <h5 class="modal-title text-white" id="exportModalLabel">
+                        <h5 class="modal-title" style="color: var(--text-main);" id="exportModalLabel">
                             <i class="bi bi-download me-2"></i>Download Data CSV
                         </h5>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
-                            aria-label="Close"></button>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <form action="{{ route('monitoring.export', $userDevice->id) }}" method="POST">
                         @csrf
                         <div class="modal-body">
-                            <p class="text-white-50 mb-4">Pilih rentang tanggal untuk data yang ingin di-download:</p>
+                            <p class="mb-4" style="color: var(--text-secondary);">Pilih rentang tanggal untuk data yang
+                                ingin di-download:</p>
 
                             <div class="mb-3">
-                                <label class="form-label text-white">
+                                <label class="form-label" style="color: var(--text-main);">
                                     <i class="bi bi-calendar-event me-1"></i> Tanggal Mulai
                                 </label>
-                                <input type="date" name="start_date"
-                                    class="form-control bg-dark text-white border-secondary"
+                                <input type="date" name="start_date" class="form-control"
+                                    style="background: var(--glass-bg); color: var(--text-main); border: 1px solid var(--glass-border);"
                                     value="{{ date('Y-m-d', strtotime('-7 days')) }}" required>
                             </div>
 
                             <div class="mb-3">
-                                <label class="form-label text-white">
+                                <label class="form-label" style="color: var(--text-main);">
                                     <i class="bi bi-calendar-check me-1"></i> Tanggal Akhir
                                 </label>
-                                <input type="date" name="end_date" class="form-control bg-dark text-white border-secondary"
+                                <input type="date" name="end_date" class="form-control"
+                                    style="background: var(--glass-bg); color: var(--text-main); border: 1px solid var(--glass-border);"
                                     value="{{ date('Y-m-d') }}" required>
                             </div>
 
                             <div class="d-flex gap-2 flex-wrap">
-                                <button type="button" class="btn btn-sm btn-outline-light" onclick="setDateRange(7)">7
+                                <button type="button" class="btn btn-sm"
+                                    style="border: 1px solid var(--primary); color: var(--primary);"
+                                    onclick="setDateRange(7)">7
                                     Hari</button>
-                                <button type="button" class="btn btn-sm btn-outline-light" onclick="setDateRange(30)">30
+                                <button type="button" class="btn btn-sm"
+                                    style="border: 1px solid var(--primary); color: var(--primary);"
+                                    onclick="setDateRange(30)">30
                                     Hari</button>
-                                <button type="button" class="btn btn-sm btn-outline-light" onclick="setDateRange(90)">3
+                                <button type="button" class="btn btn-sm"
+                                    style="border: 1px solid var(--primary); color: var(--primary);"
+                                    onclick="setDateRange(90)">3
                                     Bulan</button>
                             </div>
                         </div>
                         <div class="modal-footer border-0">
-                            <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">Batal</button>
+                            <button type="button" class="btn"
+                                style="border: 1px solid var(--glass-border); color: var(--text-main);"
+                                data-bs-dismiss="modal">Batal</button>
                             <button type="submit" class="btn" style="background: var(--primary-gradient); color: #fff;">
                                 <i class="bi bi-file-earmark-spreadsheet me-1"></i> Download CSV
                             </button>
@@ -1650,7 +1690,7 @@
                     @else
                         const response = await fetch('{{ route("monitoring.status", $userDevice->id) }}');
                     @endif
-                                                                                                                                                                        const data = await response.json();
+                                                                                                                                                                                const data = await response.json();
 
                     if (data.success) {
                         if (data.outputs) {

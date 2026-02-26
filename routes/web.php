@@ -105,7 +105,7 @@ Route::get('/email/verify/{id}/{hash}', function ($id, $hash) {
         $user->markEmailAsVerified();
     }
 
-    return redirect()->route('login')->with('success', 'Email berhasil diverifikasi! Silakan login.');
+    return view('auth.verified');
 })->middleware('signed')->name('verification.verify');
 
 // Kirim ulang email verifikasi
