@@ -445,10 +445,76 @@
             gap: 0.4rem;
         }
 
-        /* Mobile responsive adjustments */
-        @media (max-width: 576px) {
-            .output-card-special {
+        /* ========= Mobile Responsive ========= */
+        @media (max-width: 768px) {
+            .container.py-4 {
+                padding: 0.75rem 0.5rem !important;
+            }
+
+            /* Page Header compact */
+            .page-header {
+                padding: 1rem 1.25rem;
+                border-radius: 14px;
+                margin-bottom: 1.25rem;
+            }
+
+            .device-title {
+                font-size: 1.1rem;
+            }
+
+            .device-type-badge {
+                font-size: 0.75rem;
+                padding: 0.25rem 0.75rem;
+            }
+
+            /* Sensor Cards compact */
+            .sensor-card {
+                border-radius: 14px;
                 padding: 1rem;
+            }
+
+            .sensor-icon {
+                width: 36px;
+                height: 36px;
+                border-radius: 10px;
+                font-size: 1rem;
+                margin-bottom: 0.5rem;
+            }
+
+            .sensor-label {
+                font-size: 0.75rem;
+                margin-bottom: 0.25rem;
+            }
+
+            .sensor-value {
+                font-size: 1.5rem;
+            }
+
+            .sensor-unit {
+                font-size: 0.8rem;
+            }
+
+            /* Glass cards compact */
+            .glass-card {
+                border-radius: 14px;
+                padding: 1rem;
+                margin-top: 1.25rem;
+            }
+
+            .card-title {
+                font-size: 1rem;
+                margin-bottom: 0.75rem;
+            }
+
+            /* Chart smaller */
+            .glass-card canvas {
+                max-height: 200px !important;
+            }
+
+            /* Output cards compact */
+            .output-card-special {
+                padding: 0.85rem;
+                border-radius: 14px;
             }
 
             .output-card-special .badge {
@@ -463,13 +529,89 @@
             }
 
             .output-card {
-                padding: 1rem;
+                padding: 0.85rem;
+                border-radius: 14px;
             }
 
             .output-card .btn-sm {
                 font-size: 0.75rem;
                 padding: 0.25rem 0.5rem;
                 min-width: 45px !important;
+            }
+
+            .output-icon,
+            .output-icon-special {
+                width: 36px;
+                height: 36px;
+                border-radius: 10px;
+                font-size: 1rem;
+                margin-bottom: 0.5rem;
+            }
+
+            /* Button glass compact */
+            .btn-glass {
+                font-size: 0.8rem;
+                padding: 0.45rem 1rem;
+            }
+
+            /* Pump button compact */
+            .btn-pump-special {
+                padding: 0.4rem 0.75rem;
+                font-size: 0.8rem;
+            }
+
+            /* Last update */
+            .last-update {
+                font-size: 0.75rem;
+            }
+
+            /* Navbar compact */
+            .navbar .navbar-brand img {
+                height: 30px !important;
+            }
+
+            .navbar .navbar-brand span {
+                font-size: 0.9rem;
+            }
+
+            /* Row gaps smaller */
+            .row.g-3 {
+                --bs-gutter-x: 0.5rem;
+                --bs-gutter-y: 0.5rem;
+            }
+
+            .row.g-4 {
+                --bs-gutter-x: 0.5rem;
+                --bs-gutter-y: 0.5rem;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .container.py-4 {
+                padding: 0.5rem 0.35rem !important;
+            }
+
+            .page-header {
+                padding: 0.75rem 1rem;
+            }
+
+            .sensor-card {
+                padding: 0.75rem;
+            }
+
+            .sensor-icon {
+                width: 30px;
+                height: 30px;
+                font-size: 0.85rem;
+                margin-bottom: 0.35rem;
+            }
+
+            .sensor-value {
+                font-size: 1.3rem;
+            }
+
+            .glass-card {
+                padding: 0.75rem;
             }
         }
 
@@ -1684,7 +1826,7 @@
                     @else
                         const response = await fetch('{{ route("monitoring.status", $userDevice->id) }}');
                     @endif
-                                                                                                                                                                                    const data = await response.json();
+                                                                                                                                                                                        const data = await response.json();
 
                     if (data.success) {
                         if (data.outputs) {
