@@ -48,7 +48,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/add', [MonitoringController::class, 'store'])->name('store');
         Route::get('/device/{id}', [MonitoringController::class, 'show'])->name('show');
         Route::delete('/device/{id}', [MonitoringController::class, 'destroy'])->name('destroy');
-        Route::post('/device/{id}/export', [MonitoringController::class, 'exportCsv'])->name('export');
+        Route::match(['get', 'post'], '/device/{id}/export', [MonitoringController::class, 'exportCsv'])->name('export');
         Route::post('/device/{id}/output/{outputId}/toggle', [MonitoringController::class, 'toggleOutput'])->name('output.toggle');
         Route::post('/device/{id}/pump/control', [MonitoringController::class, 'controlPump'])->name('pump.control');
         Route::post('/device/{id}/output/{outputId}/irrigation-pump', [MonitoringController::class, 'controlIrrigationPump'])->name('irrigation.pump');

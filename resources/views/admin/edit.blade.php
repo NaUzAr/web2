@@ -217,6 +217,62 @@
             font-size: 0.7rem;
             color: var(--text-secondary);
         }
+
+        /* ========= Mobile Responsive ========= */
+        @media (max-width: 768px) {
+            .container.py-5 {
+                padding: 1.25rem 0.75rem !important;
+            }
+
+            .glass-card {
+                border-radius: 16px;
+            }
+
+            .card-header-gradient {
+                padding: 1rem 1.25rem;
+                border-radius: 16px 16px 0 0 !important;
+            }
+
+            .card-header-gradient h4 {
+                font-size: 1.1rem;
+            }
+
+            .card-body {
+                padding: 1.25rem !important;
+            }
+
+            .form-control {
+                font-size: 16px;
+                min-height: 48px;
+            }
+
+            #mapPicker {
+                height: 200px !important;
+            }
+
+            .info-box {
+                padding: 0.75rem;
+            }
+
+            .d-flex.gap-3.mt-4 {
+                flex-direction: column;
+            }
+
+            .d-flex.gap-3.mt-4 .btn {
+                width: 100%;
+                text-align: center;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .container.py-5 {
+                padding: 1rem 0.5rem !important;
+            }
+
+            .card-body {
+                padding: 1rem !important;
+            }
+        }
     </style>
 </head>
 

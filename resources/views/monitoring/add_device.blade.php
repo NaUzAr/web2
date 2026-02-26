@@ -124,6 +124,53 @@
             background: rgba(0, 0, 0, 0.05);
             color: #1f2937;
         }
+
+        /* ========= Mobile Responsive ========= */
+        @media (max-width: 576px) {
+            body {
+                padding: 1rem;
+                align-items: flex-start;
+                padding-top: 2rem;
+            }
+
+            .add-card {
+                padding: 1.75rem 1.5rem;
+                border-radius: 20px;
+            }
+
+            .card-icon {
+                width: 60px;
+                height: 60px;
+                font-size: 2rem;
+                border-radius: 16px;
+                margin-bottom: 1rem;
+            }
+
+            .card-title {
+                font-size: 1.15rem;
+            }
+
+            .card-subtitle {
+                font-size: 0.85rem;
+                margin-bottom: 1.5rem;
+            }
+
+            .form-control {
+                font-size: 16px;
+                min-height: 48px;
+            }
+        }
+
+        @media (max-width: 400px) {
+            body {
+                padding: 0.75rem;
+                padding-top: 1.5rem;
+            }
+
+            .add-card {
+                padding: 1.5rem 1.25rem;
+            }
+        }
     </style>
 </head>
 

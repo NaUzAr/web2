@@ -215,6 +215,65 @@
             padding: 0.25rem 0.75rem;
             border-radius: 20px;
         }
+
+        /* ========= Mobile Responsive ========= */
+        @media (max-width: 768px) {
+            .container.py-4 {
+                padding: 1rem 0.75rem !important;
+            }
+
+            .glass-card {
+                padding: 1.25rem;
+                border-radius: 16px;
+            }
+
+            .glass-card h4 {
+                font-size: 1.1rem;
+            }
+
+            .form-control,
+            .form-select {
+                font-size: 16px;
+                min-height: 46px;
+            }
+
+            /* Type cards 1 column */
+            .row.g-3.mb-4 .col-md-4 {
+                flex: 0 0 100%;
+                max-width: 100%;
+            }
+
+            /* Map smaller */
+            #mapPicker {
+                height: 200px !important;
+            }
+
+            /* Sensor/output rows compact */
+            .sensor-row,
+            .output-row {
+                flex-wrap: wrap;
+            }
+
+            /* Quick add buttons wrap better */
+            .d-flex.flex-wrap.gap-2 {
+                gap: 0.35rem !important;
+            }
+
+            .d-flex.flex-wrap.gap-2 .btn {
+                font-size: 0.75rem;
+                padding: 0.3rem 0.6rem;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .container.py-4 {
+                padding: 0.75rem 0.5rem !important;
+            }
+
+            .glass-card {
+                padding: 1rem;
+            }
+        }
     </style>
 </head>
 

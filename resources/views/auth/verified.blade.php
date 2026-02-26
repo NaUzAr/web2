@@ -83,6 +83,36 @@
             box-shadow: 0 8px 20px rgba(16, 185, 129, 0.35);
             color: white;
         }
+
+        /* ========= Mobile Responsive ========= */
+        @media (max-width: 576px) {
+            .verified-box {
+                padding: 1.5rem;
+            }
+
+            .verified-icon {
+                width: 60px;
+                height: 60px;
+                margin-bottom: 1rem;
+            }
+
+            .verified-icon i {
+                font-size: 2rem;
+            }
+
+            .verified-title {
+                font-size: 1.25rem;
+            }
+
+            .verified-desc {
+                font-size: 0.85rem;
+            }
+
+            .btn-login {
+                width: 100%;
+                justify-content: center;
+            }
+        }
     </style>
 </head>
 

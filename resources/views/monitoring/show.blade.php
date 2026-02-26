@@ -744,17 +744,12 @@
 
                     @foreach($sortedOutputs as $output)
                         <div class="col-6 col-md-4 col-lg-3">
-                            <div class="output-card" id="output-card-{{ $output->id }}"
-                                @if(in_array($output->output_name, ['sts_air_baku', 'sts_air_pupuk']))
-                                    style="background: rgba(34, 197, 94, 0.08); border-color: rgba(34, 197, 94, 0.3);"
-                                @endif
-                            >
-                                <div class="output-icon"
-                                    @if(in_array($output->output_name, ['sts_air_baku', 'sts_air_pupuk']))
-                                        style="background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);"
-                                    @endif
-                                >
-                                    <i class="bi {{ in_array($output->output_name, ['sts_air_baku', 'sts_air_pupuk']) ? 'bi-water' : 'bi-toggle-on' }} text-white"></i>
+                            <div class="output-card" id="output-card-{{ $output->id }}" @if(in_array($output->output_name, ['sts_air_baku', 'sts_air_pupuk']))
+                            style="background: rgba(34, 197, 94, 0.08); border-color: rgba(34, 197, 94, 0.3);" @endif>
+                                <div class="output-icon" @if(in_array($output->output_name, ['sts_air_baku', 'sts_air_pupuk']))
+                                style="background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);" @endif>
+                                    <i
+                                        class="bi {{ in_array($output->output_name, ['sts_air_baku', 'sts_air_pupuk']) ? 'bi-water' : 'bi-toggle-on' }} text-white"></i>
                                 </div>
                                 <div class="output-label">{{ $output->output_label }}</div>
 
@@ -1133,8 +1128,7 @@
                         </h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
-                    <form action="{{ route('monitoring.export', $userDevice->id) }}" method="POST">
-                        @csrf
+                    <form action="{{ route('monitoring.export', $userDevice->id) }}" method="GET">
                         <div class="modal-body">
                             <p class="mb-4" style="color: var(--text-secondary);">Pilih rentang tanggal untuk data yang
                                 ingin di-download:</p>
@@ -1690,7 +1684,7 @@
                     @else
                         const response = await fetch('{{ route("monitoring.status", $userDevice->id) }}');
                     @endif
-                                                                                                                                                                                const data = await response.json();
+                                                                                                                                                                                    const data = await response.json();
 
                     if (data.success) {
                         if (data.outputs) {

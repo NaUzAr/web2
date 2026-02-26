@@ -135,6 +135,83 @@
         .empty-state a {
             color: var(--primary-light);
         }
+
+        /* ========= Mobile Responsive ========= */
+        @media (max-width: 768px) {
+            .container.py-5 {
+                padding: 1.5rem 0.75rem !important;
+            }
+
+            .page-title {
+                font-size: 1.25rem;
+            }
+
+            .d-flex.justify-content-between.align-items-center.mb-4 {
+                flex-direction: column;
+                gap: 0.75rem;
+                align-items: stretch !important;
+            }
+
+            .glass-card {
+                border-radius: 16px;
+                padding: 0.5rem;
+            }
+
+            /* Table → Card Layout */
+            .table thead {
+                display: none;
+            }
+
+            .table tbody tr {
+                display: block;
+                background: var(--glass-bg);
+                border: 1px solid var(--glass-border);
+                border-radius: 12px;
+                padding: 0.75rem;
+                margin-bottom: 0.75rem;
+            }
+
+            .table tbody td {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 0.35rem 0.5rem;
+                border: none;
+                font-size: 0.85rem;
+            }
+
+            .table tbody td::before {
+                content: attr(data-label);
+                font-weight: 600;
+                font-size: 0.75rem;
+                color: var(--text-secondary);
+                margin-right: 0.75rem;
+                flex-shrink: 0;
+            }
+
+            .table tbody td:last-child {
+                justify-content: flex-end;
+                padding-top: 0.5rem;
+                border-top: 1px solid var(--glass-border);
+                margin-top: 0.25rem;
+            }
+
+            /* Hide less important on small screens */
+            .table tbody td.d-mobile-none {
+                display: none;
+            }
+
+            .btn-action {
+                width: 40px;
+                height: 40px;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .container.py-5 {
+                padding: 1rem 0.5rem !important;
+            }
+        }
     </style>
 </head>
 
@@ -192,22 +269,22 @@
                     <tbody>
                         @forelse($devices as $device)
                             <tr>
-                                <td class="fw-semibold">{{ $loop->iteration }}</td>
-                                <td>
+                                <td data-label="#" class="fw-semibold">{{ $loop->iteration }}</td>
+                                <td data-label="Device">
                                     <a href="{{ route('admin.device.monitoring', $device->id) }}"
                                         class="text-decoration-none">
                                         <div class="fw-bold" style="color: #1f2937;">{{ $device->name }}</div>
                                         <small style="color: #64748b;">{{ $device->table_name }}</small>
                                     </a>
                                 </td>
-                                <td>
+                                <td data-label="Tipe">
                                     <span class="badge-type">
                                         <i
                                             class="bi {{ $device->type === 'aws' ? 'bi-cloud-sun' : 'bi-flower1' }} me-1"></i>
                                         {{ strtoupper($device->type ?? 'N/A') }}
                                     </span>
                                 </td>
-                                <td>
+                                <td data-label="Sensors">
                                     @if($device->sensors->count() > 0)
                                         @foreach($device->sensors->take(4) as $sensor)
                                             <span class="badge-sensor" title="{{ $sensor->sensor_label }}">
@@ -218,10 +295,10 @@
                                             <span class="badge-sensor">+{{ $device->sensors->count() - 4 }}</span>
                                         @endif
                                     @else
-                                        <span class="text-white-50">-</span>
+                                        <span style="color: var(--text-secondary);">-</span>
                                     @endif
                                 </td>
-                                <td>
+                                <td data-label="Outputs">
                                     @if($device->outputs->count() > 0)
                                         @foreach($device->outputs->take(3) as $output)
                                             <span class="badge-output" title="{{ $output->output_label }}">
@@ -232,16 +309,16 @@
                                             <span class="badge-output">+{{ $device->outputs->count() - 3 }}</span>
                                         @endif
                                     @else
-                                        <span class="text-white-50">-</span>
+                                        <span style="color: var(--text-secondary);">-</span>
                                     @endif
                                 </td>
-                                <td>
+                                <td data-label="MQTT" class="d-mobile-none">
                                     <code class="text-info">{{ $device->mqtt_topic }}</code>
                                 </td>
-                                <td>
+                                <td data-label="Token" class="d-mobile-none">
                                     <span class="badge-token">{{ $device->token }}</span>
                                 </td>
-                                <td class="text-center">
+                                <td data-label="" class="text-center">
                                     <a href="{{ route('admin.device.edit', $device->id) }}"
                                         class="btn-action btn-action-edit" title="Edit">
                                         <i class="bi bi-pencil"></i>

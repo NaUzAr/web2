@@ -155,6 +155,51 @@
         .tips-box li {
             margin-bottom: 0.25rem;
         }
+
+        /* ========= Mobile Responsive ========= */
+        @media (max-width: 576px) {
+            body {
+                padding: 1rem;
+                align-items: flex-start;
+                padding-top: 2rem;
+            }
+
+            .verify-card {
+                padding: 1.75rem 1.5rem;
+                border-radius: 20px;
+            }
+
+            .verify-icon {
+                width: 70px;
+                height: 70px;
+                font-size: 2.25rem;
+                margin-bottom: 1rem;
+            }
+
+            .verify-title {
+                font-size: 1.25rem;
+            }
+
+            .verify-subtitle {
+                font-size: 0.85rem;
+            }
+
+            .btn-resend {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 400px) {
+            body {
+                padding: 0.75rem;
+                padding-top: 1.5rem;
+            }
+
+            .verify-card {
+                padding: 1.5rem 1.25rem;
+            }
+        }
     </style>
 </head>
 

@@ -152,6 +152,56 @@
         .btn-primary:hover {
             opacity: 0.9;
         }
+
+        /* ========= Mobile Responsive ========= */
+        @media (max-width: 768px) {
+            .container.py-4 {
+                padding: 1rem 0.75rem !important;
+            }
+
+            .page-header {
+                padding: 1rem 1.25rem;
+                border-radius: 16px;
+            }
+
+            .device-title {
+                font-size: 1.15rem;
+            }
+
+            .sensor-card .px-4 {
+                padding-left: 1rem !important;
+                padding-right: 1rem !important;
+            }
+
+            .sensor-card .p-4 {
+                padding: 1rem !important;
+            }
+
+            .sensor-card h4 {
+                font-size: 1rem;
+            }
+
+            /* Modal touch-friendly */
+            .form-glass {
+                font-size: 16px;
+                min-height: 48px;
+            }
+
+            .btn-icon {
+                width: 40px;
+                height: 40px;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .container.py-4 {
+                padding: 0.75rem 0.5rem !important;
+            }
+
+            .page-header {
+                padding: 0.75rem 1rem;
+            }
+        }
     </style>
 </head>
 
