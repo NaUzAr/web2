@@ -266,15 +266,15 @@ class MonitoringController extends Controller
             $name = strtolower($output->output_name);
 
             // 1. Specific Pumps (Dosing & pH)
-            if (str_contains($name, 'pump_ab') || str_contains($name, 'dosing')) {
+            if (str_contains($name, 'pump_ab') || str_contains($name, 'dosing') || $name === 'st_dos') {
                 $message = "<pmpAB#{$val}#>";
-            } elseif (str_contains($name, 'ph_up') || str_contains($name, 'ph1')) {
+            } elseif (str_contains($name, 'ph_up') || str_contains($name, 'ph1') || $name === 'st_ph_u') {
                 $message = "<pmpPH#{$val}#>";
-            } elseif (str_contains($name, 'ph_down') || str_contains($name, 'ph2')) {
+            } elseif (str_contains($name, 'ph_down') || str_contains($name, 'ph2') || $name === 'st_ph_d') {
                 $message = "<pmpPH2#{$val}#>";
             }
             // 2. Main Pump (Pompa Utama / Irigasi)
-            elseif (str_contains($name, 'pompa') || str_contains($name, 'pump')) {
+            elseif (str_contains($name, 'pompa') || str_contains($name, 'pump') || $name === 'st_pmp') {
                 if ($newValue) {
                     $message = "<PMP_ON#0#0#>";
                 } else {
@@ -282,18 +282,24 @@ class MonitoringController extends Controller
                 }
             }
             // 3. Components
-            elseif (str_contains($name, 'air_input')) {
+            elseif (str_contains($name, 'air_input') || $name === 'st_air') {
                 $message = "<AIR#{$val}#>";
             } elseif (str_contains($name, 'mix')) {
                 $message = "<MIX#{$val}#>";
-            } elseif (str_contains($name, 'fan')) {
+            } elseif (str_contains($name, 'fan') || $name === 'st_fa') {
                 $message = "<FAN#{$val}#>";
-            } elseif (str_contains($name, 'mist')) {
+            } elseif (str_contains($name, 'mist') || $name === 'st_mis') {
                 $message = "<MIS#{$val}#>";
-            } elseif (str_contains($name, 'lamp')) {
+            } elseif (str_contains($name, 'lamp') || $name === 'st_lam') {
                 $message = "<LAM#{$val}#>";
             }
-            // 4. Fallback
+            // 4. Air Baku & Air Pupuk
+            elseif ($name === 'st_bak') {
+                $message = "<BAK#{$val}#>";
+            } elseif ($name === 'st_ppk') {
+                $message = "<PPK#{$val}#>";
+            }
+            // 5. Fallback
             else {
                 $message = sprintf('<%s#%s#>', $output->output_name, $val);
             }
