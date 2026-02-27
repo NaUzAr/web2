@@ -812,6 +812,14 @@
                         $sortedOutputs = $outputs->where('output_type', '!=', 'multi_zone')->sortBy(function ($output) {
                             $name = strtolower($output->output_name);
 
+                            // Paling bawah khusus Air Baku Valve dan Air Pupuk Valve
+                            if (in_array($name, ['st_bak', 'st_ppk']))
+                                return 100;
+
+                            // Display-only status outputs
+                            if (str_starts_with($name, 'st_'))
+                                return 95;
+
                             // Priority Mapping
                             if (str_contains($name, 'pompa') || str_contains($name, 'pump') && !str_contains($name, 'ab') && !str_contains($name, 'ph'))
                                 return 10;
@@ -827,18 +835,12 @@
                                 return 50;
                             if (str_contains($name, 'fan'))
                                 return 51;
+                            if (str_contains($name, 'air'))
+                                return 52;
                             if (str_contains($name, 'lamp'))
                                 return 53;
                             if (str_contains($name, 'mix'))
                                 return 54;
-
-                            // Display-only valves (paling bawah)
-                            if ($name === 'sts_air_baku' || $name === 'sts_air_pupuk')
-                                return 95;
-
-                            // Other air-related
-                            if (str_contains($name, 'air'))
-                                return 52;
 
                             return 99; // Default priority
                         })->values();
@@ -886,17 +888,18 @@
 
                     @foreach($sortedOutputs as $output)
                         <div class="col-6 col-md-4 col-lg-3">
-                            <div class="output-card" id="output-card-{{ $output->id }}" @if(in_array($output->output_name, ['sts_air_baku', 'sts_air_pupuk']))
-                            style="background: rgba(34, 197, 94, 0.08); border-color: rgba(34, 197, 94, 0.3);" @endif>
-                                <div class="output-icon" @if(in_array($output->output_name, ['sts_air_baku', 'sts_air_pupuk']))
+                            <div class="output-card" id="output-card-{{ $output->id }}"
+                                @if(str_starts_with($output->output_name, 'sts_') || in_array($output->output_name, ['st_bak', 'st_ppk']))
+                                style="background: rgba(34, 197, 94, 0.08); border-color: rgba(34, 197, 94, 0.3);" @endif>
+                                <div class="output-icon" @if(str_starts_with($output->output_name, 'sts_') || in_array($output->output_name, ['st_bak', 'st_ppk']))
                                 style="background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);" @endif>
                                     <i
-                                        class="bi {{ in_array($output->output_name, ['sts_air_baku', 'sts_air_pupuk']) ? 'bi-water' : 'bi-toggle-on' }} text-white"></i>
+                                        class="bi {{ (str_starts_with($output->output_name, 'sts_') || in_array($output->output_name, ['st_bak', 'st_ppk'])) ? 'bi-water' : 'bi-toggle-on' }} text-white"></i>
                                 </div>
                                 <div class="output-label">{{ $output->output_label }}</div>
 
                                 @if($output->output_type === 'boolean')
-                                    @if(in_array($output->output_name, ['sts_air_baku', 'sts_air_pupuk']))
+                                    @if(str_starts_with($output->output_name, 'sts_') || in_array($output->output_name, ['st_bak', 'st_ppk']))
                                         {{-- Display-only status for Air Baku & Air Pupuk Valve --}}
                                         <div class="d-flex justify-content-center mt-1">
                                             <span
@@ -1826,7 +1829,7 @@
                     @else
                         const response = await fetch('{{ route("monitoring.status", $userDevice->id) }}');
                     @endif
-                                                                                                                                                                                        const data = await response.json();
+                                                                                                                                                                                                    const data = await response.json();
 
                     if (data.success) {
                         if (data.outputs) {

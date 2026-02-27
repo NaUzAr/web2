@@ -22,3 +22,8 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
+setup_mqtt.sh
+setup_nginx.sh
+setup_postgres.sh
+setup-laravel-project.sh
+setup-server.sh
