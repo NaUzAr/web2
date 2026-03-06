@@ -8,6 +8,7 @@ use App\Models\UserDevice;
 use App\Models\DeviceOutput;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use App\Models\ActivityLog;
 
 class MonitoringController extends Controller
 {
@@ -18,9 +19,29 @@ class MonitoringController extends Controller
     {
         $userDevices = UserDevice::with(['device.sensors'])
             ->where('user_id', Auth::id())
+            ->orderBy('is_favorite', 'desc')
+            ->orderBy('created_at', 'desc')
             ->get();
 
         return view('monitoring.index', compact('userDevices'));
+    }
+
+    /**
+     * Toggle favorite status device
+     */
+    public function toggleFavorite($id)
+    {
+        $userDevice = UserDevice::where('user_id', Auth::id())
+            ->where('id', $id)
+            ->firstOrFail();
+
+        $userDevice->is_favorite = !$userDevice->is_favorite;
+        $userDevice->save();
+
+        return response()->json([
+            'success' => true,
+            'is_favorite' => $userDevice->is_favorite,
+        ]);
     }
 
     /**
@@ -66,6 +87,8 @@ class MonitoringController extends Controller
             'device_id' => $device->id,
             'custom_name' => $request->custom_name ?: $device->name,
         ]);
+
+        ActivityLog::log('add_device', "Menambahkan device '{$device->name}' ke monitoring");
 
         return redirect()->route('monitoring.index')
             ->with('success', "Device '{$device->name}' berhasil ditambahkan ke monitoring!");
@@ -146,6 +169,8 @@ class MonitoringController extends Controller
 
         $deviceName = $userDevice->custom_name;
         $userDevice->delete();
+
+        ActivityLog::log('remove_device', "Menghapus device '{$deviceName}' dari monitoring");
 
         return redirect()->route('monitoring.index')
             ->with('success', "Device '{$deviceName}' berhasil dihapus dari monitoring.");

@@ -179,12 +179,19 @@
                     placeholder="Masukkan username" required autofocus>
             </div>
 
-            <div class="mb-4">
+            <div class="mb-3">
                 <label for="password" class="form-label">
                     <i class="bi bi-lock me-1"></i>Password
                 </label>
                 <input type="password" class="form-control" id="password" name="password"
                     placeholder="Masukkan password" required>
+            </div>
+
+            <div class="mb-4 text-end">
+                <a href="{{ route('password.request') }}"
+                    style="color: var(--primary-light, #38bdf8); font-size: 0.85rem; text-decoration: none;">
+                    Lupa Password?
+                </a>
             </div>
 
             <div class="d-grid gap-2 mb-4">

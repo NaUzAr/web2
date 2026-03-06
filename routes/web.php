@@ -6,9 +6,14 @@ use App\Http\Controllers\AdminDeviceController;
 use App\Http\Controllers\MonitoringController;
 use App\Http\Controllers\AutomationConfigController;
 use App\Http\Controllers\ScheduleController;
+use App\Http\Controllers\ChatbotController;
+use App\Http\Controllers\ForgotPasswordController;
+use App\Http\Controllers\ActivityLogController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
 
+// Chatbot
+Route::post('/chatbot', [ChatbotController::class, 'respond'])->name('chatbot.respond');
 
 Route::middleware(['auth', 'verified'])->group(function () {
 
@@ -35,6 +40,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // Toggle Output (Admin)
         Route::post('/device/{deviceId}/output/{outputId}/toggle', [AdminDeviceController::class, 'toggleOutput'])->name('device.output.toggle');
 
+        // Activity Logs
+        Route::get('/activity-logs', [ActivityLogController::class, 'index'])->name('activity-logs');
 
 
         // Status (Admin Polling)
@@ -53,6 +60,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/device/{id}/pump/control', [MonitoringController::class, 'controlPump'])->name('pump.control');
         Route::post('/device/{id}/output/{outputId}/irrigation-pump', [MonitoringController::class, 'controlIrrigationPump'])->name('irrigation.pump');
         Route::get('/device/{id}/status', [MonitoringController::class, 'getStatus'])->name('status');
+        Route::post('/device/{id}/favorite', [MonitoringController::class, 'toggleFavorite'])->name('favorite');
     });
 
     // === AUTOMATION ROUTES (untuk user kelola automation) ===
@@ -140,4 +148,10 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 // --- REGISTER ---
 Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('register');
 Route::post('/register', [AuthController::class, 'register'])->name('register.perform');
+
+// --- FORGOT PASSWORD ---
+Route::get('/password/forgot', [ForgotPasswordController::class, 'showForm'])->name('password.request');
+Route::post('/password/forgot', [ForgotPasswordController::class, 'sendResetLink'])->name('password.email');
+Route::get('/password/reset/{token}', [ForgotPasswordController::class, 'showResetForm'])->name('password.reset');
+Route::post('/password/reset', [ForgotPasswordController::class, 'resetPassword'])->name('password.update');
 

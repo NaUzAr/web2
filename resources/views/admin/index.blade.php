@@ -226,6 +226,9 @@
                 <span class="fw-bold" style="color: var(--navbar_text, #333);">Swaratani IoT</span>
             </a>
             <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="{{ route('admin.activity-logs') }}">
+                    <i class="bi bi-journal-text me-1"></i> Activity Logs
+                </a>
                 <a class="nav-link" href="{{ route('home') }}">
                     <i class="bi bi-house me-1"></i> Beranda
                 </a>
@@ -239,6 +242,9 @@
                 <i class="bi bi-cpu-fill me-2"></i>Device Management
             </h2>
             <div class="d-flex gap-2">
+                <a href="{{ route('admin.activity-logs') }}" class="btn btn-outline-light">
+                    <i class="bi bi-journal-text me-1"></i> Logs
+                </a>
                 <a href="{{ route('admin.device.create') }}" class="btn btn-gradient">
                     <i class="bi bi-plus-lg me-1"></i> Tambah Device
                 </a>

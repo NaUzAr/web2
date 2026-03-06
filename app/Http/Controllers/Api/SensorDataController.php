@@ -78,6 +78,10 @@ class SensorDataController extends Controller
             // Insert ke database
             DB::table($tableName)->insert($insertData);
 
+            // Update last_seen_at for connection status
+            $device->last_seen_at = now();
+            $device->save();
+
             Log::info("Sensor data received", [
                 'device' => $device->name,
                 'token' => $token,

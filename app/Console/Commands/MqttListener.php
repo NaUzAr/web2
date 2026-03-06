@@ -357,6 +357,10 @@ class MqttListener extends Command
             DB::table($tableName)->insert($insertData);
             $this->info("           ✅ Sensor data saved to {$tableName} (" . count($buffer) . " values)");
 
+            // Update last_seen_at for connection status
+            $device->last_seen_at = now();
+            $device->save();
+
             // Clear buffer
             \Cache::forget($cacheKey);
             \Cache::forget($bufferTimeKey);

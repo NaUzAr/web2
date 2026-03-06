@@ -212,6 +212,98 @@
             opacity: 1;
         }
 
+        /* Favorite Button */
+        .btn-favorite {
+            background: rgba(100, 116, 139, 0.1);
+            border: 1px solid rgba(100, 116, 139, 0.3);
+            color: #94a3b8;
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+
+        .btn-favorite:hover {
+            color: #f59e0b;
+            border-color: #f59e0b;
+            background: rgba(245, 158, 11, 0.1);
+        }
+
+        .btn-favorite.active {
+            color: #f59e0b;
+            border-color: #f59e0b;
+            background: rgba(245, 158, 11, 0.15);
+        }
+
+        .btn-favorite.active:hover {
+            background: rgba(245, 158, 11, 0.25);
+        }
+
+        @keyframes starPop {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.4);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .btn-favorite.pop {
+            animation: starPop 0.3s ease;
+        }
+
+        /* Connection Status */
+        .connection-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+        }
+
+        .connection-status.online {
+            background: rgba(16, 185, 129, 0.12);
+            color: #10b981;
+        }
+
+        .connection-status.offline {
+            background: rgba(100, 116, 139, 0.12);
+            color: #94a3b8;
+        }
+
+        .connection-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .connection-dot.online {
+            background: #10b981;
+            box-shadow: 0 0 6px rgba(16, 185, 129, 0.6);
+        }
+
+        .connection-dot.offline {
+            background: #94a3b8;
+        }
+
+        .last-seen-text {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
         @media (max-width: 576px) {
             .page-title {
                 font-size: 1.5rem;
@@ -281,20 +373,41 @@
                                         </span>
                                     </div>
                                 </div>
-                                <form action="{{ route('monitoring.destroy', $userDevice->id) }}" method="POST"
-                                    onsubmit="return confirm('Hapus device ini dari monitoring?');">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn-delete" title="Hapus">
-                                        <i class="bi bi-trash"></i>
+                                <div class="d-flex gap-1">
+                                    <button class="btn-favorite {{ $userDevice->is_favorite ? 'active' : '' }}"
+                                        data-id="{{ $userDevice->id }}"
+                                        title="{{ $userDevice->is_favorite ? 'Hapus dari favorit' : 'Tambah ke favorit' }}">
+                                        <i class="bi {{ $userDevice->is_favorite ? 'bi-star-fill' : 'bi-star' }}"></i>
                                     </button>
-                                </form>
+                                    <form action="{{ route('monitoring.destroy', $userDevice->id) }}" method="POST"
+                                        onsubmit="return confirm('Hapus device ini dari monitoring?');">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn-delete" title="Hapus">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
                             </div>
 
-                            <p class="sensor-count mb-3">
-                                <i class="bi bi-thermometer-half me-1"></i>
-                                {{ $userDevice->device->sensors->count() }} Sensor Aktif
-                            </p>
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <p class="sensor-count mb-0">
+                                    <i class="bi bi-thermometer-half me-1"></i>
+                                    {{ $userDevice->device->sensors->count() }} Sensor Aktif
+                                </p>
+                                <div class="text-end">
+                                    @if($userDevice->device->isOnline())
+                                        <span class="connection-status online">
+                                            <span class="connection-dot online"></span> Online
+                                        </span>
+                                    @else
+                                        <span class="connection-status offline">
+                                            <span class="connection-dot offline"></span> Offline
+                                        </span>
+                                    @endif
+                                    <div class="last-seen-text">{{ $userDevice->device->lastSeenText() }}</div>
+                                </div>
+                            </div>
 
                             <a href="{{ route('monitoring.show', $userDevice->id) }}"
                                 class="btn-view w-100 d-block text-center">
@@ -317,6 +430,39 @@
     </div>
 
     @include('partials.pwa-scripts')
+    @include('partials.chatbot')
+
+    <script>
+        document.querySelectorAll('.btn-favorite').forEach(btn => {
+            btn.addEventListener('click', async function () {
+                const id = this.dataset.id;
+                const icon = this.querySelector('i');
+                const btn = this;
+
+                try {
+                    const res = await fetch(`/monitoring/device/${id}/favorite`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'Accept': 'application/json',
+                        },
+                    });
+
+                    const data = await res.json();
+                    if (data.success) {
+                        btn.classList.toggle('active', data.is_favorite);
+                        icon.className = data.is_favorite ? 'bi bi-star-fill' : 'bi bi-star';
+                        btn.title = data.is_favorite ? 'Hapus dari favorit' : 'Tambah ke favorit';
+                        btn.classList.add('pop');
+                        setTimeout(() => btn.classList.remove('pop'), 300);
+                    }
+                } catch (err) {
+                    console.error('Toggle favorite failed', err);
+                }
+            });
+        });
+    </script>
 </body>
 
 </html>

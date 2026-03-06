@@ -20,8 +20,35 @@ class Device extends Model
         'token',
         'table_name',
         'max_time_schedules',
-        'max_sensor_automations'
+        'max_sensor_automations',
+        'last_seen_at',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'last_seen_at' => 'datetime',
+        ];
+    }
+
+    /**
+     * Check if device is online (data received within last 5 minutes)
+     */
+    public function isOnline(): bool
+    {
+        return $this->last_seen_at && $this->last_seen_at->diffInMinutes(now()) < 5;
+    }
+
+    /**
+     * Get human-readable last seen text
+     */
+    public function lastSeenText(): string
+    {
+        if (!$this->last_seen_at) {
+            return 'Belum pernah terhubung';
+        }
+        return $this->last_seen_at->diffForHumans();
+    }
 
     /**
      * Relasi ke DeviceSensor (satu device punya banyak sensor)

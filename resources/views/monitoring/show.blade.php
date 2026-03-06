@@ -1502,7 +1502,7 @@
 
                             console.log('Irrigation pump ON:', data.message);
                         } else {
-                            alert('Gagal mengirim perintah pompa. Silakan coba lagi.');
+                            alert('Gagal mengirim perintah pompa: ' + (data.message || 'Silakan coba lagi.'));
                         }
                     })
                     .catch(error => {
@@ -1548,7 +1548,7 @@
 
                             console.log('Irrigation pump OFF:', data.message);
                         } else {
-                            alert('Gagal mematikan pompa. Silakan coba lagi.');
+                            alert('Gagal mematikan pompa: ' + (data.message || 'Silakan coba lagi.'));
                         }
                     })
                     .catch(error => {

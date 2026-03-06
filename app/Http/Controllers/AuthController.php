@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
+use App\Models\ActivityLog;
 
 class AuthController extends Controller
 {
@@ -51,6 +52,9 @@ class AuthController extends Controller
         Auth::login($user);
         $request->session()->regenerate();
 
+        // Log activity
+        ActivityLog::log('login', "User {$user->name} berhasil login");
+
         // Detect PWA mode
         if ($request->has('pwa') || $request->session()->get('is_pwa')) {
             $request->session()->put('is_pwa', true);
@@ -90,6 +94,9 @@ class AuthController extends Controller
     // Logout
     public function logout(Request $request)
     {
+        $userName = Auth::user()->name ?? 'Unknown';
+        ActivityLog::log('logout', "User {$userName} logout");
+
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
