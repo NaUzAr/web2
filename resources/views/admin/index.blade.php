@@ -127,17 +127,116 @@
             transform: translateY(-2px);
         }
 
-        /* QR Modal */
+        /* QR Modal & QRIS Card */
         .qr-modal .modal-content {
             background: var(--glass-bg, #fff);
             backdrop-filter: blur(20px);
             border: 1px solid var(--glass-border, #e2e8f0);
             border-radius: 24px;
+            overflow: hidden;
         }
 
-        .qr-modal .modal-header {
-            border-bottom: 1px solid var(--glass-border, #e2e8f0);
-            padding: 1.25rem 1.5rem;
+        .qris-card {
+            background: #ffffff;
+            width: 100%;
+            max-width: 340px;
+            margin: 0 auto;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        .qris-header {
+            background: linear-gradient(135deg, #0ea5e9 0%, #0369a1 100%);
+            padding: 1.5rem 1rem;
+            color: white;
+            text-align: center;
+        }
+
+        .qris-logo-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .qris-header-logo {
+            width: 48px;
+            height: 48px;
+            object-fit: contain;
+            background: white;
+            border-radius: 12px;
+            padding: 4px;
+        }
+
+        .qris-header-text {
+            text-align: left;
+        }
+
+        .qris-brand {
+            font-size: 1.25rem;
+            font-weight: 800;
+            letter-spacing: 1px;
+            line-height: 1.2;
+        }
+
+        .qris-sub {
+            font-size: 0.75rem;
+            font-weight: 500;
+            opacity: 0.9;
+            letter-spacing: 0.5px;
+        }
+
+        .qris-device-name {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: #1e293b;
+            text-align: center;
+            padding: 1.25rem 1rem 0.5rem;
+        }
+
+        .qris-qr-wrapper {
+            padding: 1rem;
+            display: flex;
+            justify-content: center;
+        }
+
+        .qris-qr-border {
+            background: white;
+            padding: 0.5rem;
+            border-radius: 20px;
+            box-shadow: inset 0 0 0 2px rgba(14, 165, 233, 0.2);
+            position: relative;
+        }
+
+        .qris-qr-border::before {
+            content: '';
+            position: absolute;
+            top: -2px; left: -2px; right: -2px; bottom: -2px;
+            border-radius: 22px;
+            background: linear-gradient(135deg, #0ea5e9, #8b5cf6);
+            z-index: -1;
+        }
+
+        .qris-token {
+            font-family: monospace;
+            font-size: 1.25rem;
+            letter-spacing: 3px;
+            color: #334155;
+            text-align: center;
+            padding: 0.5rem;
+            font-weight: 600;
+        }
+
+        .qris-footer {
+            background: #f8fafc;
+            padding: 1rem;
+            text-align: center;
+            font-size: 0.85rem;
+            color: #64748b;
+            font-weight: 500;
+            border-top: 1px dashed #e2e8f0;
         }
 
         .qr-modal .modal-body {
@@ -453,7 +552,7 @@
                         <!-- QR Code area with gradient border -->
                         <div class="qris-qr-wrapper">
                             <div class="qris-qr-border">
-                                <canvas id="qrCanvas" width="280" height="280"></canvas>
+                                <div id="qrCanvas" style="width: 280px; height: 280px; display: flex; align-items: center; justify-content: center;"></div>
                             </div>
                         </div>
 
@@ -479,16 +578,14 @@
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- QRCode.js CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+    <!-- QR Code Styling - proper QR code library with built-in styling support -->
+    <script src="https://unpkg.com/qr-code-styling@1.6.0-rc.1/lib/qr-code-styling.js"></script>
     <!-- html2canvas for card download -->
     <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
     <script>
         let currentDeviceName = '';
-        const logoImg = new Image();
-        logoImg.crossOrigin = 'anonymous';
-        logoImg.src = '{{ asset("images/logo.png") }}';
+        let currentQrCode = null;
 
         function showQrModal(token, deviceName) {
             currentDeviceName = deviceName;
@@ -502,144 +599,59 @@
         }
 
         function generateQrisQr(text) {
-            const canvas = document.getElementById('qrCanvas');
-            const size = 280;
-            canvas.width = size;
-            canvas.height = size;
-            const ctx = canvas.getContext('2d');
+            const container = document.getElementById('qrCanvas').parentElement;
 
-            // Create temp container for QR generation
-            const tempDiv = document.createElement('div');
-            tempDiv.style.cssText = 'position:absolute;left:-9999px;top:-9999px;';
-            document.body.appendChild(tempDiv);
+            // Remove old canvas
+            const oldCanvas = document.getElementById('qrCanvas');
+            if (oldCanvas) oldCanvas.remove();
 
-            const tempCanvas = document.createElement('canvas');
-            tempCanvas.width = size;
-            tempCanvas.height = size;
-            tempDiv.appendChild(tempCanvas);
+            // Create new container div for qr-code-styling
+            const qrDiv = document.createElement('div');
+            qrDiv.id = 'qrCanvas';
+            qrDiv.style.width = '280px';
+            qrDiv.style.height = '280px';
+            qrDiv.style.display = 'flex';
+            qrDiv.style.alignItems = 'center';
+            qrDiv.style.justifyContent = 'center';
+            container.appendChild(qrDiv);
 
-            const qr = new QRCode(tempDiv, {
-                text: text,
-                width: size,
-                height: size,
-                colorDark: '#000000',
-                colorLight: '#ffffff',
-                correctLevel: QRCode.CorrectLevel.H,
+            // Use qr-code-styling for proper, scannable QR codes
+            currentQrCode = new QRCodeStyling({
+                width: 280,
+                height: 280,
+                type: "canvas",
+                data: text,
+                margin: 8,
+                qrOptions: {
+                    typeNumber: 0,
+                    mode: "Byte",
+                    errorCorrectionLevel: "H"
+                },
+                imageOptions: {
+                    hideBackgroundDots: true,
+                    imageSize: 0.35,
+                    margin: 6,
+                    crossOrigin: "anonymous",
+                },
+                image: "{{ asset('images/logo.png') }}",
+                dotsOptions: {
+                    color: "#0c4a6e",
+                    type: "rounded"
+                },
+                cornersSquareOptions: {
+                    color: "#0369a1",
+                    type: "extra-rounded"
+                },
+                cornersDotOptions: {
+                    color: "#0ea5e9",
+                    type: "dot"
+                },
+                backgroundOptions: {
+                    color: "#ffffff",
+                }
             });
 
-            setTimeout(function() {
-                const qrSource = tempDiv.querySelector('canvas') || tempDiv.querySelector('img');
-                if (!qrSource) {
-                    document.body.removeChild(tempDiv);
-                    return;
-                }
-
-                // Get QR data from the generated image
-                const tempCtx = document.createElement('canvas').getContext('2d');
-                const tempC = tempCtx.canvas;
-                tempC.width = size;
-                tempC.height = size;
-                tempCtx.drawImage(qrSource, 0, 0, size, size);
-                const imageData = tempCtx.getImageData(0, 0, size, size);
-
-                // Clear main canvas
-                ctx.fillStyle = '#ffffff';
-                ctx.fillRect(0, 0, size, size);
-
-                // Draw QR modules as rounded dots
-                const moduleCount = 33; // QR version for 16 chars + H correction
-                const moduleSize = size / moduleCount;
-                const dotRadius = moduleSize * 0.38;
-
-                // Gradient colors for dots
-                const gradient1 = ctx.createLinearGradient(0, 0, size, size);
-                gradient1.addColorStop(0, '#0369a1');
-                gradient1.addColorStop(0.5, '#0ea5e9');
-                gradient1.addColorStop(1, '#0d9488');
-
-                for (let row = 0; row < moduleCount; row++) {
-                    for (let col = 0; col < moduleCount; col++) {
-                        const px = Math.floor((col + 0.5) * (size / moduleCount));
-                        const py = Math.floor((row + 0.5) * (size / moduleCount));
-
-                        // Sample pixel from QR image
-                        const idx = (py * size + px) * 4;
-                        const isDark = imageData.data[idx] < 128;
-
-                        if (isDark) {
-                            const cx = col * moduleSize + moduleSize / 2;
-                            const cy = row * moduleSize + moduleSize / 2;
-
-                            // Check if this is part of finder pattern (corners)
-                            const isFinderPattern =
-                                (row < 7 && col < 7) ||
-                                (row < 7 && col >= moduleCount - 7) ||
-                                (row >= moduleCount - 7 && col < 7);
-
-                            if (isFinderPattern) {
-                                // Draw finder patterns as squares with rounded corners
-                                ctx.fillStyle = '#0369a1';
-                                roundRect(ctx, col * moduleSize + 0.5, row * moduleSize + 0.5,
-                                    moduleSize - 1, moduleSize - 1, 1.5);
-                                ctx.fill();
-                            } else {
-                                // Draw regular modules as circles
-                                ctx.fillStyle = '#1e3a5f';
-                                ctx.beginPath();
-                                ctx.arc(cx, cy, dotRadius, 0, Math.PI * 2);
-                                ctx.fill();
-                            }
-                        }
-                    }
-                }
-
-                // Draw logo in center
-                if (logoImg.complete && logoImg.naturalWidth > 0) {
-                    drawCenteredLogo(ctx, size);
-                } else {
-                    logoImg.onload = function() { drawCenteredLogo(ctx, size); };
-                }
-
-                document.body.removeChild(tempDiv);
-            }, 400);
-        }
-
-        function drawCenteredLogo(ctx, size) {
-            const logoSize = size * 0.2;
-            const cx = size / 2;
-            const cy = size / 2;
-            const padding = 8;
-            const totalSize = logoSize + padding * 2;
-
-            // White circle background
-            ctx.fillStyle = '#ffffff';
-            ctx.beginPath();
-            ctx.arc(cx, cy, totalSize / 2 + 2, 0, Math.PI * 2);
-            ctx.fill();
-
-            // Gradient border ring
-            ctx.strokeStyle = '#0ea5e9';
-            ctx.lineWidth = 2.5;
-            ctx.beginPath();
-            ctx.arc(cx, cy, totalSize / 2 + 2, 0, Math.PI * 2);
-            ctx.stroke();
-
-            // Draw logo
-            ctx.drawImage(logoImg, cx - logoSize / 2, cy - logoSize / 2, logoSize, logoSize);
-        }
-
-        function roundRect(ctx, x, y, width, height, radius) {
-            ctx.beginPath();
-            ctx.moveTo(x + radius, y);
-            ctx.lineTo(x + width - radius, y);
-            ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
-            ctx.lineTo(x + width, y + height - radius);
-            ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
-            ctx.lineTo(x + radius, y + height);
-            ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
-            ctx.lineTo(x, y + radius);
-            ctx.quadraticCurveTo(x, y, x + radius, y);
-            ctx.closePath();
+            currentQrCode.append(qrDiv);
         }
 
         function downloadQr() {
