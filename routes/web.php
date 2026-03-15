@@ -9,11 +9,15 @@ use App\Http\Controllers\ScheduleController;
 use App\Http\Controllers\ChatbotController;
 use App\Http\Controllers\ForgotPasswordController;
 use App\Http\Controllers\ActivityLogController;
+use App\Http\Controllers\WebViewAuthController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
 
 // Chatbot
 Route::post('/chatbot', [ChatbotController::class, 'respond'])->name('chatbot.respond');
+
+// === WEBVIEW AUTO-LOGIN (From Flutter) ===
+Route::get('/webview/auto-login', [WebViewAuthController::class, 'autoLogin'])->name('webview.auto-login');
 
 Route::middleware(['auth', 'verified'])->group(function () {
 

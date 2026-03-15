@@ -125,6 +125,55 @@
             color: #1f2937;
         }
 
+        /* ========= QR Scanner ========= */
+        .btn-outline-scan {
+            background: transparent;
+            border: 2px dashed var(--primary-color, #0ea5e9);
+            color: var(--primary-color, #0ea5e9);
+            border-radius: 12px;
+            padding: 0.75rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-outline-scan:hover {
+            background: rgba(14, 165, 233, 0.1);
+            border-style: solid;
+            color: var(--primary-dark, #0369a1);
+        }
+
+        .btn-outline-scan.scanning {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: #ef4444;
+            border-style: solid;
+            color: #ef4444;
+        }
+
+        .btn-outline-scan-img {
+            background: transparent;
+            border: 2px dashed #8b5cf6;
+            color: #8b5cf6;
+            border-radius: 12px;
+            padding: 0.75rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-outline-scan-img:hover {
+            background: rgba(139, 92, 246, 0.1);
+            border-style: solid;
+            color: #7c3aed;
+        }
+
+        #qrReader {
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        #qrReader video {
+            border-radius: 12px;
+        }
+
         /* ========= Mobile Responsive ========= */
         @media (max-width: 576px) {
             body {
@@ -199,10 +248,32 @@
 
             <div class="mb-3">
                 <label class="form-label"><i class="bi bi-key me-1"></i>Token Device</label>
-                <input type="text" class="form-control" name="token" value="{{ old('token') }}"
+                <input type="text" class="form-control" name="token" id="tokenInput" value="{{ old('token') }}"
                     placeholder="XXXXXXXXXXXXXXXX" maxlength="16" required autofocus>
                 <div class="form-text form-text-light">
                     Token terdiri dari 16 karakter. Dapatkan dari admin.
+                </div>
+            </div>
+
+            <!-- QR Scanner Section -->
+            <div class="mb-3">
+                <div class="d-flex gap-2">
+                    <button type="button" class="btn btn-outline-scan flex-grow-1" id="btnScanQR" onclick="toggleScanner()">
+                        <i class="bi bi-camera me-2"></i>Scan Kamera
+                    </button>
+                    <button type="button" class="btn btn-outline-scan-img flex-grow-1" onclick="document.getElementById('qrImageInput').click()">
+                        <i class="bi bi-image me-2"></i>Scan dari Gambar
+                    </button>
+                    <input type="file" id="qrImageInput" accept="image/*" style="display:none" onchange="scanFromImage(this)">
+                </div>
+                <div id="qrScannerContainer" style="display: none;">
+                    <div id="qrReader" style="width: 100%; margin-top: 0.75rem; border-radius: 12px; overflow: hidden;"></div>
+                </div>
+                <div id="qrScanStatus" class="text-center mt-2" style="display: none;">
+                    <small class="text-success"><i class="bi bi-check-circle me-1"></i>Token berhasil di-scan!</small>
+                </div>
+                <div id="qrScanError" class="text-center mt-2" style="display: none;">
+                    <small class="text-danger"><i class="bi bi-x-circle me-1"></i>QR Code tidak ditemukan di gambar.</small>
                 </div>
             </div>
 
@@ -231,6 +302,146 @@
             </div>
         </form>
     </div>
+
+    <!-- html5-qrcode CDN -->
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+    <script>
+        let html5QrCode = null;
+        let scannerRunning = false;
+
+        function toggleScanner() {
+            if (scannerRunning) {
+                stopScanner();
+            } else {
+                startScanner();
+            }
+        }
+
+        function startScanner() {
+            const container = document.getElementById('qrScannerContainer');
+            const btn = document.getElementById('btnScanQR');
+            const statusEl = document.getElementById('qrScanStatus');
+            container.style.display = 'block';
+            statusEl.style.display = 'none';
+            btn.innerHTML = '<i class="bi bi-x-circle me-2"></i>Tutup Scanner';
+            btn.classList.add('scanning');
+
+            html5QrCode = new Html5Qrcode("qrReader");
+
+            const config = {
+                fps: 10,
+                qrbox: function(viewfinderWidth, viewfinderHeight) {
+                    let minEdge = Math.min(viewfinderWidth, viewfinderHeight);
+                    let qrboxSize = Math.floor(minEdge * 0.75);
+                    return { width: qrboxSize, height: qrboxSize };
+                },
+                aspectRatio: 1.0,
+            };
+
+            // Prefer rear camera on mobile devices
+            html5QrCode.start(
+                { facingMode: "environment" },
+                config,
+                onScanSuccess,
+                onScanFailure
+            ).catch(err => {
+                // Fallback: try any available camera
+                html5QrCode.start(
+                    { facingMode: "user" },
+                    config,
+                    onScanSuccess,
+                    onScanFailure
+                ).catch(err2 => {
+                    console.error("Camera error:", err2);
+                    alert("Tidak dapat mengakses kamera. Pastikan izin kamera diaktifkan dan halaman diakses via HTTPS.");
+                    stopScanner();
+                });
+            });
+
+            scannerRunning = true;
+        }
+
+        function stopScanner() {
+            const container = document.getElementById('qrScannerContainer');
+            const btn = document.getElementById('btnScanQR');
+            btn.innerHTML = '<i class="bi bi-qr-code-scan me-2"></i>Scan QR Code';
+            btn.classList.remove('scanning');
+
+            if (html5QrCode && scannerRunning) {
+                html5QrCode.stop().then(() => {
+                    html5QrCode.clear();
+                    container.style.display = 'none';
+                }).catch(err => {
+                    console.error("Stop error:", err);
+                    container.style.display = 'none';
+                });
+            } else {
+                container.style.display = 'none';
+            }
+            scannerRunning = false;
+        }
+
+        function onScanSuccess(decodedText, decodedResult) {
+            // Extract token: take up to 16 characters, remove whitespace
+            let token = decodedText.trim().replace(/\s/g, '');
+            if (token.length > 16) {
+                token = token.substring(0, 16);
+            }
+
+            // Fill the token field
+            const tokenInput = document.getElementById('tokenInput');
+            tokenInput.value = token;
+            tokenInput.focus();
+
+            // Show success status
+            const statusEl = document.getElementById('qrScanStatus');
+            statusEl.style.display = 'block';
+
+            // Add success animation to token field
+            tokenInput.style.borderColor = '#22c55e';
+            tokenInput.style.boxShadow = '0 0 0 3px rgba(34, 197, 94, 0.3)';
+            setTimeout(() => {
+                tokenInput.style.borderColor = '';
+                tokenInput.style.boxShadow = '';
+            }, 2000);
+
+            // Stop scanner after successful scan
+            stopScanner();
+            // Keep the success status visible
+            document.getElementById('qrScannerContainer').style.display = 'block';
+        }
+
+        function onScanFailure(error) {
+            // Ignore scan failures (continuous scanning)
+        }
+
+        function scanFromImage(input) {
+            if (!input.files || !input.files[0]) return;
+
+            const file = input.files[0];
+            const statusEl = document.getElementById('qrScanStatus');
+            const errorEl = document.getElementById('qrScanError');
+            statusEl.style.display = 'none';
+            errorEl.style.display = 'none';
+
+            // Stop camera scanner if running
+            if (scannerRunning) stopScanner();
+
+            const scanner = new Html5Qrcode('qrReader');
+            scanner.scanFileV2(file, true)
+                .then(result => {
+                    onScanSuccess(result.decodedText, result);
+                })
+                .catch(err => {
+                    console.error('Image scan error:', err);
+                    errorEl.style.display = 'block';
+                    setTimeout(() => { errorEl.style.display = 'none'; }, 3000);
+                });
+
+            // Reset file input so same file can be re-selected
+            input.value = '';
+        }
+    </script>
 
 </body>
 

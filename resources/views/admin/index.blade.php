@@ -105,6 +105,17 @@
             transform: translateY(-2px);
         }
 
+        .btn-action-qr {
+            background: rgba(14, 165, 233, 0.2);
+            color: #0ea5e9;
+        }
+
+        .btn-action-qr:hover {
+            background: rgba(14, 165, 233, 0.4);
+            color: #fff;
+            transform: translateY(-2px);
+        }
+
         .btn-action-delete {
             background: rgba(239, 68, 68, 0.2);
             color: #ef4444;
@@ -114,6 +125,60 @@
             background: rgba(239, 68, 68, 0.4);
             color: #fff;
             transform: translateY(-2px);
+        }
+
+        /* QR Modal */
+        .qr-modal .modal-content {
+            background: var(--glass-bg, #fff);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border, #e2e8f0);
+            border-radius: 24px;
+        }
+
+        .qr-modal .modal-header {
+            border-bottom: 1px solid var(--glass-border, #e2e8f0);
+            padding: 1.25rem 1.5rem;
+        }
+
+        .qr-modal .modal-body {
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .qr-display {
+            display: inline-block;
+            padding: 1rem;
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+        }
+
+        .qr-token-text {
+            font-family: monospace;
+            font-size: 1.1rem;
+            letter-spacing: 2px;
+            color: #475569;
+            background: rgba(100, 116, 139, 0.1);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            display: inline-block;
+            margin-top: 1rem;
+        }
+
+        .btn-download-qr {
+            background: var(--primary-gradient, linear-gradient(135deg, #0ea5e9, #0369a1));
+            border: none;
+            color: #fff;
+            padding: 0.65rem 1.5rem;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-download-qr:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(14, 165, 233, 0.3);
+            color: #fff;
         }
 
         /* Empty State */
@@ -325,6 +390,10 @@
                                     <span class="badge-token">{{ $device->token }}</span>
                                 </td>
                                 <td data-label="" class="text-center">
+                                    <button type="button" class="btn-action btn-action-qr" title="QR Code"
+                                        onclick="showQrModal('{{ $device->token }}', '{{ $device->name }}')">
+                                        <i class="bi bi-qr-code"></i>
+                                    </button>
                                     <a href="{{ route('admin.device.edit', $device->id) }}"
                                         class="btn-action btn-action-edit" title="Edit">
                                         <i class="bi bi-pencil"></i>
@@ -356,6 +425,239 @@
             </div>
         </div>
 
+    <!-- QR Code Modal - QRIS Style -->
+    <div class="modal fade qr-modal" id="qrModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" style="max-width: 380px;">
+            <div class="modal-content">
+                <div class="modal-body p-0">
+                    <!-- Close button -->
+                    <button type="button" class="btn-close position-absolute" data-bs-dismiss="modal"
+                        style="top: 12px; right: 12px; z-index: 10; filter: invert(1);"></button>
+
+                    <!-- QRIS-style Card -->
+                    <div class="qris-card" id="qrisCard">
+                        <!-- Header gradient band -->
+                        <div class="qris-header">
+                            <div class="qris-logo-row">
+                                <img src="{{ asset('images/logo.png') }}" alt="Logo" class="qris-header-logo">
+                                <div class="qris-header-text">
+                                    <div class="qris-brand">SWARATANI</div>
+                                    <div class="qris-sub">Smart Agriculture IoT</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Device name -->
+                        <div class="qris-device-name" id="qrisDeviceName">Device Name</div>
+
+                        <!-- QR Code area with gradient border -->
+                        <div class="qris-qr-wrapper">
+                            <div class="qris-qr-border">
+                                <canvas id="qrCanvas" width="280" height="280"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Token -->
+                        <div class="qris-token" id="qrisToken">XXXXXXXXXXXXXXXX</div>
+
+                        <!-- Footer -->
+                        <div class="qris-footer">
+                            <span><i class="bi bi-shield-check me-1"></i>Scan untuk tambah device</span>
+                        </div>
+                    </div>
+
+                    <!-- Download button (outside card for clean export) -->
+                    <div class="text-center p-3">
+                        <button class="btn btn-download-qr" onclick="downloadQr()">
+                            <i class="bi bi-download me-2"></i>Download QR Card
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- QRCode.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+    <!-- html2canvas for card download -->
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
+    <script>
+        let currentDeviceName = '';
+        const logoImg = new Image();
+        logoImg.crossOrigin = 'anonymous';
+        logoImg.src = '{{ asset("images/logo.png") }}';
+
+        function showQrModal(token, deviceName) {
+            currentDeviceName = deviceName;
+            document.getElementById('qrisDeviceName').textContent = deviceName;
+            document.getElementById('qrisToken').textContent = token;
+
+            generateQrisQr(token);
+
+            const modal = new bootstrap.Modal(document.getElementById('qrModal'));
+            modal.show();
+        }
+
+        function generateQrisQr(text) {
+            const canvas = document.getElementById('qrCanvas');
+            const size = 280;
+            canvas.width = size;
+            canvas.height = size;
+            const ctx = canvas.getContext('2d');
+
+            // Create temp container for QR generation
+            const tempDiv = document.createElement('div');
+            tempDiv.style.cssText = 'position:absolute;left:-9999px;top:-9999px;';
+            document.body.appendChild(tempDiv);
+
+            const tempCanvas = document.createElement('canvas');
+            tempCanvas.width = size;
+            tempCanvas.height = size;
+            tempDiv.appendChild(tempCanvas);
+
+            const qr = new QRCode(tempDiv, {
+                text: text,
+                width: size,
+                height: size,
+                colorDark: '#000000',
+                colorLight: '#ffffff',
+                correctLevel: QRCode.CorrectLevel.H,
+            });
+
+            setTimeout(function() {
+                const qrSource = tempDiv.querySelector('canvas') || tempDiv.querySelector('img');
+                if (!qrSource) {
+                    document.body.removeChild(tempDiv);
+                    return;
+                }
+
+                // Get QR data from the generated image
+                const tempCtx = document.createElement('canvas').getContext('2d');
+                const tempC = tempCtx.canvas;
+                tempC.width = size;
+                tempC.height = size;
+                tempCtx.drawImage(qrSource, 0, 0, size, size);
+                const imageData = tempCtx.getImageData(0, 0, size, size);
+
+                // Clear main canvas
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(0, 0, size, size);
+
+                // Draw QR modules as rounded dots
+                const moduleCount = 33; // QR version for 16 chars + H correction
+                const moduleSize = size / moduleCount;
+                const dotRadius = moduleSize * 0.38;
+
+                // Gradient colors for dots
+                const gradient1 = ctx.createLinearGradient(0, 0, size, size);
+                gradient1.addColorStop(0, '#0369a1');
+                gradient1.addColorStop(0.5, '#0ea5e9');
+                gradient1.addColorStop(1, '#0d9488');
+
+                for (let row = 0; row < moduleCount; row++) {
+                    for (let col = 0; col < moduleCount; col++) {
+                        const px = Math.floor((col + 0.5) * (size / moduleCount));
+                        const py = Math.floor((row + 0.5) * (size / moduleCount));
+
+                        // Sample pixel from QR image
+                        const idx = (py * size + px) * 4;
+                        const isDark = imageData.data[idx] < 128;
+
+                        if (isDark) {
+                            const cx = col * moduleSize + moduleSize / 2;
+                            const cy = row * moduleSize + moduleSize / 2;
+
+                            // Check if this is part of finder pattern (corners)
+                            const isFinderPattern =
+                                (row < 7 && col < 7) ||
+                                (row < 7 && col >= moduleCount - 7) ||
+                                (row >= moduleCount - 7 && col < 7);
+
+                            if (isFinderPattern) {
+                                // Draw finder patterns as squares with rounded corners
+                                ctx.fillStyle = '#0369a1';
+                                roundRect(ctx, col * moduleSize + 0.5, row * moduleSize + 0.5,
+                                    moduleSize - 1, moduleSize - 1, 1.5);
+                                ctx.fill();
+                            } else {
+                                // Draw regular modules as circles
+                                ctx.fillStyle = '#1e3a5f';
+                                ctx.beginPath();
+                                ctx.arc(cx, cy, dotRadius, 0, Math.PI * 2);
+                                ctx.fill();
+                            }
+                        }
+                    }
+                }
+
+                // Draw logo in center
+                if (logoImg.complete && logoImg.naturalWidth > 0) {
+                    drawCenteredLogo(ctx, size);
+                } else {
+                    logoImg.onload = function() { drawCenteredLogo(ctx, size); };
+                }
+
+                document.body.removeChild(tempDiv);
+            }, 400);
+        }
+
+        function drawCenteredLogo(ctx, size) {
+            const logoSize = size * 0.2;
+            const cx = size / 2;
+            const cy = size / 2;
+            const padding = 8;
+            const totalSize = logoSize + padding * 2;
+
+            // White circle background
+            ctx.fillStyle = '#ffffff';
+            ctx.beginPath();
+            ctx.arc(cx, cy, totalSize / 2 + 2, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Gradient border ring
+            ctx.strokeStyle = '#0ea5e9';
+            ctx.lineWidth = 2.5;
+            ctx.beginPath();
+            ctx.arc(cx, cy, totalSize / 2 + 2, 0, Math.PI * 2);
+            ctx.stroke();
+
+            // Draw logo
+            ctx.drawImage(logoImg, cx - logoSize / 2, cy - logoSize / 2, logoSize, logoSize);
+        }
+
+        function roundRect(ctx, x, y, width, height, radius) {
+            ctx.beginPath();
+            ctx.moveTo(x + radius, y);
+            ctx.lineTo(x + width - radius, y);
+            ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+            ctx.lineTo(x + width, y + height - radius);
+            ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+            ctx.lineTo(x + radius, y + height);
+            ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+            ctx.lineTo(x, y + radius);
+            ctx.quadraticCurveTo(x, y, x + radius, y);
+            ctx.closePath();
+        }
+
+        function downloadQr() {
+            const card = document.getElementById('qrisCard');
+            html2canvas(card, {
+                scale: 3,
+                backgroundColor: '#ffffff',
+                borderRadius: '20px',
+                useCORS: true,
+            }).then(function(canvas) {
+                const link = document.createElement('a');
+                const safeName = currentDeviceName.replace(/[^a-zA-Z0-9]/g, '_');
+                link.download = 'QR_Swaratani_' + safeName + '.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            });
+        }
+    </script>
 
 </body>
 
