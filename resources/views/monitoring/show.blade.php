@@ -772,6 +772,17 @@
             </div>
         </div>
 
+        @if(session('error'))
+            <div class="alert alert-danger mb-4" style="background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 12px; color: #fca5a5; backdrop-filter: blur(10px);">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>{{ session('error') }}
+            </div>
+        @endif
+        @if(session('success'))
+            <div class="alert alert-success mb-4" style="background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 12px; color: #6ee7b7; backdrop-filter: blur(10px);">
+                <i class="bi bi-check-circle-fill me-2"></i>{{ session('success') }}
+            </div>
+        @endif
+
         @if($latestData)
             <!-- Sensor Cards -->
             <div class="row g-4">
