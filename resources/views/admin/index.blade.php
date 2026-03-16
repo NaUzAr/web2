@@ -552,9 +552,10 @@
                         <!-- QR Code area with gradient border -->
                         <div class="qris-qr-wrapper">
                             <div class="qris-qr-border">
-                                <div id="qrCanvas" style="width: 280px; height: 280px; display: flex; align-items: center; justify-content: center;"></div>
+                                <div id="qrCanvas" style="width: 260px; min-height: 260px; margin: 0 auto;"></div>
                             </div>
                         </div>
+                        <div id="qrError" class="text-danger text-center mt-2" style="display: none; font-size: 0.9rem;"></div>
 
                         <!-- Token -->
                         <div class="qris-token" id="qrisToken">XXXXXXXXXXXXXXXX</div>
@@ -578,80 +579,119 @@
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- QR Code Styling - proper QR code library with built-in styling support -->
-    <script src="https://unpkg.com/qr-code-styling@1.6.0-rc.1/lib/qr-code-styling.js"></script>
+    <!-- QRCode.js Local -->
+    <script src="{{ asset('js/qrcode.min.js') }}"></script>
     <!-- html2canvas for card download -->
     <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
     <script>
         let currentDeviceName = '';
-        let currentQrCode = null;
+        const logoImg = new Image();
+        logoImg.crossOrigin = 'anonymous';
+        logoImg.src = '{{ asset("images/logo.png") }}';
 
         function showQrModal(token, deviceName) {
             currentDeviceName = deviceName;
             document.getElementById('qrisDeviceName').textContent = deviceName;
             document.getElementById('qrisToken').textContent = token;
 
-            generateQrisQr(token);
+            // Wait a tiny bit for modal to be visible then generate
+            setTimeout(() => generateQrisQr(token), 100);
 
             const modal = new bootstrap.Modal(document.getElementById('qrModal'));
             modal.show();
         }
 
         function generateQrisQr(text) {
-            const container = document.getElementById('qrCanvas').parentElement;
+            const qrContainer = document.getElementById('qrCanvas');
+            const qrError = document.getElementById('qrError');
 
-            // Remove old canvas
-            const oldCanvas = document.getElementById('qrCanvas');
-            if (oldCanvas) oldCanvas.remove();
+            // Reset previous QR and error message
+            qrContainer.innerHTML = '';
+            qrError.style.display = 'none';
+            qrError.textContent = '';
 
-            // Create new container div for qr-code-styling
-            const qrDiv = document.createElement('div');
-            qrDiv.id = 'qrCanvas';
-            qrDiv.style.width = '280px';
-            qrDiv.style.height = '280px';
-            qrDiv.style.display = 'flex';
-            qrDiv.style.alignItems = 'center';
-            qrDiv.style.justifyContent = 'center';
-            container.appendChild(qrDiv);
+            if (typeof QRCode === 'undefined') {
+                qrError.textContent = 'QR library tidak dimuat (QRCode.js tidak ditemukan). Silakan refresh halaman.';
+                qrError.style.display = 'block';
+                return;
+            }
 
-            // Use qr-code-styling for proper, scannable QR codes
-            currentQrCode = new QRCodeStyling({
-                width: 280,
-                height: 280,
-                type: "canvas",
-                data: text,
-                margin: 8,
-                qrOptions: {
-                    typeNumber: 0,
-                    mode: "Byte",
-                    errorCorrectionLevel: "H"
-                },
-                imageOptions: {
-                    hideBackgroundDots: true,
-                    imageSize: 0.35,
-                    margin: 6,
-                    crossOrigin: "anonymous",
-                },
-                image: "{{ asset('images/logo.png') }}",
-                dotsOptions: {
-                    color: "#0c4a6e",
-                    type: "rounded"
-                },
-                cornersSquareOptions: {
-                    color: "#0369a1",
-                    type: "extra-rounded"
-                },
-                cornersDotOptions: {
-                    color: "#0ea5e9",
-                    type: "dot"
-                },
-                backgroundOptions: {
-                    color: "#ffffff",
+            try {
+                // Generate QR code directly into container using QRCode.js
+                new QRCode(qrContainer, {
+                    text: text,
+                    width: 260,
+                    height: 260,
+                    colorDark: '#0c4a6e',
+                    colorLight: '#ffffff',
+                    correctLevel: QRCode.CorrectLevel.H,
+                });
+            } catch (err) {
+                console.error('QR generation error:', err);
+                qrError.textContent = 'Gagal membuat QR code. Cek konsol untuk detail.';
+                qrError.style.display = 'block';
+                return;
+            }
+
+            // After QR is rendered, overlay the logo in center
+            setTimeout(function() {
+                const qrImg = qrContainer.querySelector('img');
+                const qrCanvasEl = qrContainer.querySelector('canvas');
+
+                if (!qrImg && !qrCanvasEl) {
+                    qrError.textContent = 'QR tidak muncul: Elemen QR tidak dibuat.';
+                    qrError.style.display = 'block';
+                    return;
                 }
-            });
 
-            currentQrCode.append(qrDiv);
+                if (qrCanvasEl) {
+                    // Style the canvas
+                    qrCanvasEl.style.borderRadius = '12px';
+                    qrCanvasEl.style.display = 'block';
+
+                    // Draw logo overlay on top of the canvas
+                    const ctx = qrCanvasEl.getContext('2d');
+                    const size = qrCanvasEl.width;
+
+                    if (logoImg.complete && logoImg.naturalWidth > 0) {
+                        drawLogoOnCanvas(ctx, size);
+                    } else {
+                        logoImg.onload = function() {
+                            drawLogoOnCanvas(ctx, size);
+                        };
+                    }
+                }
+
+                // Hide the img fallback if canvas exists
+                if (qrImg && qrCanvasEl) {
+                    qrImg.style.display = 'none';
+                }
+            }, 500);
+        }
+
+        function drawLogoOnCanvas(ctx, size) {
+            const logoSize = size * 0.2;
+            const cx = size / 2;
+            const cy = size / 2;
+            const padding = 8;
+            const totalSize = logoSize + padding * 2;
+
+            // White circle background
+            ctx.fillStyle = '#ffffff';
+            ctx.beginPath();
+            ctx.arc(cx, cy, totalSize / 2 + 4, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Blue border ring
+            ctx.strokeStyle = '#0ea5e9';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.arc(cx, cy, totalSize / 2 + 4, 0, Math.PI * 2);
+            ctx.stroke();
+
+            // Draw the logo image
+            ctx.drawImage(logoImg, cx - logoSize / 2, cy - logoSize / 2, logoSize, logoSize);
         }
 
         function downloadQr() {
@@ -659,7 +699,6 @@
             html2canvas(card, {
                 scale: 3,
                 backgroundColor: '#ffffff',
-                borderRadius: '20px',
                 useCORS: true,
             }).then(function(canvas) {
                 const link = document.createElement('a');
