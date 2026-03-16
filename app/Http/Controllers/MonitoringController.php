@@ -204,12 +204,11 @@ class MonitoringController extends Controller
             return back()->with('error', 'Tidak ada data untuk diexport.');
         }
 
-        $data = DB::table($device->table_name)
+        $query = DB::table($device->table_name)
             ->whereBetween('recorded_at', [$startDate, $endDate])
-            ->orderBy('recorded_at', 'asc')
-            ->get();
+            ->orderBy('recorded_at', 'asc');
 
-        if ($data->isEmpty()) {
+        if (!$query->exists()) {
             return back()->with('error', 'Tidak ada data pada rentang tanggal tersebut.');
         }
 
@@ -218,10 +217,15 @@ class MonitoringController extends Controller
 
         $headers = [
             'Content-Type' => 'text/csv',
-            'Content-Disposition' => "attachment; filename=\"$filename\"",
+            'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
+            'Expires' => '0',
+            'Pragma' => 'public',
         ];
 
-        $callback = function () use ($data, $sensors) {
+        $callback = function () use ($query, $sensors) {
+            // Hindari timeout jika data sangat besar
+            set_time_limit(0);
+            
             $file = fopen('php://output', 'w');
 
             // Header row
@@ -231,9 +235,9 @@ class MonitoringController extends Controller
             }
             fputcsv($file, $headerRow);
 
-            // Data rows
+            // Data rows di-load per baris (cursor)
             $no = 1;
-            foreach ($data as $row) {
+            foreach ($query->cursor() as $row) {
                 $dataRow = [$no++, $row->recorded_at];
                 foreach ($sensors as $sensor) {
                     $dataRow[] = $row->{$sensor->sensor_name} ?? '';
@@ -244,7 +248,7 @@ class MonitoringController extends Controller
             fclose($file);
         };
 
-        return response()->stream($callback, 200, $headers);
+        return response()->streamDownload($callback, $filename, $headers);
     }
 
     /**
