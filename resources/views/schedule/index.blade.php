@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="id">
 
 <head>
     <meta charset="utf-8">
@@ -89,71 +89,234 @@
         }
 
         .modal-content-glass {
-            background: rgba(255, 255, 255, 0.05); /* slightly whiter/lighter */
-            backdrop-filter: blur(24px);
-            border: 2px solid #ffffff; /* pure white frame/list */
-            border-radius: 24px;
-            color: var(--text-main);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            background: #ffffff;
+            border: none;
+            border-radius: 24px 24px 0 0;
+            color: #1f2937;
+            box-shadow: 0 -10px 60px rgba(0, 0, 0, 0.2);
             overflow: hidden;
-        }
-        
-        .modal-header {
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-            background: rgba(0,0,0,0.1);
-            padding: 1.5rem;
-        }
-        
-        .modal-body {
-            padding: 1.5rem;
-        }
-        
-        .modal-footer {
-            border-top: 1px solid rgba(255,255,255,0.05);
-            padding: 1.5rem;
-        }
-        
-        .form-control-dark, .form-select-dark {
-            background-color: rgba(0,0,0,0.2) !important;
-            border: 1px solid rgba(255,255,255,0.1) !important;
-            color: var(--text-main) !important;
-            border-radius: 12px;
-            padding: 0.75rem 1rem;
-        }
-        
-        .form-control-dark:focus, .form-select-dark:focus {
-            background-color: rgba(0,0,0,0.3) !important;
-            border-color: var(--primary) !important;
-            box-shadow: 0 0 0 0.25rem rgba(14, 95, 138, 0.25) !important;
+            max-height: 90vh;
         }
 
-        .schedule-day-check {
-            display: none;
+        .modal-dialog {
+            margin: 0;
+            max-width: 100%;
+            display: flex;
+            align-items: flex-end;
+            min-height: 100%;
         }
-        
-        .schedule-day-label {
-            display: inline-block;
-            width: 42px;
-            height: 42px;
-            line-height: 40px;
+
+        @media (min-width: 576px) {
+            .modal-dialog {
+                max-width: 480px;
+                margin: auto;
+                align-items: center;
+            }
+            .modal-content-glass {
+                border-radius: 24px;
+            }
+        }
+
+        /* Handle bar (iOS style) */
+        .modal-handle {
+            width: 40px;
+            height: 5px;
+            background: #d1d5db;
+            border-radius: 3px;
+            margin: 12px auto 0;
+        }
+
+        .modal-header-custom {
+            padding: 0.75rem 1.5rem 1rem;
             text-align: center;
-            border-radius: 12px;
-            border: 1px solid var(--glass-border);
-            background: rgba(255,255,255,0.05);
-            cursor: pointer;
-            margin-right: 6px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            user-select: none;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: none;
         }
-        
+
+        .modal-header-custom h5 {
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: #111827;
+        }
+
+        .modal-header-custom .subtitle {
+            font-size: 0.85rem;
+            color: #9ca3af;
+            margin-top: 2px;
+        }
+
+        .modal-body-custom {
+            padding: 0 1.25rem 1rem;
+            overflow-y: auto;
+        }
+
+        /* Section Card */
+        .form-section {
+            background: #f8fafc;
+            border-radius: 18px;
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+            border: 1px solid #e5e7eb;
+        }
+
+        .form-section-title {
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: #9ca3af;
+            letter-spacing: 1px;
+            margin-bottom: 0.85rem;
+        }
+
+        .form-control-dark, .form-select-dark {
+            background-color: #ffffff !important;
+            border: 2px solid #e5e7eb !important;
+            color: #111827 !important;
+            border-radius: 14px;
+            padding: 0.9rem 1rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .form-control-dark:focus, .form-select-dark:focus {
+            background-color: #ffffff !important;
+            border-color: var(--primary) !important;
+            box-shadow: 0 0 0 4px rgba(14, 95, 138, 0.12) !important;
+        }
+
+        /* ===== Time & Duration Inputs ===== */
+        input[type="time"].form-control-dark,
+        input[type="number"].form-control-dark {
+            text-align: center;
+            font-size: 1.6rem;
+            font-weight: 800;
+            letter-spacing: 1px;
+            padding: 0.85rem 0.5rem;
+            min-height: 60px;
+        }
+
+        /* Duration Quick Buttons */
+        .duration-quick {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .duration-chip {
+            border: 2px solid #e5e7eb;
+            background: #fff;
+            color: #374151;
+            border-radius: 12px;
+            padding: 10px 0;
+            font-size: 0.95rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.15s;
+            flex: 1;
+            text-align: center;
+            min-width: 55px;
+        }
+
+        .duration-chip:hover { border-color: var(--primary); color: var(--primary); }
+        .duration-chip.active {
+            background: linear-gradient(135deg, #0e5f8a, #0d9488);
+            border-color: transparent;
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(14, 95, 138, 0.3);
+        }
+
+        /* Day Selector */
+        .schedule-day-check { display: none; }
+
+        .schedule-day-label {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            border: 2px solid #e5e7eb;
+            background: #ffffff;
+            color: #6b7280;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 700;
+            user-select: none;
+            transition: all 0.2s ease;
+        }
+
         .schedule-day-check:checked + .schedule-day-label {
-            background-color: var(--primary);
-            border-color: var(--primary);
-            color: white;
-            box-shadow: 0 4px 12px rgba(14, 95, 138, 0.4);
-            transform: translateY(-2px);
+            background: linear-gradient(135deg, #0e5f8a, #0d9488);
+            border-color: transparent;
+            color: #fff;
+            transform: scale(1.08);
+            box-shadow: 0 4px 14px rgba(14, 95, 138, 0.35);
+        }
+
+        /* Footer action bar */
+        .modal-actions {
+            padding: 1rem 1.25rem 1.5rem;
+            background: #ffffff;
+            display: flex;
+            flex-direction: column;
+            gap: 0.65rem;
+        }
+
+        .btn-save-schedule {
+            background: linear-gradient(135deg, #0e5f8a, #0d9488);
+            color: #fff;
+            border: none;
+            border-radius: 16px;
+            padding: 1rem;
+            font-size: 1.15rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            transition: transform 0.15s, box-shadow 0.15s;
+            box-shadow: 0 6px 20px rgba(14, 95, 138, 0.3);
+        }
+
+        .btn-save-schedule:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 25px rgba(14, 95, 138, 0.4);
+            color: #fff;
+        }
+
+        .btn-save-schedule:active {
+            transform: scale(0.98);
+        }
+
+        .btn-cancel-schedule {
+            background: #f3f4f6;
+            color: #6b7280;
+            border: none;
+            border-radius: 16px;
+            padding: 0.85rem;
+            font-size: 1.05rem;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+
+        .btn-cancel-schedule:hover {
+            background: #e5e7eb;
+        }
+
+        .btn-delete-schedule {
+            background: none;
+            color: #ef4444;
+            border: none;
+            border-radius: 16px;
+            padding: 0.75rem;
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin-top: 0.5rem;
+        }
+
+        .btn-delete-schedule:hover {
+            background: rgba(239, 68, 68, 0.08);
         }
 
         /* ========= Mobile Responsive ========= */
@@ -207,20 +370,17 @@
                 margin-top: 0.25rem;
             }
 
-            /* Day selector bigger for touch */
+            /* Day selector */
             .schedule-day-label {
                 width: 44px;
                 height: 44px;
-                line-height: 42px;
                 font-size: 0.85rem;
-                margin-right: 4px;
-                margin-bottom: 4px;
             }
 
             /* Modal form touch-friendly */
             .form-control-dark, .form-select-dark {
-                font-size: 16px;
-                min-height: 50px;
+                font-size: 1.1rem;
+                min-height: 52px;
             }
 
             /* Alert compact */
@@ -373,11 +533,11 @@
                                 
                                 <td data-label="">
                                     <div class="d-flex justify-content-end gap-2">
-                                        <button class="btn btn-sm" style="background: transparent; border: 1px solid #ffffff; color: #ffffff; border-radius: 50px; padding: 6px 14px; font-weight: 500;" onclick='openScheduleModal({{ $i }}, @json($sch))' title="Edit Jadwal">
+                                        <button class="btn btn-sm" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); color: #60a5fa; border-radius: 50px; padding: 6px 14px; font-weight: 500;" onclick='openScheduleModal({{ $i }}, @json($sch))' title="Edit Jadwal">
                                             <i class="bi bi-pencil-square me-1"></i> Edit
                                         </button>
                                         @if($isActive)
-                                            <button class="btn btn-sm" style="background: transparent; border: 1px solid #ffffff; color: #ffffff; border-radius: 50px; padding: 6px 12px;" onclick="deleteSchedule({{ $i }})" title="Hapus Jadwal">
+                                            <button class="btn btn-sm" style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); color: #f87171; border-radius: 50px; padding: 6px 12px;" onclick="deleteSchedule({{ $i }})" title="Hapus Jadwal">
                                                 <i class="bi bi-trash"></i>
                                             </button>
                                         @endif
@@ -399,73 +559,86 @@
         </div>
     </div>
     
-    <!-- Modal -->
+    <!-- Modal (Bottom Sheet Style) -->
     <div class="modal fade" id="scheduleModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-dialog">
             <div class="modal-content modal-content-glass">
-                <div class="modal-header border-bottom border-secondary">
-                    <h5 class="modal-title" id="modalTitle">Set Jadwal</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                <!-- iOS Handle Bar -->
+                <div class="modal-handle"></div>
+
+                <!-- Header -->
+                <div class="modal-header-custom">
+                    <h5 id="modalTitle">Atur Jadwal</h5>
+                    <div class="subtitle">Sesuaikan waktu sesuai kebutuhan Anda</div>
                 </div>
-                <div class="modal-body">
+
+                <!-- Body -->
+                <div class="modal-body-custom">
                     <input type="hidden" id="slot_id">
-                    
-                    <div class="row g-3">
-                        <div class="col-6">
-                            <label class="form-label" style="color: var(--text-secondary);">Waktu Mulai</label>
-                            <input type="time" id="on_time" class="form-control form-control-dark">
-                        </div>
-                        <div class="col-6">
-                            @if($isDuration)
-                                <label class="form-label" style="color: var(--text-secondary);">Durasi (Menit)</label>
-                                <input type="number" id="duration" class="form-control form-control-dark" min="1" value="5">
-                            @else
-                                <label class="form-label" style="color: var(--text-secondary);">Waktu Selesai</label>
-                                <input type="time" id="off_time" class="form-control form-control-dark">
-                            @endif
+
+                    <!-- Section: Waktu -->
+                    <div class="form-section">
+                        <div class="form-section-title">⏰ Pengaturan Waktu</div>
+                        <div class="row g-3">
+                            <div class="col-6">
+                                <label class="form-label fw-bold text-center d-block" style="color: #374151; font-size: 0.9rem;">Waktu Mulai</label>
+                                <input type="time" id="on_time" class="form-control form-control-dark">
+                            </div>
+                            <div class="col-6">
+                                @if($isDuration)
+                                    <label class="form-label fw-bold text-center d-block" style="color: #374151; font-size: 0.9rem;">Durasi (menit)</label>
+                                    <input type="number" id="duration" class="form-control form-control-dark" min="1" value="5">
+                                @else
+                                    <label class="form-label fw-bold text-center d-block" style="color: #374151; font-size: 0.9rem;">Waktu Selesai</label>
+                                    <input type="time" id="off_time" class="form-control form-control-dark">
+                                @endif
+                            </div>
                         </div>
                     </div>
-                    
-                    @if($isSector)
-                    <div class="mb-3 mt-3">
-                        <label class="form-label" style="color: var(--text-secondary);">Output</label>
-                        <select id="sector" class="form-select form-select-dark">
-                            @for($s = 1; $s <= ($scheduleConfig->max_sectors ?? 1); $s++)
-                                <option value="{{ $s }}">Output {{ $s }}</option>
-                            @endfor
-                        </select>
+
+                    @if($isSector || $isType)
+                    <!-- Section: Sumber -->
+                    <div class="form-section">
+                        <div class="form-section-title">💧 Sumber & Output</div>
+                        @if($isSector)
+                        <div class="mb-3">
+                            <label class="form-label fw-bold" style="color: #374151; font-size: 0.9rem;">Output Tujuan</label>
+                            <select id="sector" class="form-select form-select-dark">
+                                @for($s = 1; $s <= ($scheduleConfig->max_sectors ?? 1); $s++)
+                                    <option value="{{ $s }}">🔌 Output {{ $s }}</option>
+                                @endfor
+                            </select>
+                        </div>
+                        @endif
+                        @if($isType)
+                        <div>
+                            <label class="form-label fw-bold" style="color: #374151; font-size: 0.9rem;">Jenis Air</label>
+                            <select id="schedule_type" class="form-select form-select-dark">
+                                <option value="BAKU">🚿 Air Baku</option>
+                                <option value="PUPUK">🧪 Air Pupuk</option>
+                            </select>
+                        </div>
+                        @endif
                     </div>
                     @endif
-                    
-                    @if($isType)
-                    <div class="mb-3">
-                        <label class="form-label" style="color: var(--text-secondary);">Input</label>
-                        <select id="schedule_type" class="form-select form-select-dark">
-                            <option value="BAKU">Air Baku</option>
-                            <option value="PUPUK">Air Pupuk</option>
-                        </select>
-                    </div>
-                    @endif
-                    
+
                     @if($isDays)
-                    <div class="mb-3 mt-3">
-                        <label class="form-label d-block" style="color: var(--text-secondary);">Hari Aktif</label>
-                        <div class="d-flex flex-wrap">
+                    <!-- Section: Hari -->
+                    <div class="form-section">
+                        <div class="form-section-title">📅 Pilih Hari Aktif</div>
+                        <div class="d-flex flex-wrap justify-content-center gap-2">
                             @foreach(['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'] as $key => $day)
-                                <div class="me-2 mb-2">
-                                    <input type="checkbox" id="day_{{ $key }}" class="schedule-day-check" value="{{ $key + 1 }}"> <!-- Device usually 1=Sun or 1=Mon, need to confirm. Based on MqttService convertDaysToBinary map: 1=Mon...7=Sun. View labels: Min(0?), Sen(1?).. -->
-                                    <!-- Let's map View labels to standard 1=Mon..7=Sun or just correct the loop values. -->
-                                    <!-- MqttService expects "12345" where 1=Mon. View array was Min(0),Sen(1).. -->
-                                    <!-- Let's fix days: 1=Mon, 2=Tue, ..., 7=Sun. Min in array should be 7 -->
-                                    @php 
-                                        $val = ($day == 'Min') ? 7 : ($key); // Standardize to 1=Mon...7=Sun
-                                        if($day == 'Sen') $val = 1;
-                                        if($day == 'Sel') $val = 2;
-                                        if($day == 'Rab') $val = 3;
-                                        if($day == 'Kam') $val = 4;
-                                        if($day == 'Jum') $val = 5;
-                                        if($day == 'Sab') $val = 6;
-                                    @endphp
+                                @php 
+                                    $val = ($day == 'Min') ? 7 : ($key);
+                                    if($day == 'Sen') $val = 1;
+                                    if($day == 'Sel') $val = 2;
+                                    if($day == 'Rab') $val = 3;
+                                    if($day == 'Kam') $val = 4;
+                                    if($day == 'Jum') $val = 5;
+                                    if($day == 'Sab') $val = 6;
+                                @endphp
+                                <div>
+                                    <input type="checkbox" id="day_{{ $key }}" class="schedule-day-check" value="{{ $key + 1 }}">
                                     <label for="day_{{ $key }}" class="schedule-day-label">{{ $day }}</label>
                                 </div>
                             @endforeach
@@ -473,17 +646,18 @@
                     </div>
                     @endif
                 </div>
-                <div class="modal-footer justify-content-between">
-                    <button type="button" class="btn border-0 text-danger px-3 py-2 rounded-pill d-none" style="background: rgba(239,68,68,0.1);" id="btnDeleteModal" onclick="deleteScheduleFromModal()">
-                        <i class="bi bi-trash me-1"></i> Hapus
+
+                <!-- Actions -->
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-save-schedule" onclick="sendSchedule()">
+                        <i class="bi bi-check-circle-fill"></i>
+                        <span id="btnText">Simpan Jadwal</span>
+                        <div id="btnLoading" class="spinner-border spinner-border-sm d-none"></div>
                     </button>
-                    <div class="d-flex align-items-center gap-2">
-                        <button type="button" class="btn btn-link text-decoration-none" style="color: var(--text-secondary);" data-bs-dismiss="modal">Batal</button>
-                        <button type="button" class="btn btn-primary rounded-pill px-4 py-2" onclick="sendSchedule()">
-                            <span id="btnText">Kirim Jadwal</span>
-                            <div id="btnLoading" class="spinner-border spinner-border-sm ms-2 d-none"></div>
-                        </button>
-                    </div>
+                    <button type="button" class="btn btn-cancel-schedule" data-bs-dismiss="modal">Batalkan</button>
+                    <button type="button" class="btn btn-delete-schedule d-none" id="btnDeleteModal" onclick="deleteScheduleFromModal()">
+                        <i class="bi bi-trash3 me-1"></i> Hapus Jadwal Ini
+                    </button>
                 </div>
             </div>
         </div>
@@ -495,7 +669,6 @@
         const deleteUrlBase = '/device/{{ $userDevice->id }}/schedule';
         const csrfToken = '{{ csrf_token() }}';
         
-        // PHP configs to JS
         const isDuration = {{ $isDuration ? 'true' : 'false' }};
         const isDays = {{ $isDays ? 'true' : 'false' }};
         const isSector = {{ $isSector ? 'true' : 'false' }};
@@ -504,35 +677,57 @@
 
         const modal = new bootstrap.Modal(document.getElementById('scheduleModal'));
 
+        // Duration Quick Select
+        function setDuration(val) {
+            document.getElementById('duration').value = val;
+            document.querySelectorAll('.duration-chip').forEach(c => c.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
+        function highlightDuration(val) {
+            document.querySelectorAll('.duration-chip').forEach(c => {
+                const chipVal = c.textContent.trim();
+                c.classList.remove('active');
+                if ((val == 1 && chipVal === '1m') || (val == 5 && chipVal === '5m') ||
+                    (val == 10 && chipVal === '10m') || (val == 15 && chipVal === '15m') ||
+                    (val == 30 && chipVal === '30m') || (val == 60 && chipVal === '1j'))
+                    c.classList.add('active');
+            });
+        }
+
         function openScheduleModal(slotId, data = null) {
             document.getElementById('slot_id').value = slotId;
-            document.getElementById('modalTitle').innerText = `Edit Jadwal ${slotId}`;
+            document.getElementById('modalTitle').innerText = `Atur Jadwal ${slotId}`;
             
             const btnDelete = document.getElementById('btnDeleteModal');
             
-            // Default values
+            // Default
             document.getElementById('on_time').value = '';
-            if(isDuration) document.getElementById('duration').value = 5;
-            else document.getElementById('off_time').value = '';
+            if(isDuration) {
+                document.getElementById('duration').value = 5;
+                highlightDuration(5);
+            } else {
+                document.getElementById('off_time').value = '';
+            }
             
             if(isSector) document.getElementById('sector').value = 1;
             if(isType) document.getElementById('schedule_type').value = 'BAKU';
+            if(isDays) document.querySelectorAll('.schedule-day-check').forEach(el => el.checked = false);
             
-            if(isDays) {
-                document.querySelectorAll('.schedule-day-check').forEach(el => el.checked = false);
-            }
-            
-            // Fill data if editing existing schedule
             if (data && data.is_active) {
                 btnDelete.classList.remove('d-none');
-                
                 document.getElementById('on_time').value = data.on_time ? data.on_time.substring(0, 5) : '';
                 
-                if(isDuration) document.getElementById('duration').value = data.duration || 5;
-                else document.getElementById('off_time').value = data.off_time ? data.off_time.substring(0, 5) : '';
+                if(isDuration) {
+                    const dur = data.duration || 5;
+                    document.getElementById('duration').value = dur;
+                    highlightDuration(dur);
+                } else {
+                    document.getElementById('off_time').value = data.off_time ? data.off_time.substring(0, 5) : '';
+                }
                 
                 if(isSector) document.getElementById('sector').value = data.sector || 1;
-                if(isType) document.getElementById('schedule_type').value = data.name || 'BAKU'; 
+                if(isType) document.getElementById('schedule_type').value = data.name || 'BAKU';
                 
                 if(isDays && data.days) {
                     let daysArr = Array.isArray(data.days) ? data.days : (data.days ? data.days.split(',') : []);
@@ -554,27 +749,15 @@
 
         async function deleteSchedule(slotId) {
             if(!confirm(`Yakin ingin menghapus Jadwal ${slotId}?`)) return;
-            
             try {
                 const res = await fetch(`${deleteUrlBase}/${slotId}`, {
                     method: 'DELETE',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': csrfToken
-                    }
+                    headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrfToken }
                 });
-                
                 const data = await res.json();
-                
-                if(data.success) {
-                    alert(data.message);
-                    location.reload();
-                } else {
-                    alert('Gagal: ' + data.message);
-                }
-            } catch (e) {
-                alert('Error: ' + e.message);
-            }
+                if(data.success) { alert(data.message); location.reload(); }
+                else { alert('Gagal: ' + data.message); }
+            } catch (e) { alert('Error: ' + e.message); }
         }
 
         function deleteScheduleFromModal() {
@@ -589,13 +772,7 @@
             
             if(!onTime) { alert('Waktu Mulai harus diisi'); return; }
 
-            let payload = {
-                slot_id: slotId,
-                on_time: onTime,
-                _token: csrfToken
-            };
-
-            // Slot ID is always fixed now
+            let payload = { slot_id: slotId, on_time: onTime, _token: csrfToken };
             
             if(isDuration) payload.duration = document.getElementById('duration').value;
             else payload.off_time = document.getElementById('off_time').value;
@@ -610,8 +787,7 @@
                 payload.days = days.join('');
             }
 
-            // UX
-            const btn = document.querySelector('.modal-footer .btn-primary');
+            const btn = document.querySelector('.btn-save-schedule');
             const btnText = document.getElementById('btnText');
             const loader = document.getElementById('btnLoading');
             
@@ -625,13 +801,11 @@
                     headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
                     body: JSON.stringify(payload)
                 });
-                
                 const data = await res.json();
-                
                 if(data.success) {
                     alert(data.message);
                     modal.hide();
-                    location.reload(); 
+                    location.reload();
                 } else {
                     alert('Gagal: ' + data.message);
                 }
@@ -639,7 +813,7 @@
                 alert('Error: ' + e.message);
             } finally {
                 btn.disabled = false;
-                btnText.innerText = 'Kirim ke Device';
+                btnText.innerText = 'Simpan Jadwal';
                 loader.classList.add('d-none');
             }
         }

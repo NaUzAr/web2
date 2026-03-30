@@ -149,29 +149,93 @@
             font-size: 0.85rem;
         }
 
-        /* Glassmorphism Classes (From Schedule) */
+        /* Modal Classes (From Schedule - Bottom Sheet) */
         .modal-content-glass {
-            background: var(--glass-bg, rgba(30, 41, 59, 0.85));
-            /* Fallback to dark glass if variable missing */
-            backdrop-filter: blur(20px);
-            border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.1));
-            color: var(--text-main, #fff);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            background: #ffffff;
+            border: none;
+            border-radius: 24px 24px 0 0;
+            color: #1f2937;
+            box-shadow: 0 -10px 60px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            max-height: 90vh;
+        }
+
+        .modal-dialog {
+            margin: 0;
+            max-width: 100%;
+            display: flex;
+            align-items: flex-end;
+            min-height: 100%;
+        }
+
+        @media (min-width: 576px) {
+            .modal-dialog {
+                max-width: 480px;
+                margin: auto;
+                align-items: center;
+            }
+            .modal-content-glass {
+                border-radius: 24px;
+            }
+        }
+
+        /* Handle bar (iOS style) */
+        .modal-handle {
+            width: 40px;
+            height: 5px;
+            background: #d1d5db;
+            border-radius: 3px;
+            margin: 12px auto 0;
+        }
+
+        .modal-header-custom {
+            padding: 0.75rem 1.5rem 1rem;
+            text-align: center;
+            border: none;
+        }
+
+        .modal-header-custom h5 {
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: #111827;
+        }
+
+        .modal-header-custom .subtitle {
+            font-size: 0.85rem;
+            color: #9ca3af;
+            margin-top: 2px;
+        }
+
+        .modal-body-custom {
+            padding: 0 1.25rem 1rem;
+            overflow-y: auto;
+        }
+
+        .modal-actions {
+            padding: 1rem 1.25rem 1.5rem;
+            background: #ffffff;
+            display: flex;
+            flex-direction: column;
+            gap: 0.65rem;
         }
 
         .form-control-dark,
         .form-select-dark {
-            background-color: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            color: var(--text-main);
+            background-color: #ffffff !important;
+            border: 2px solid #e5e7eb !important;
+            color: #111827 !important;
+            border-radius: 14px;
+            padding: 0.9rem 1rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            transition: border-color 0.2s, box-shadow 0.2s;
         }
 
         .form-control-dark:focus,
         .form-select-dark:focus {
-            background-color: var(--glass-bg);
-            border-color: var(--primary);
-            color: var(--text-main);
-            box-shadow: 0 0 0 0.25rem rgba(var(--primary), 0.25);
+            background-color: #ffffff !important;
+            border-color: var(--primary) !important;
+            box-shadow: 0 0 0 4px rgba(14, 95, 138, 0.12) !important;
         }
 
         .btn-glass {
@@ -1380,86 +1444,74 @@
 
     @if(!($isAdminView ?? false))
         <!-- Export Modal -->
-        <div class="modal fade" id="exportModal" tabindex="-1" aria-labelledby="exportModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content"
-                    style="background: var(--glass-bg); backdrop-filter: blur(20px); border: 1px solid var(--glass-border);">
-                    <div class="modal-header border-0">
-                        <h5 class="modal-title" style="color: var(--text-main);" id="exportModalLabel">
-                            <i class="bi bi-download me-2"></i>Download Data CSV
-                        </h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <div class="modal fade" id="exportModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content modal-content-glass">
+                    <div class="modal-handle"></div>
+                    <div class="modal-header-custom">
+                        <h5 id="exportModalLabel"><i class="bi bi-download me-2"></i>Download Data</h5>
+                        <div class="subtitle">Pilih rentang tanggal untuk data CSV</div>
                     </div>
                     <form action="{{ route('monitoring.export', $userDevice->id) }}" method="GET">
-                        <div class="modal-body">
-                            <p class="mb-4" style="color: var(--text-secondary);">Pilih rentang tanggal untuk data yang
-                                ingin di-download:</p>
-
+                        <div class="modal-body-custom">
                             <div class="mb-3">
-                                <label class="form-label" style="color: var(--text-main);">
+                                <label class="form-label fw-bold" style="color: #374151; font-size: 0.9rem;">
                                     <i class="bi bi-calendar-event me-1"></i> Tanggal Mulai
                                 </label>
-                                <input type="date" name="start_date" class="form-control"
-                                    style="background: var(--glass-bg); color: var(--text-main); border: 1px solid var(--glass-border);"
+                                <input type="date" name="start_date" class="form-control form-control-dark"
                                     value="{{ date('Y-m-d', strtotime('-7 days')) }}" required>
                             </div>
 
                             <div class="mb-3">
-                                <label class="form-label" style="color: var(--text-main);">
+                                <label class="form-label fw-bold" style="color: #374151; font-size: 0.9rem;">
                                     <i class="bi bi-calendar-check me-1"></i> Tanggal Akhir
                                 </label>
-                                <input type="date" name="end_date" class="form-control"
-                                    style="background: var(--glass-bg); color: var(--text-main); border: 1px solid var(--glass-border);"
+                                <input type="date" name="end_date" class="form-control form-control-dark"
                                     value="{{ date('Y-m-d') }}" required>
                             </div>
 
                             <div class="d-flex gap-2 flex-wrap">
                                 <button type="button" class="btn btn-sm"
-                                    style="border: 1px solid var(--primary); color: var(--primary);"
-                                    onclick="setDateRange(7)">7
-                                    Hari</button>
+                                    style="border: 1px solid var(--primary); color: var(--primary); border-radius: 12px; padding: 6px 12px;"
+                                    onclick="setDateRange(7)">7 Hari</button>
                                 <button type="button" class="btn btn-sm"
-                                    style="border: 1px solid var(--primary); color: var(--primary);"
-                                    onclick="setDateRange(30)">30
-                                    Hari</button>
+                                    style="border: 1px solid var(--primary); color: var(--primary); border-radius: 12px; padding: 6px 12px;"
+                                    onclick="setDateRange(30)">30 Hari</button>
                                 <button type="button" class="btn btn-sm"
-                                    style="border: 1px solid var(--primary); color: var(--primary);"
-                                    onclick="setDateRange(90)">3
-                                    Bulan</button>
+                                    style="border: 1px solid var(--primary); color: var(--primary); border-radius: 12px; padding: 6px 12px;"
+                                    onclick="setDateRange(90)">3 Bulan</button>
                             </div>
                         </div>
-                        <div class="modal-footer border-0">
-                            <button type="button" class="btn"
-                                style="border: 1px solid var(--glass-border); color: var(--text-main);"
-                                data-bs-dismiss="modal">Batal</button>
-                            <button type="submit" class="btn" style="background: var(--primary-gradient); color: #fff;">
+                        <div class="modal-actions">
+                            <button type="submit" class="btn" style="background: linear-gradient(135deg, #0e5f8a, #0d9488); border-radius: 16px; padding: 1rem; font-size: 1.15rem; font-weight: 700; width: 100%; color: #fff;">
                                 <i class="bi bi-file-earmark-spreadsheet me-1"></i> Download CSV
                             </button>
+                            <button type="button" class="btn"
+                                style="background: #f3f4f6; color: #6b7280; border-radius: 16px; padding: 0.85rem; font-size: 1.05rem; font-weight: 600; width: 100%; border: none;"
+                                data-bs-dismiss="modal">Batal</button>
                         </div>
                     </form>
                 </div>
             </div>
         </div>
 
-        <!-- Irrigation Pump Control Modal (Dynamic & Glass Style) -->
-        <div class="modal fade" id="irrigationPumpModal" tabindex="-1" aria-labelledby="irrigationPumpModalLabel"
-            aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
+        <!-- Irrigation Pump Control Modal (Bottom Sheet Style) -->
+        <div class="modal fade" id="irrigationPumpModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog">
                 <div class="modal-content modal-content-glass">
-                    <div class="modal-header border-bottom border-secondary">
-                        <h5 class="modal-title" id="irrigationPumpModalLabel">
+                    <div class="modal-handle"></div>
+                    <div class="modal-header-custom">
+                        <h5 id="irrigationPumpModalLabel">
                             <i class="bi bi-droplet-fill me-2" style="color: #0ea5e9;"></i>Kontrol Pompa Irigasi
                         </h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <div class="subtitle">Pilih jenis air dan zona output yang dituju</div>
                     </div>
-                    <div class="modal-body">
-                        <p class="mb-4 text-secondary">Pilih jenis input air dan zona irigasi:</p>
-
+                    <div class="modal-body-custom">
                         <!-- Hidden field for output ID -->
                         <input type="hidden" id="irrigationOutputId" value="">
 
                         <div class="mb-3">
-                            <label class="form-label text-secondary">
+                            <label class="form-label fw-bold" style="color: #374151; font-size: 0.9rem;">
                                 <i class="bi bi-water me-1" style="color: #0ea5e9;"></i> Jenis Air
                             </label>
                             <select id="irrigationWaterType" class="form-select form-select-dark">
@@ -1469,7 +1521,7 @@
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label text-secondary">
+                            <label class="form-label fw-bold" style="color: #374151; font-size: 0.9rem;">
                                 <i class="bi bi-geo-alt me-1" style="color: #0ea5e9;"></i> Zona / Blok
                             </label>
                             <select id="irrigationZone" class="form-select form-select-dark">
@@ -1477,12 +1529,14 @@
                             </select>
                         </div>
                     </div>
-                    <div class="modal-footer border-top border-secondary">
-                        <button type="button" class="btn btn-link text-secondary text-decoration-none"
-                            data-bs-dismiss="modal">Batal</button>
-                        <button type="button" class="btn btn-primary" onclick="sendIrrigationPumpOn()">
+                    <div class="modal-actions">
+                        <button type="button" class="btn" onclick="sendIrrigationPumpOn()"
+                            style="background: linear-gradient(135deg, #0ea5e9, #0284c7); border-radius: 16px; padding: 1rem; font-size: 1.15rem; font-weight: 700; width: 100%; color: #fff; box-shadow: 0 6px 20px rgba(14, 165, 233, 0.3);">
                             <i class="bi bi-play-fill me-1"></i> Nyalakan Pompa
                         </button>
+                        <button type="button" class="btn"
+                            style="background: #f3f4f6; color: #6b7280; border-radius: 16px; padding: 0.85rem; font-size: 1.05rem; font-weight: 600; width: 100%; border: none;"
+                            data-bs-dismiss="modal">Batal</button>
                     </div>
                 </div>
             </div>

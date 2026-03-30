@@ -176,37 +176,150 @@
             border: 1px solid rgba(14, 95, 138, 0.2);
         }
 
-        /* Modal specific matching monitoring style */
-        .modal-glass {
-            background: var(--glass-bg);
-            backdrop-filter: blur(20px);
-            border: 1px solid var(--glass-border);
-            color: var(--text-main);
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
-            border-radius: 20px;
-        }
-
-        .form-glass {
-            background-color: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            color: var(--text-main);
-        }
-
-        .form-glass:focus {
-            background-color: var(--glass-bg);
-            border-color: var(--primary);
-            color: var(--text-main);
-            box-shadow: 0 0 0 0.25rem rgba(var(--primary), 0.25);
-        }
-
-        .btn-primary {
-            background: var(--primary-gradient);
+        /* Modal specific matching schedule style */
+        .modal-content-glass {
+            background: #ffffff;
             border: none;
+            border-radius: 24px 24px 0 0;
+            color: #1f2937;
+            box-shadow: 0 -10px 60px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            max-height: 90vh;
+        }
+
+        .modal-dialog {
+            margin: 0;
+            max-width: 100%;
+            display: flex;
+            align-items: flex-end;
+            min-height: 100%;
+        }
+
+        @media (min-width: 576px) {
+            .modal-dialog {
+                max-width: 480px;
+                margin: auto;
+                align-items: center;
+            }
+            .modal-content-glass {
+                border-radius: 24px;
+            }
+        }
+
+        /* Handle bar (iOS style) */
+        .modal-handle {
+            width: 40px;
+            height: 5px;
+            background: #d1d5db;
+            border-radius: 3px;
+            margin: 12px auto 0;
+        }
+
+        .modal-header-custom {
+            padding: 0.75rem 1.5rem 1rem;
+            text-align: center;
+            border: none;
+        }
+
+        .modal-header-custom h5 {
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: #111827;
+            margin-bottom: 0;
+        }
+
+        .modal-header-custom .subtitle {
+            font-size: 0.85rem;
+            color: #9ca3af;
+            margin-top: 2px;
+        }
+
+        .modal-body-custom {
+            padding: 0 1.25rem 1rem;
+            overflow-y: auto;
+        }
+
+        /* Section Card */
+        .form-section {
+            background: #f8fafc;
+            border-radius: 18px;
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+            border: 1px solid #e5e7eb;
+        }
+
+        .form-section-title {
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: #9ca3af;
+            letter-spacing: 1px;
+            margin-bottom: 0.85rem;
+        }
+
+        .form-control-dark, .form-select-dark {
+            background-color: #ffffff !important;
+            border: 2px solid #e5e7eb !important;
+            color: #111827 !important;
+            border-radius: 14px;
+            padding: 0.9rem 1rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .form-control-dark:focus, .form-select-dark:focus {
+            background-color: #ffffff !important;
+            border-color: var(--primary) !important;
+            box-shadow: 0 0 0 4px rgba(14, 95, 138, 0.12) !important;
+        }
+
+        /* Footer action bar */
+        .modal-actions {
+            padding: 1rem 1.25rem 1.5rem;
+            background: #ffffff;
+            display: flex;
+            flex-direction: column;
+            gap: 0.65rem;
+        }
+
+        .btn-save-schedule {
+            background: linear-gradient(135deg, #0e5f8a, #0d9488);
+            color: #fff;
+            border: none;
+            border-radius: 16px;
+            padding: 1rem;
+            font-size: 1.15rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            transition: transform 0.15s, box-shadow 0.15s;
+            box-shadow: 0 6px 20px rgba(14, 95, 138, 0.3);
+            width: 100%;
+        }
+
+        .btn-save-schedule:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 25px rgba(14, 95, 138, 0.4);
             color: #fff;
         }
 
-        .btn-primary:hover {
-            opacity: 0.9;
+        .btn-cancel-schedule {
+            background: #f3f4f6;
+            color: #6b7280;
+            border: none;
+            border-radius: 16px;
+            padding: 0.85rem;
+            font-size: 1.05rem;
+            font-weight: 600;
+            transition: background 0.2s;
+            width: 100%;
+        }
+
+        .btn-cancel-schedule:hover {
+            background: #e5e7eb;
         }
 
         /* ========= Mobile Responsive ========= */
@@ -446,37 +559,42 @@
     </div>
 
     <!-- Edit Modal -->
-    <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content modal-glass">
-                <div class="modal-header border-bottom border-secondary">
-                    <h5 class="modal-title fw-bold" id="editModalLabel">Edit Setting</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <div class="modal fade" id="editModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content modal-content-glass">
+                <div class="modal-handle"></div>
+                <div class="modal-header-custom">
+                    <h5 id="editModalLabel">Edit Setting</h5>
+                    <div class="subtitle">Sesuaikan batas atas dan bawah otomasi</div>
                 </div>
                 <!-- Route update single handling -->
                 <form action="{{ route('automasi.update_single', ['id' => $deviceId]) }}" method="POST">
                     @csrf
-                    <div class="modal-body p-4">
+                    <div class="modal-body-custom">
                         <input type="hidden" name="sensor_type" id="modalSensorType">
 
-                        <div class="mb-3">
-                            <label for="atsVal" class="form-label" style="color: var(--text-secondary);">Batas Atas
-                                <span id="modalUnit1"></span></label>
-                            <input type="number" step="0.01" class="form-control form-glass" id="atsVal" name="ats_val"
-                                required>
-                        </div>
+                        <div class="form-section">
+                            <div class="form-section-title">📊 Parameter Otomasi</div>
+                            <div class="mb-3">
+                                <label for="atsVal" class="form-label fw-bold" style="color: #374151; font-size: 0.9rem;">Batas Atas
+                                    <span id="modalUnit1"></span></label>
+                                <input type="number" step="0.01" class="form-control form-control-dark" id="atsVal" name="ats_val"
+                                    required>
+                            </div>
 
-                        <div class="mb-3">
-                            <label for="bwhVal" class="form-label" style="color: var(--text-secondary);">Batas Bawah
-                                <span id="modalUnit2"></span></label>
-                            <input type="number" step="0.01" class="form-control form-glass" id="bwhVal" name="bwh_val"
-                                required>
+                            <div class="mb-3">
+                                <label for="bwhVal" class="form-label fw-bold" style="color: #374151; font-size: 0.9rem;">Batas Bawah
+                                    <span id="modalUnit2"></span></label>
+                                <input type="number" step="0.01" class="form-control form-control-dark" id="bwhVal" name="bwh_val"
+                                    required>
+                            </div>
                         </div>
                     </div>
-                    <div class="modal-footer border-top border-secondary">
-                        <button type="button" class="btn btn-outline-light rounded-pill"
-                            data-bs-dismiss="modal">Batal</button>
-                        <button type="submit" class="btn btn-primary rounded-pill px-4 fw-bold">Simpan</button>
+                    <div class="modal-actions">
+                        <button type="submit" class="btn btn-save-schedule">
+                            <i class="bi bi-check-circle-fill me-1"></i> Simpan
+                        </button>
+                        <button type="button" class="btn btn-cancel-schedule" data-bs-dismiss="modal">Batalkan</button>
                     </div>
                 </form>
             </div>
