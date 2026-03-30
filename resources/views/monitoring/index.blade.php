@@ -318,11 +318,23 @@
 
         @media (max-width: 576px) {
             .page-title {
-                font-size: 1.5rem;
+                font-size: 1.2rem !important;
             }
-            .btn-action-responsive {
-                padding: 0.5rem 1rem !important;
-                font-size: 0.85rem !important;
+            .header-actions .btn-action {
+                width: 42px;
+                height: 42px;
+                padding: 0 !important;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: 50% !important;
+            }
+            .header-actions .btn-action i {
+                margin: 0 !important;
+                font-size: 1.2rem;
+            }
+            .header-actions .action-text {
+                display: none !important;
             }
         }
     </style>
@@ -339,16 +351,16 @@
                 <img src="{{ asset('images/logo.png') }}" alt="Swaratani" height="40" class="me-2">
                 <span class="fw-bold" style="color: var(--navbar_text, #333);">Swaratani IoT</span>
             </a>
-            <div class="navbar-nav ms-auto">
+            <div class="navbar-nav ms-auto flex-row align-items-center gap-4 gap-sm-3">
                 @if(!session('is_pwa'))
-                    <a class="nav-link" href="{{ route('home') }}">
-                        <i class="bi bi-house me-1"></i> Beranda
+                    <a class="nav-link px-0" href="{{ route('home') }}" title="Beranda" style="color: var(--navbar-text);">
+                        <i class="bi bi-house fs-5 me-sm-1"></i><span class="d-none d-sm-inline"> Beranda</span>
                     </a>
                 @endif
-                <form action="{{ route('logout') }}" method="POST" class="d-inline">
+                <form action="{{ route('logout') }}" method="POST" class="d-inline m-0">
                     @csrf
-                    <button type="submit" class="nav-link btn btn-link" style="color: rgba(255,255,255,0.8);">
-                        <i class="bi bi-box-arrow-right me-1"></i> Logout
+                    <button type="submit" class="nav-link btn btn-link px-0 text-decoration-none" style="color: var(--navbar-text);" title="Logout">
+                        <i class="bi bi-box-arrow-right fs-5 me-sm-1"></i><span class="d-none d-sm-inline"> Logout</span>
                     </button>
                 </form>
             </div>
@@ -356,18 +368,18 @@
     </nav>
 
     <div class="container py-5">
-        <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
-            <h2 class="page-title mb-0">
-                <i class="bi bi-graph-up-arrow me-2"></i>Monitoring Devices
+        <div class="d-flex justify-content-between align-items-center mb-4 gap-2 header-container">
+            <h2 class="page-title mb-0 text-truncate">
+                <i class="bi bi-graph-up-arrow me-1"></i><span class="d-none d-sm-inline">Monitoring </span>Devices
             </h2>
-            <div class="d-flex flex-wrap gap-2">
+            <div class="d-flex gap-2 header-actions flex-shrink-0">
                 @if(!session('is_pwa'))
-                    <button onclick="openSwarataniApp(event)" class="btn btn-outline-primary btn-action-responsive" style="border-radius: 50px; font-weight: 600;">
-                        <i class="bi bi-phone me-1"></i> Buka Aplikasi
+                    <button onclick="openSwarataniApp(event)" class="btn btn-outline-primary btn-action" style="border-radius: 50px; font-weight: 600;" title="Buka Aplikasi">
+                        <i class="bi bi-phone me-sm-1"></i><span class="action-text"> Buka Aplikasi</span>
                     </button>
                 @endif
-                <a href="{{ route('monitoring.create') }}" class="btn btn-gradient btn-action-responsive">
-                    <i class="bi bi-plus-lg me-1"></i> Tambah Device
+                <a href="{{ route('monitoring.create') }}" class="btn btn-gradient btn-action" style="border-radius: 50px;" title="Tambah Device">
+                    <i class="bi bi-plus-lg me-sm-1"></i><span class="action-text"> Tambah Device</span>
                 </a>
             </div>
         </div>
