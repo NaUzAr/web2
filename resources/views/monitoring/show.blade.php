@@ -791,11 +791,78 @@
                 @foreach($sensors as $sensor)
                     @php
                         $value = $latestData->{$sensor->sensor_name} ?? null;
+                        $labelLower = strtolower($sensor->sensor_label);
+                        
+                        $icon = 'bi-activity';
+                        $bgColor = 'var(--primary-gradient)';
+                        $stdUnit = $sensor->unit;
+
+                        if (str_contains($labelLower, 'suhu udara') || str_contains($labelLower, 'suhu ruangan') || $labelLower === 'suhu' || str_contains($labelLower, 'temperature')) {
+                            $icon = 'bi-thermometer-half';
+                            $bgColor = '#FF5733';
+                            $stdUnit = '°C';
+                        } elseif (str_contains($labelLower, 'kelembapan udara') || str_contains($labelLower, 'kelembaban udara') || $labelLower === 'kelembaban' || $labelLower === 'kelembapan' || str_contains($labelLower, 'humidity')) {
+                            $icon = 'bi-droplet';
+                            $bgColor = '#3498DB';
+                            $stdUnit = '%';
+                        } elseif (str_contains($labelLower, 'curah hujan') || str_contains($labelLower, 'rain')) {
+                            $icon = 'bi-cloud-rain';
+                            $bgColor = '#5DADE2';
+                            $stdUnit = 'mm';
+                        } elseif (str_contains($labelLower, 'kecepatan angin') || str_contains($labelLower, 'wind speed')) {
+                            $icon = 'bi-wind';
+                            $bgColor = '#85C1E9';
+                            $stdUnit = 'km/h';
+                        } elseif (str_contains($labelLower, 'arah angin') || str_contains($labelLower, 'wind dir')) {
+                            $icon = 'bi-compass';
+                            $bgColor = '#7FB3D5';
+                            $stdUnit = '°';
+                        } elseif (str_contains($labelLower, 'tekanan udara') || str_contains($labelLower, 'pressure')) {
+                            $icon = 'bi-speedometer';
+                            $bgColor = '#2E86C1';
+                            $stdUnit = 'hPa';
+                        } elseif (str_contains($labelLower, 'indeks uv') || str_contains($labelLower, ' uv')) {
+                            $icon = 'bi-brightness-high';
+                            $bgColor = '#F1C40F';
+                            $stdUnit = '';
+                        } elseif (str_contains($labelLower, 'intensitas cahaya') || str_contains($labelLower, 'cahaya') || str_contains($labelLower, 'light')) {
+                            $icon = 'bi-sun';
+                            $bgColor = '#F7DC6F';
+                            $stdUnit = 'lux';
+                        } elseif (str_contains($labelLower, 'kelembaban tanah') || str_contains($labelLower, 'kelembapan tanah') || str_contains($labelLower, 'soil moisture')) {
+                            $icon = 'bi-moisture';
+                            $bgColor = '#27AE60';
+                            $stdUnit = '%';
+                        } elseif (str_contains($labelLower, 'suhu tanah') || str_contains($labelLower, 'soil temp')) {
+                            $icon = 'bi-thermometer';
+                            $bgColor = '#D35400';
+                            $stdUnit = '°C';
+                        } elseif (str_contains($labelLower, 'level air') || str_contains($labelLower, 'water level') || str_contains($labelLower, 'ketinggian air') || str_contains($labelLower, 'jarak')) {
+                            $icon = 'bi-water';
+                            $bgColor = '#1ABC9C';
+                            $stdUnit = 'cm';
+                        } elseif (str_contains($labelLower, 'co2') || str_contains($labelLower, 'karbon')) {
+                            $icon = 'bi-cloud';
+                            $bgColor = '#7D3C98';
+                            $stdUnit = 'ppm';
+                        } elseif (str_contains($labelLower, 'ec ') || $labelLower === 'ec' || str_contains($labelLower, 'electrical conductivity')) {
+                            $icon = 'bi-lightning';
+                            $bgColor = '#16A085';
+                            $stdUnit = 'mS/cm';
+                        } elseif (str_contains($labelLower, 'tds') || str_contains($labelLower, 'salinitas') || str_contains($labelLower, 'nutrisi')) {
+                            $icon = 'bi-droplet-fill';
+                            $bgColor = '#48C9B0';
+                            $stdUnit = 'ppm';
+                        } elseif (str_contains($labelLower, 'ph')) {
+                            $icon = 'bi-speedometer2';
+                            $bgColor = '#8E44AD';
+                            $stdUnit = '';
+                        }
                     @endphp
                     <div class="col-6 col-md-4 col-lg-3">
                         <div class="sensor-card">
-                            <div class="sensor-icon">
-                                <i class="bi bi-thermometer-half text-white"></i>
+                            <div class="sensor-icon" style="background: {{ $bgColor }}; box-shadow: 0 4px 10px {{ $bgColor }}40;">
+                                <i class="bi {{ $icon }} text-white"></i>
                             </div>
                             <div class="sensor-label">{{ $sensor->sensor_label }}</div>
                             <div class="sensor-value" id="sensor-val-{{ $sensor->id }}">
@@ -805,7 +872,7 @@
                                     --
                                 @endif
                             </div>
-                            <div class="sensor-unit">{{ $sensor->unit }}</div>
+                            <div class="sensor-unit">{{ $stdUnit }}</div>
                         </div>
                     </div>
                 @endforeach
@@ -900,14 +967,51 @@
                     @endforeach
 
                     @foreach($sortedOutputs as $output)
+                        @php
+                            $outLabel = strtolower($output->output_label);
+                            $outIcon = 'bi-plug';
+                            $outBgColor = 'var(--primary-gradient)'; 
+
+                            if (str_contains($outLabel, 'ph')) {
+                                $outIcon = 'bi-speedometer2';
+                                $outBgColor = '#8E44AD';
+                            } elseif (str_contains($outLabel, 'mix') || str_contains($outLabel, 'dosing') || str_contains($outLabel, 'nutrisi') || str_contains($outLabel, 'ab')) {
+                                $outIcon = 'bi-droplet-half';
+                                $outBgColor = '#F39C12';
+                            } elseif (str_contains($outLabel, 'pompa air') || str_contains($outLabel, 'water pump') || str_contains($outLabel, 'pompa utama')) {
+                                $outIcon = 'bi-water';
+                                $outBgColor = '#3498DB';
+                            } elseif (str_contains($outLabel, 'fan') || str_contains($outLabel, 'kipas') || str_contains($outLabel, 'blower')) {
+                                $outIcon = 'bi-fan';
+                                $outBgColor = '#95A5A6';
+                            } elseif (str_contains($outLabel, 'lamp') || str_contains($outLabel, 'cahaya') || str_contains($outLabel, 'light')) {
+                                $outIcon = 'bi-lightbulb';
+                                $outBgColor = '#F1C40F';
+                            } elseif (str_contains($outLabel, 'mist') || str_contains($outLabel, 'kabut') || str_contains($outLabel, 'pengkabutan')) {
+                                $outIcon = 'bi-cloud-fog';
+                                $outBgColor = '#5DADE2';
+                            } elseif (str_contains($outLabel, 'heater') || str_contains($outLabel, 'pemanas')) {
+                                $outIcon = 'bi-fire';
+                                $outBgColor = '#E74C3C';
+                            } elseif (str_contains($outLabel, 'valve') || str_contains($outLabel, 'katup') || str_contains($outLabel, 'kran')) {
+                                $outIcon = 'bi-sign-stop';
+                                $outBgColor = '#1ABC9C';
+                            }
+                            
+                            // Override for pure status sensors
+                            $isStatusOnly = str_starts_with($output->output_name, 'sts_') || in_array($output->output_name, ['st_bak', 'st_ppk']);
+                            if($isStatusOnly) {
+                                $outIcon = 'bi-info-circle';
+                                $outBgColor = '#22c55e';
+                            }
+                            
+                            $bgColorHex = (strpos($outBgColor, '#') === 0) ? $outBgColor : '#0ea5e9';
+                        @endphp
                         <div class="col-6 col-md-4 col-lg-3">
                             <div class="output-card" id="output-card-{{ $output->id }}"
-                                @if(str_starts_with($output->output_name, 'sts_') || in_array($output->output_name, ['st_bak', 'st_ppk']))
-                                style="background: rgba(34, 197, 94, 0.08); border-color: rgba(34, 197, 94, 0.3);" @endif>
-                                <div class="output-icon" @if(str_starts_with($output->output_name, 'sts_') || in_array($output->output_name, ['st_bak', 'st_ppk']))
-                                style="background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);" @endif>
-                                    <i
-                                        class="bi {{ (str_starts_with($output->output_name, 'sts_') || in_array($output->output_name, ['st_bak', 'st_ppk'])) ? 'bi-water' : 'bi-toggle-on' }} text-white"></i>
+                                @if($isStatusOnly) style="background: rgba(34, 197, 94, 0.08); border-color: rgba(34, 197, 94, 0.3);" @endif>
+                                <div class="output-icon" style="background: {{ $outBgColor }}; box-shadow: 0 4px 10px {{ $bgColorHex }}40;">
+                                    <i class="bi {{ $outIcon }} text-white"></i>
                                 </div>
                                 <div class="output-label">{{ $output->output_label }}</div>
 

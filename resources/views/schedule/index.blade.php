@@ -53,13 +53,24 @@
 
         .table-glass {
             color: var(--text-main);
+            border-collapse: separate;
+            border-spacing: 0;
+            width: 100%;
         }
         
         .table-glass th,
         .table-glass td {
-            border-color: var(--glass-border);
-            padding: 1rem;
+            border-bottom: 1px dashed var(--glass-border);
+            padding: 1.25rem 1rem;
             vertical-align: middle;
+        }
+        
+        .table-glass tbody tr {
+            transition: all 0.2s ease;
+        }
+
+        .table-glass tbody tr:hover {
+            background: rgba(14, 95, 138, 0.03);
         }
         
         .table-glass thead th {
@@ -78,23 +89,42 @@
         }
 
         .modal-content-glass {
-            background: var(--glass-bg);
-            backdrop-filter: blur(20px);
-            border: 1px solid var(--glass-border);
+            background: rgba(255, 255, 255, 0.05); /* slightly whiter/lighter */
+            backdrop-filter: blur(24px);
+            border: 2px solid #ffffff; /* pure white frame/list */
+            border-radius: 24px;
             color: var(--text-main);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+        }
+        
+        .modal-header {
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            background: rgba(0,0,0,0.1);
+            padding: 1.5rem;
+        }
+        
+        .modal-body {
+            padding: 1.5rem;
+        }
+        
+        .modal-footer {
+            border-top: 1px solid rgba(255,255,255,0.05);
+            padding: 1.5rem;
         }
         
         .form-control-dark, .form-select-dark {
-            background-color: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            color: var(--text-main);
+            background-color: rgba(0,0,0,0.2) !important;
+            border: 1px solid rgba(255,255,255,0.1) !important;
+            color: var(--text-main) !important;
+            border-radius: 12px;
+            padding: 0.75rem 1rem;
         }
         
         .form-control-dark:focus, .form-select-dark:focus {
-            background-color: var(--glass-bg);
-            border-color: var(--primary);
-            color: var(--text-main);
-            box-shadow: 0 0 0 0.25rem rgba(var(--primary), 0.25);
+            background-color: rgba(0,0,0,0.3) !important;
+            border-color: var(--primary) !important;
+            box-shadow: 0 0 0 0.25rem rgba(14, 95, 138, 0.25) !important;
         }
 
         .schedule-day-check {
@@ -103,23 +133,27 @@
         
         .schedule-day-label {
             display: inline-block;
-            width: 36px;
-            height: 36px;
-            line-height: 34px;
+            width: 42px;
+            height: 42px;
+            line-height: 40px;
             text-align: center;
-            border-radius: 50%;
+            border-radius: 12px;
             border: 1px solid var(--glass-border);
+            background: rgba(255,255,255,0.05);
             cursor: pointer;
-            margin-right: 5px;
-            font-size: 0.8rem;
+            margin-right: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
             user-select: none;
-            transition: all 0.2s;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
         
         .schedule-day-check:checked + .schedule-day-label {
             background-color: var(--primary);
             border-color: var(--primary);
             color: white;
+            box-shadow: 0 4px 12px rgba(14, 95, 138, 0.4);
+            transform: translateY(-2px);
         }
 
         /* ========= Mobile Responsive ========= */
@@ -142,9 +176,10 @@
                 display: block;
                 background: var(--glass-bg);
                 border: 1px solid var(--glass-border);
-                border-radius: 12px;
-                padding: 0.75rem;
-                margin-bottom: 0.75rem;
+                border-radius: 16px;
+                padding: 1rem;
+                margin-bottom: 1rem;
+                box-shadow: 0 4px 10px rgba(0,0,0,0.02);
             }
 
             .table-glass tbody td {
@@ -174,9 +209,9 @@
 
             /* Day selector bigger for touch */
             .schedule-day-label {
-                width: 42px;
-                height: 42px;
-                line-height: 40px;
+                width: 44px;
+                height: 44px;
+                line-height: 42px;
                 font-size: 0.85rem;
                 margin-right: 4px;
                 margin-bottom: 4px;
@@ -185,7 +220,7 @@
             /* Modal form touch-friendly */
             .form-control-dark, .form-select-dark {
                 font-size: 16px;
-                min-height: 48px;
+                min-height: 50px;
             }
 
             /* Alert compact */
@@ -216,10 +251,10 @@
                 <img src="{{ asset('images/logo.png') }}" alt="Swaratani" height="40" class="me-2">
                 <span class="fw-bold" style="color: var(--navbar_text, #333);">Swaratani IoT</span>
             </a>
-            <div class="navbar-nav ms-auto">
-                {{-- Helper Text / Status --}}
-                <a class="nav-link" href="{{ route('monitoring.show', $userDevice->id) }}">
-                    <i class="bi bi-arrow-left me-1"></i> Kembali
+            <div class="navbar-nav ms-auto flex-row align-items-center gap-4 gap-sm-3">
+                <a class="nav-link px-0 text-decoration-none" href="{{ route('monitoring.show', $userDevice->id) }}" title="Kembali ke Device" style="color: var(--navbar-text);">
+                    <i class="bi bi-arrow-left fs-5 me-2 me-sm-1" style="-webkit-text-stroke: 1px currentColor;"></i>
+                    <i class="bi bi-display fs-5 me-sm-1"></i><span class="d-none d-sm-inline"> Tampilan Device</span>
                 </a>
             </div>
         </div>
@@ -278,22 +313,28 @@
                                 }
                             @endphp
                             <tr id="row-slot-{{ $i }}">
-                                <td data-label="Jadwal"><span class="badge bg-secondary">Jadwal {{ $i }}</span></td>
+                                <td data-label="Jadwal">
+                                    <span class="badge rounded-pill" style="background: rgba(14, 95, 138, 0.1); color: var(--primary); border: 1px solid rgba(14, 95, 138, 0.2); padding: 6px 12px; font-weight: 700;">
+                                        Jadwal {{ $i }}
+                                    </span>
+                                </td>
                                 
-                                <td data-label="Waktu Mulai">{{ $isActive ? substr($sch['on_time'], 0, 5) : '-' }}</td>
+                                <td data-label="Waktu Mulai" class="fw-bold">{{ $isActive ? substr($sch['on_time'], 0, 5) : '-' }}</td>
                                 
                                 @if($isDuration) 
                                     <td data-label="Durasi">{{ $isActive ? $sch['duration'] . ' Menit' : '-' }}</td> 
                                 @else
-                                    <td data-label="Waktu Selesai">{{ $isActive ? ($sch['off_time'] ?? '-') : '-' }}</td>
+                                    <td data-label="Waktu Selesai" class="fw-bold">{{ $isActive ? ($sch['off_time'] ?? '-') : '-' }}</td>
                                 @endif
                                 
                                 @if($isSector) 
                                     <td data-label="Output">
                                         @if($isActive)
-                                            <span class="badge badge-sector">Output {{ $sch['sector'] }}</span>
+                                            <span class="badge rounded-pill" style="background: rgba(14, 95, 138, 0.05); color: var(--text-main); border: 1px solid rgba(14, 95, 138, 0.2);">
+                                                <i class="bi bi-outlet me-1" style="color: var(--primary);"></i> Output {{ $sch['sector'] }}
+                                            </span>
                                         @else
-                                            -
+                                            <span style="color: var(--text-secondary);">-</span>
                                         @endif
                                     </td> 
                                 @endif
@@ -302,11 +343,11 @@
                                     <td data-label="Input">
                                         @if($isActive)
                                             @if(($sch['name'] ?? '') == 'PUPUK')
-                                                <span class="badge bg-warning text-dark">Air Pupuk</span>
+                                                <span class="badge rounded-pill" style="background: rgba(234, 179, 8, 0.1); color: #ca8a04; border: 1px solid rgba(234, 179, 8, 0.2);"><i class="bi bi-droplet-half me-1"></i>Air Pupuk</span>
                                             @elseif(($sch['name'] ?? '') == 'BAKU')
-                                                <span class="badge bg-success">Air Baku</span>
+                                                <span class="badge rounded-pill" style="background: rgba(34, 197, 94, 0.1); color: #16a34a; border: 1px solid rgba(34, 197, 94, 0.2);"><i class="bi bi-water me-1"></i>Air Baku</span>
                                             @else
-                                                <span class="badge bg-secondary">{{ $sch['name'] ?? '-' }}</span>
+                                                <span class="badge rounded-pill bg-secondary">{{ $sch['name'] ?? '-' }}</span>
                                             @endif
                                         @else
                                             <span style="color: var(--text-secondary);">-</span>
@@ -315,26 +356,32 @@
                                 @endif
                                 
                                 @if($isDays) 
-                                    <td data-label="Hari"><small>{{ $isActive ? ($days ?: 'Setiap Hari') : '-' }}</small></td> 
+                                    <td data-label="Hari" style="color: var(--text-secondary);">{{ $isActive ? ($days ?: 'Setiap Hari') : '-' }}</td> 
                                 @endif
                                 
                                 <td data-label="Status">
                                     @if($isActive)
-                                        <span class="badge bg-success">Aktif</span>
+                                        <span class="badge rounded-pill shadow-sm" style="background: rgba(16, 185, 129, 0.15); color: #059669; border: 1px solid rgba(16, 185, 129, 0.3); padding: 6px 12px;">
+                                            <i class="bi bi-check-circle-fill me-1"></i> Aktif
+                                        </span>
                                     @else
-                                        <span class="badge bg-secondary">Kosong</span>
+                                        <span class="badge rounded-pill" style="background: rgba(107, 114, 128, 0.1); color: var(--text-secondary); border: 1px solid rgba(107, 114, 128, 0.2); padding: 6px 12px;">
+                                            Kosong
+                                        </span>
                                     @endif
                                 </td>
                                 
                                 <td data-label="">
-                                    <button class="btn btn-sm btn-outline-primary me-1" onclick='openScheduleModal({{ $i }}, @json($sch))'>
-                                        <i class="bi bi-pencil-square"></i> Edit
-                                    </button>
-                                    @if($isActive)
-                                        <button class="btn btn-sm btn-outline-danger" onclick="deleteSchedule({{ $i }})">
-                                            <i class="bi bi-trash"></i>
+                                    <div class="d-flex justify-content-end gap-2">
+                                        <button class="btn btn-sm" style="background: transparent; border: 1px solid #ffffff; color: #ffffff; border-radius: 50px; padding: 6px 14px; font-weight: 500;" onclick='openScheduleModal({{ $i }}, @json($sch))' title="Edit Jadwal">
+                                            <i class="bi bi-pencil-square me-1"></i> Edit
                                         </button>
-                                    @endif
+                                        @if($isActive)
+                                            <button class="btn btn-sm" style="background: transparent; border: 1px solid #ffffff; color: #ffffff; border-radius: 50px; padding: 6px 12px;" onclick="deleteSchedule({{ $i }})" title="Hapus Jadwal">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        @endif
+                                    </div>
                                 </td>
                             </tr>
                         @endfor
@@ -426,14 +473,14 @@
                     </div>
                     @endif
                 </div>
-                <div class="modal-footer border-top border-secondary justify-content-between">
-                    <button type="button" class="btn btn-outline-danger d-none" id="btnDeleteModal" onclick="deleteScheduleFromModal()">
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn border-0 text-danger px-3 py-2 rounded-pill d-none" style="background: rgba(239,68,68,0.1);" id="btnDeleteModal" onclick="deleteScheduleFromModal()">
                         <i class="bi bi-trash me-1"></i> Hapus
                     </button>
-                    <div>
+                    <div class="d-flex align-items-center gap-2">
                         <button type="button" class="btn btn-link text-decoration-none" style="color: var(--text-secondary);" data-bs-dismiss="modal">Batal</button>
-                        <button type="button" class="btn btn-primary" onclick="sendSchedule()">
-                            <span id="btnText">Kirim ke Device</span>
+                        <button type="button" class="btn btn-primary rounded-pill px-4 py-2" onclick="sendSchedule()">
+                            <span id="btnText">Kirim Jadwal</span>
                             <div id="btnLoading" class="spinner-border spinner-border-sm ms-2 d-none"></div>
                         </button>
                     </div>

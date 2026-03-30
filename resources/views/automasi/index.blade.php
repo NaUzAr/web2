@@ -120,6 +120,62 @@
             color: var(--primary);
         }
 
+        /* Premium Params */
+        .param-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            height: 100%;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
+        }
+        
+        .param-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.06);
+            border-color: var(--primary);
+        }
+
+        .icon-box {
+            width: 50px;
+            height: 50px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+        }
+
+        .limit-row span:first-child {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+
+        .limit-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.8rem 0;
+            border-bottom: 1px dashed var(--glass-border);
+        }
+        
+        .limit-row:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .limit-badge {
+            background: rgba(14, 95, 138, 0.1);
+            color: var(--primary);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-weight: 800;
+            font-size: 1.1rem;
+            border: 1px solid rgba(14, 95, 138, 0.2);
+        }
+
         /* Modal specific matching monitoring style */
         .modal-glass {
             background: var(--glass-bg);
@@ -155,6 +211,14 @@
 
         /* ========= Mobile Responsive ========= */
         @media (max-width: 768px) {
+            .limit-badge {
+                font-size: 0.85rem;
+                padding: 4px 12px;
+            }
+            .limit-row span:first-child {
+                font-size: 0.9rem;
+            }
+
             .container.py-4 {
                 padding: 1rem 0.75rem !important;
             }
@@ -215,9 +279,10 @@
                 <img src="{{ asset('images/logo.png') }}" alt="Swaratani" height="40" class="me-2">
                 <span class="fw-bold" style="color: var(--navbar_text, #333);">Swaratani IoT</span>
             </a>
-            <div class="navbar-nav ms-auto">
-                <a class="nav-link" href="{{ route('monitoring.show', $deviceId) }}">
-                    <i class="bi bi-arrow-left me-1"></i> Kembali
+            <div class="navbar-nav ms-auto flex-row align-items-center gap-4 gap-sm-3">
+                <a class="nav-link px-0 text-decoration-none" href="{{ route('monitoring.show', $deviceId) }}" title="Kembali ke Device" style="color: var(--navbar-text);">
+                    <i class="bi bi-arrow-left fs-5 me-2 me-sm-1" style="-webkit-text-stroke: 1px currentColor;"></i>
+                    <i class="bi bi-display fs-5 me-sm-1"></i><span class="d-none d-sm-inline"> Tampilan Device</span>
                 </a>
             </div>
         </div>
@@ -243,58 +308,54 @@
                                     class="bi bi-flower1 me-2"></i> Pemupukan</h4>
                         </div>
                         <div class="p-4">
-                            <!-- Items -->
-                            <div class="row g-3">
+                            <div class="row g-4">
                                 <!-- TDS / Nutrisi -->
                                 <div class="col-md-6">
-                                    <div class="p-3 rounded-3 h-100 d-flex flex-column justify-content-between"
-                                        style="background: var(--glass-bg);">
-                                        <div class="d-flex align-items-center justify-content-between mb-3">
+                                    <div class="param-card d-flex flex-column justify-content-between">
+                                        <div class="d-flex align-items-center justify-content-between mb-4 pb-3" style="border-bottom: 1px solid var(--glass-border);">
                                             <div class="d-flex align-items-center">
-                                                <i class="bi bi-droplet-half text-warning fs-4 me-2"></i>
-                                                <span class="fw-bold" style="color: var(--text-main);">Pompa Mix
-                                                    (TDS)</span>
+                                                <div class="icon-box" style="background: rgba(234, 179, 8, 0.1);">
+                                                    <i class="bi bi-droplet-half text-warning fs-3"></i>
+                                                </div>
+                                                <span class="fw-bold fs-5" style="color: var(--text-main);">Pompa Mix (TDS)</span>
                                             </div>
                                             <button class="btn btn-sm btn-light btn-icon rounded-circle shadow-sm"
-                                                onclick="openEditModal('tds', 'Pompa Mix (TDS)', 'ppm', {{ $settings['ats_tds'] ?? 0 }}, {{ $settings['bwh_tds'] ?? 0 }})">
-                                                <i class="bi bi-pencil-square text-dark"></i>
+                                                onclick="openEditModal('tds', 'Pompa Mix (TDS)', 'ppm', {{ $settings['ats_tds'] ?? 0 }}, {{ $settings['bwh_tds'] ?? 0 }})" title="Edit Otomasi Pompa Mix">
+                                                <i class="bi bi-pencil-square text-dark fs-5"></i>
                                             </button>
                                         </div>
-                                        <div class="d-flex justify-content-between small mb-1"
-                                            style="color: var(--text-secondary);">
-                                            <span>Batas Atas:</span>
-                                            <span class="fw-bold" style="color: var(--text-main);">{{ $settings['ats_tds'] ?? '-' }} ppm</span>
+                                        <div class="limit-row">
+                                            <span style="color: var(--text-secondary); font-weight: 500;">Batas Atas</span>
+                                            <span class="limit-badge">{{ $settings['ats_tds'] ?? '-' }} ppm</span>
                                         </div>
-                                        <div class="d-flex justify-content-between small"
-                                            style="color: var(--text-secondary);">
-                                            <span>Batas Bawah:</span>
-                                            <span class="fw-bold" style="color: var(--text-main);">{{ $settings['bwh_tds'] ?? '-' }} ppm</span>
+                                        <div class="limit-row">
+                                            <span style="color: var(--text-secondary); font-weight: 500;">Batas Bawah</span>
+                                            <span class="limit-badge">{{ $settings['bwh_tds'] ?? '-' }} ppm</span>
                                         </div>
                                     </div>
                                 </div>
                                 <!-- pH -->
                                 <div class="col-md-6">
-                                    <div class="p-3 rounded-3 h-100 d-flex flex-column justify-content-between"
-                                        style="background: var(--glass-bg);">
-                                        <div class="d-flex align-items-center justify-content-between mb-3">
+                                    <div class="param-card d-flex flex-column justify-content-between">
+                                        <div class="d-flex align-items-center justify-content-between mb-4 pb-3" style="border-bottom: 1px solid var(--glass-border);">
                                             <div class="d-flex align-items-center">
-                                                <i class="bi bi-speedometer2 text-warning fs-4 me-2"></i>
-                                                <span class="fw-bold" style="color: var(--text-main);">Pompa pH</span>
+                                                <div class="icon-box" style="background: rgba(20, 184, 166, 0.1);">
+                                                    <i class="bi bi-speedometer2 text-teal fs-3" style="color: #14b8a6;"></i>
+                                                </div>
+                                                <span class="fw-bold fs-5" style="color: var(--text-main);">Pompa pH</span>
                                             </div>
                                             <button class="btn btn-sm btn-light btn-icon rounded-circle shadow-sm"
-                                                onclick="openEditModal('ph', 'Pompa pH', '', {{ $settings['ats_ph'] ?? 0 }}, {{ $settings['bwh_ph'] ?? 0 }})">
-                                                <i class="bi bi-pencil-square text-dark"></i>
+                                                onclick="openEditModal('ph', 'Pompa pH', '', {{ $settings['ats_ph'] ?? 0 }}, {{ $settings['bwh_ph'] ?? 0 }})" title="Edit Otomasi Pompa pH">
+                                                <i class="bi bi-pencil-square text-dark fs-5"></i>
                                             </button>
                                         </div>
-                                        <div class="d-flex justify-content-between small mb-1"
-                                            style="color: var(--text-secondary);">
-                                            <span>Batas Atas:</span>
-                                            <span class="fw-bold" style="color: var(--text-main);">{{ $settings['ats_ph'] ?? '-' }}</span>
+                                        <div class="limit-row">
+                                            <span style="color: var(--text-secondary); font-weight: 500;">Batas Atas</span>
+                                            <span class="limit-badge">{{ $settings['ats_ph'] ?? '-' }}</span>
                                         </div>
-                                        <div class="d-flex justify-content-between small"
-                                            style="color: var(--text-secondary);">
-                                            <span>Batas Bawah:</span>
-                                            <span class="fw-bold" style="color: var(--text-main);">{{ $settings['bwh_ph'] ?? '-' }}</span>
+                                        <div class="limit-row">
+                                            <span style="color: var(--text-secondary); font-weight: 500;">Batas Bawah</span>
+                                            <span class="limit-badge">{{ $settings['bwh_ph'] ?? '-' }}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -305,7 +366,7 @@
 
                 @if($hasClimate ?? false)
                     <!-- CLIMATE SECTION -->
-                    <div class="sensor-card text-start p-0 overflow-hidden">
+                    <div class="sensor-card text-start p-0 overflow-hidden mt-2">
                         <div class="px-4 py-3 d-flex justify-content-between align-items-center"
                             style="background: linear-gradient(90deg, #0891b2 0%, #06b6d4 100%);">
                             <h4 class="mb-0 fw-bold text-white text-uppercase text-shadow"><i
@@ -313,56 +374,54 @@
                         </div>
                         <div class="p-4">
                             <!-- Items -->
-                            <div class="row g-3">
+                            <div class="row g-4">
                                 <!-- Suhu -->
                                 <div class="col-md-6">
-                                    <div class="p-3 rounded-3 h-100 d-flex flex-column justify-content-between"
-                                        style="background: var(--glass-bg);">
-                                        <div class="d-flex align-items-center justify-content-between mb-3">
+                                    <div class="param-card d-flex flex-column justify-content-between">
+                                        <div class="d-flex align-items-center justify-content-between mb-4 pb-3" style="border-bottom: 1px solid var(--glass-border);">
                                             <div class="d-flex align-items-center">
-                                                <i class="bi bi-thermometer-half text-info fs-4 me-2"></i>
-                                                <span class="fw-bold" style="color: var(--text-main);">Suhu Ruangan</span>
+                                                <div class="icon-box" style="background: rgba(239, 68, 68, 0.1);">
+                                                    <i class="bi bi-thermometer-half text-danger fs-3"></i>
+                                                </div>
+                                                <span class="fw-bold fs-5" style="color: var(--text-main);">Suhu Ruangan</span>
                                             </div>
                                             <button class="btn btn-sm btn-light btn-icon rounded-circle shadow-sm"
-                                                onclick="openEditModal('suhu', 'Suhu Ruangan', '°C', {{ $settings['ats_suhu'] ?? 0 }}, {{ $settings['bwh_suhu'] ?? 0 }})">
-                                                <i class="bi bi-pencil-square text-dark"></i>
+                                                onclick="openEditModal('suhu', 'Suhu Ruangan', '°C', {{ $settings['ats_suhu'] ?? 0 }}, {{ $settings['bwh_suhu'] ?? 0 }})" title="Edit Otomasi Suhu Ruangan">
+                                                <i class="bi bi-pencil-square text-dark fs-5"></i>
                                             </button>
                                         </div>
-                                        <div class="d-flex justify-content-between small mb-1"
-                                            style="color: var(--text-secondary);">
-                                            <span>Batas Atas:</span>
-                                            <span class="fw-bold" style="color: var(--text-main);">{{ $settings['ats_suhu'] ?? '-' }} °C</span>
+                                        <div class="limit-row">
+                                            <span style="color: var(--text-secondary); font-weight: 500;">Batas Atas</span>
+                                            <span class="limit-badge">{{ $settings['ats_suhu'] ?? '-' }} °C</span>
                                         </div>
-                                        <div class="d-flex justify-content-between small"
-                                            style="color: var(--text-secondary);">
-                                            <span>Batas Bawah:</span>
-                                            <span class="fw-bold" style="color: var(--text-main);">{{ $settings['bwh_suhu'] ?? '-' }} °C</span>
+                                        <div class="limit-row">
+                                            <span style="color: var(--text-secondary); font-weight: 500;">Batas Bawah</span>
+                                            <span class="limit-badge">{{ $settings['bwh_suhu'] ?? '-' }} °C</span>
                                         </div>
                                     </div>
                                 </div>
                                 <!-- Kelembaban -->
                                 <div class="col-md-6">
-                                    <div class="p-3 rounded-3 h-100 d-flex flex-column justify-content-between"
-                                        style="background: var(--glass-bg);">
-                                        <div class="d-flex align-items-center justify-content-between mb-3">
+                                    <div class="param-card d-flex flex-column justify-content-between">
+                                        <div class="d-flex align-items-center justify-content-between mb-4 pb-3" style="border-bottom: 1px solid var(--glass-border);">
                                             <div class="d-flex align-items-center">
-                                                <i class="bi bi-droplet text-info fs-4 me-2"></i>
-                                                <span class="fw-bold" style="color: var(--text-main);">Kelembaban</span>
+                                                <div class="icon-box" style="background: rgba(59, 130, 246, 0.1);">
+                                                    <i class="bi bi-droplet text-primary fs-3"></i>
+                                                </div>
+                                                <span class="fw-bold fs-5" style="color: var(--text-main);">Kelembaban</span>
                                             </div>
                                             <button class="btn btn-sm btn-light btn-icon rounded-circle shadow-sm"
-                                                onclick="openEditModal('kelem', 'Kelembaban', '%', {{ $settings['ats_kelem'] ?? 0 }}, {{ $settings['bwh_kelem'] ?? 0 }})">
-                                                <i class="bi bi-pencil-square text-dark"></i>
+                                                onclick="openEditModal('kelem', 'Kelembaban', '%', {{ $settings['ats_kelem'] ?? 0 }}, {{ $settings['bwh_kelem'] ?? 0 }})" title="Edit Otomasi Kelembaban">
+                                                <i class="bi bi-pencil-square text-dark fs-5"></i>
                                             </button>
                                         </div>
-                                        <div class="d-flex justify-content-between small mb-1"
-                                            style="color: var(--text-secondary);">
-                                            <span>Batas Atas:</span>
-                                            <span class="fw-bold" style="color: var(--text-main);">{{ $settings['ats_kelem'] ?? '-' }} %</span>
+                                        <div class="limit-row">
+                                            <span style="color: var(--text-secondary); font-weight: 500;">Batas Atas</span>
+                                            <span class="limit-badge">{{ $settings['ats_kelem'] ?? '-' }} %</span>
                                         </div>
-                                        <div class="d-flex justify-content-between small"
-                                            style="color: var(--text-secondary);">
-                                            <span>Batas Bawah:</span>
-                                            <span class="fw-bold" style="color: var(--text-main);">{{ $settings['bwh_kelem'] ?? '-' }} %</span>
+                                        <div class="limit-row">
+                                            <span style="color: var(--text-secondary); font-weight: 500;">Batas Bawah</span>
+                                            <span class="limit-badge">{{ $settings['bwh_kelem'] ?? '-' }} %</span>
                                         </div>
                                     </div>
                                 </div>
