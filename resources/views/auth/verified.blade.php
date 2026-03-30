@@ -84,6 +84,52 @@
             color: white;
         }
 
+        .btn-outline-green {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.7rem 1.5rem;
+            border-radius: 12px;
+            background: transparent;
+            border: 2px solid #10b981;
+            color: #10b981;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-outline-green:hover {
+            transform: translateY(-2px);
+            background: #10b981;
+            box-shadow: 0 8px 20px rgba(16, 185, 129, 0.35);
+            color: white;
+        }
+
+        .btn-blue {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.7rem 1.5rem;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #0ea5e9, #0284c7);
+            border: none;
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .btn-blue:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(14, 165, 233, 0.35);
+            color: white;
+        }
+
         /* ========= Mobile Responsive ========= */
         @media (max-width: 576px) {
             .verified-box {
@@ -124,12 +170,37 @@
             <i class="bi bi-check-lg"></i>
         </div>
         <h1 class="verified-title">Email Anda Sudah Diverifikasi!</h1>
-        <p class="verified-desc">Akun Anda telah aktif. Silakan login untuk mulai menggunakan Swaratani IoT.</p>
-        <a href="{{ route('login') }}" class="btn-login">
-            <i class="bi bi-box-arrow-in-right"></i>
-            Login Sekarang
-        </a>
+        <p class="verified-desc">Akun Anda telah aktif. Silakan pilih di platform mana Anda ingin melanjutkan.</p>
+        
+        <div class="d-flex flex-column gap-3 mx-auto mt-4" style="max-width: 250px;">
+            <button onclick="openSwarataniApp(event)" class="btn-blue w-100">
+                <i class="bi bi-phone"></i>
+                Buka Aplikasi Android
+            </button>
+            <a href="{{ route('login') }}" class="btn-outline-green w-100">
+                <i class="bi bi-globe"></i>
+                Lanjut di Web
+            </a>
+        </div>
     </div>
+
+    <script>
+        function openSwarataniApp(e) {
+            e.preventDefault();
+            
+            var packageName = "id.swaratani.swaratani_mobile";
+            var playStoreLink = "https://play.google.com/store/apps/details?id=" + packageName;
+            
+            var userAgent = navigator.userAgent || navigator.vendor || window.opera;
+            
+            if (/android/i.test(userAgent)) {
+                var intentUrl = "intent://#Intent;scheme=swaratani;package=" + packageName + ";S.browser_fallback_url=" + encodeURIComponent(playStoreLink) + ";end";
+                window.location.href = intentUrl;
+            } else {
+                window.location.href = playStoreLink;
+            }
+        }
+    </script>
 </body>
 
 </html>

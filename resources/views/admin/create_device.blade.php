@@ -351,9 +351,14 @@
                             </div>
 
                             <div class="mb-3">
-                                <label class="form-label"><i class="bi bi-geo-alt me-1"></i> Lokasi Alat</label>
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <label class="form-label mb-0"><i class="bi bi-geo-alt me-1"></i> Lokasi Alat</label>
+                                    <button type="button" class="btn btn-sm btn-outline-primary" id="btnAutoDetect" style="border-radius: 12px;">
+                                        <i class="bi bi-crosshair me-1"></i> Auto Lokasi
+                                    </button>
+                                </div>
                                 <input type="text" name="location" id="locationInput" class="form-control"
-                                    placeholder="Contoh: Greenhouse A, Kebun Teh Blok 3">
+                                    placeholder="Contoh: Greenhouse A, Kebun Teh Blok 3 (atau klik Auto Lokasi)">
                             </div>
 
                             <!-- Map Picker -->
@@ -831,6 +836,63 @@
                 }
 
                 marker.bindPopup('<b>📍 Lokasi Device</b><br>Lat: ' + lat + '<br>Lng: ' + lng).openPopup();
+            });
+
+            // Auto Detect Location
+            document.getElementById('btnAutoDetect').addEventListener('click', function() {
+                const btn = this;
+                const originalText = btn.innerHTML;
+                
+                if (!navigator.geolocation) {
+                    alert('Geolocation tidak didukung oleh browser ini.');
+                    return;
+                }
+                
+                btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> Mencari...';
+                btn.disabled = true;
+                
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    const lat = position.coords.latitude;
+                    const lng = position.coords.longitude;
+                    
+                    document.getElementById('latitudeInput').value = lat.toFixed(7);
+                    document.getElementById('longitudeInput').value = lng.toFixed(7);
+                    
+                    const newLatLng = new L.LatLng(lat, lng);
+                    map.setView(newLatLng, 15);
+                    
+                    if (marker) {
+                        marker.setLatLng(newLatLng);
+                    } else {
+                        marker = L.marker(newLatLng, { draggable: true }).addTo(map);
+                        marker.on('dragend', function (event) {
+                            const pos = marker.getLatLng();
+                            document.getElementById('latitudeInput').value = pos.lat.toFixed(7);
+                            document.getElementById('longitudeInput').value = pos.lng.toFixed(7);
+                        });
+                    }
+                    marker.bindPopup('<b>📍 Lokasi Anda (Auto)</b><br>Lat: ' + lat.toFixed(5) + '<br>Lng: ' + lng.toFixed(5)).openPopup();
+                    
+                    fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data && data.display_name) {
+                                document.getElementById('locationInput').value = data.display_name;
+                            }
+                            btn.innerHTML = originalText;
+                            btn.disabled = false;
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            btn.innerHTML = originalText;
+                            btn.disabled = false;
+                        });
+                        
+                }, function(error) {
+                    alert('Gagal mendapatkan lokasi. Pastikan izin lokasi diizinkan di browser Anda.');
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                }, { enableHighAccuracy: true });
             });
 
             // Fix map display issue when in tabs/hidden containers

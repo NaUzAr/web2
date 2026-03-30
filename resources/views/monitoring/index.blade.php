@@ -92,20 +92,32 @@
         /* Empty State */
         .empty-state {
             text-align: center;
+            padding: 4rem 1rem;
+            background: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(10px);
+            border: 2px dashed rgba(14, 95, 138, 0.3);
+            border-radius: 24px;
+            margin-top: 2rem;
         }
 
-        .empty-state i {
-            font-size: 4rem;
-            color: rgba(255, 255, 255, 0.3);
+        .empty-state > i {
+            font-size: 3.5rem;
+            color: var(--primary);
+            opacity: 0.5;
+            display: inline-block;
+            margin-bottom: 0.5rem;
         }
 
         .empty-state h5 {
-            color: #fff;
-            margin-top: 1rem;
+            color: var(--text-main);
+            margin-top: 1.5rem;
+            font-weight: 700;
         }
 
         .empty-state p {
-            color: rgba(255, 255, 255, 0.6);
+            color: var(--text-secondary);
+            max-width: 400px;
+            margin: 0.5rem auto 1.5rem auto;
         }
 
         /* Device Type Badge */
@@ -344,10 +356,19 @@
             <h2 class="page-title mb-0">
                 <i class="bi bi-graph-up-arrow me-2"></i>Monitoring Devices
             </h2>
-            <a href="{{ route('monitoring.create') }}" class="btn btn-gradient">
-                <i class="bi bi-plus-lg me-1"></i> Tambah Device
-            </a>
+            <div class="d-flex flex-wrap gap-2">
+                @if(!session('is_pwa'))
+                    <button onclick="openSwarataniApp(event)" class="btn btn-outline-primary" style="border-radius: 50px; font-weight: 600;">
+                        <i class="bi bi-phone me-1"></i> Buka Aplikasi
+                    </button>
+                @endif
+                <a href="{{ route('monitoring.create') }}" class="btn btn-gradient">
+                    <i class="bi bi-plus-lg me-1"></i> Tambah Device
+                </a>
+            </div>
         </div>
+
+
 
         @if(session('success'))
             <div class="alert alert-success-custom mb-4">
@@ -433,6 +454,25 @@
     @include('partials.chatbot')
 
     <script>
+        function openSwarataniApp(e) {
+            e.preventDefault();
+            
+            // Sesuai dengan config di swaratani_mobile/android/app/build.gradle
+            var packageName = "id.swaratani.swaratani_mobile";
+            var playStoreLink = "https://play.google.com/store/apps/details?id=" + packageName;
+            
+            var userAgent = navigator.userAgent || navigator.vendor || window.opera;
+            
+            if (/android/i.test(userAgent)) {
+                // Di Android, gunakan Intent untuk buka aplikasi. Jika belum install, browser akan fallback ke PlayStore (browser_fallback_url)
+                var intentUrl = "intent://#Intent;scheme=swaratani;package=" + packageName + ";S.browser_fallback_url=" + encodeURIComponent(playStoreLink) + ";end";
+                window.location.href = intentUrl;
+            } else {
+                // Untuk iOS atau desktop sementara buka PlayStore
+                window.location.href = playStoreLink;
+            }
+        }
+
         document.querySelectorAll('.btn-favorite').forEach(btn => {
             btn.addEventListener('click', async function () {
                 const id = this.dataset.id;

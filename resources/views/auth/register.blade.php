@@ -196,12 +196,22 @@
             <div class="row">
                 <div class="col-md-6 mb-3">
                     <label class="form-label"><i class="bi bi-lock me-1"></i>Password</label>
-                    <input type="password" class="form-control" name="password" placeholder="Min. 8 karakter" required>
+                    <div class="input-group">
+                        <input type="password" class="form-control" id="password" name="password" placeholder="Min. 6 karakter" minlength="6" required style="border-radius: 12px 0 0 12px;">
+                        <button class="btn btn-outline-secondary" type="button" id="togglePassword" style="border-radius: 0 12px 12px 0; border: 1px solid #ced4da; background-color: white;">
+                            <i class="bi bi-eye" id="toggleIcon"></i>
+                        </button>
+                    </div>
                 </div>
                 <div class="col-md-6 mb-4">
                     <label class="form-label"><i class="bi bi-lock-fill me-1"></i>Ulangi Password</label>
-                    <input type="password" class="form-control" name="password_confirmation"
-                        placeholder="Ulangi password" required>
+                    <div class="input-group">
+                        <input type="password" class="form-control" id="password_confirmation" name="password_confirmation"
+                            placeholder="Ulangi password" minlength="6" required style="border-radius: 12px 0 0 12px;">
+                        <button class="btn btn-outline-secondary" type="button" id="togglePasswordConfirm" style="border-radius: 0 12px 12px 0; border: 1px solid #ced4da; background-color: white;">
+                            <i class="bi bi-eye" id="toggleIconConfirm"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -220,6 +230,29 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function togglePasswordVisibility(inputId, iconId) {
+            const password = document.getElementById(inputId);
+            const icon = document.getElementById(iconId);
+            if (password.type === 'password') {
+                password.type = 'text';
+                icon.classList.remove('bi-eye');
+                icon.classList.add('bi-eye-slash');
+            } else {
+                password.type = 'password';
+                icon.classList.remove('bi-eye-slash');
+                icon.classList.add('bi-eye');
+            }
+        }
+
+        document.getElementById('togglePassword').addEventListener('click', function () {
+            togglePasswordVisibility('password', 'toggleIcon');
+        });
+
+        document.getElementById('togglePasswordConfirm').addEventListener('click', function () {
+            togglePasswordVisibility('password_confirmation', 'toggleIconConfirm');
+        });
+    </script>
 </body>
 
 </html>

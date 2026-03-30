@@ -136,7 +136,10 @@ Route::post('/email/resend', function (Request $request) {
 
 // Beranda (public)
 Route::get('/', function () {
-    return view('page.beranda');
+    if (auth()->check()) {
+        return view('page.beranda');
+    }
+    return redirect()->route('login');
 })->name('home');
 
 // Privacy Policy

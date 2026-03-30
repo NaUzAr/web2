@@ -72,8 +72,9 @@
 
         /* Menu Grid */
         .menu-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
             gap: 1rem;
             max-width: 600px;
             width: 100%;
@@ -82,6 +83,8 @@
 
         /* Menu Card */
         .menu-card {
+            width: 100%;
+            max-width: 250px;
             background: var(--glass-bg);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
@@ -248,8 +251,8 @@
                 height: 150px;
             }
 
-            .menu-grid {
-                grid-template-columns: 1fr 1fr;
+            .menu-card {
+                max-width: calc(50% - 0.5rem);
             }
 
             .user-badge {

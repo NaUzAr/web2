@@ -814,7 +814,7 @@
             <!-- Output Control Panel -->
             <div class="glass-card"
                 style="background: rgba(250, 204, 21, 0.05); border-color: rgba(250, 204, 21, 0.2); margin-top: 1.5rem;">
-                <h5 class="card-title" style="color: #fde047;">
+                <h5 class="card-title" style="color: #000000;">
                     <i class="bi bi-sliders me-2"></i>Kontrol Output
                 </h5>
                 <div class="row g-4 mt-2">

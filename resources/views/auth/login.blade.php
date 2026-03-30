@@ -183,8 +183,13 @@
                 <label for="password" class="form-label">
                     <i class="bi bi-lock me-1"></i>Password
                 </label>
-                <input type="password" class="form-control" id="password" name="password"
-                    placeholder="Masukkan password" required>
+                <div class="input-group">
+                    <input type="password" class="form-control" id="password" name="password"
+                        placeholder="Masukkan password" minlength="6" required style="border-radius: 12px 0 0 12px;">
+                    <button class="btn btn-outline-secondary" type="button" id="togglePassword" style="border-radius: 0 12px 12px 0; border: 1px solid #ced4da; background-color: white;">
+                        <i class="bi bi-eye" id="toggleIcon"></i>
+                    </button>
+                </div>
             </div>
 
             <div class="mb-4 text-end">
@@ -205,17 +210,26 @@
             <p class="text-muted-light small mb-2">Belum punya akun?</p>
             <a href="{{ route('register') }}" class="link-green">Buat Akun Baru</a>
 
-            @if(!request('pwa') && !session('is_pwa'))
-                <div class="mt-4 pt-3" style="border-top: 1px solid rgba(0,0,0,0.1);">
-                    <a href="{{ route('home') }}" style="color: #64748b; font-size: 0.9rem; text-decoration: none;">
-                        <i class="bi bi-arrow-left me-1"></i>Kembali ke Beranda
-                    </a>
-                </div>
-            @endif
+
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.getElementById('togglePassword').addEventListener('click', function (e) {
+            const password = document.getElementById('password');
+            const icon = document.getElementById('toggleIcon');
+            if (password.type === 'password') {
+                password.type = 'text';
+                icon.classList.remove('bi-eye');
+                icon.classList.add('bi-eye-slash');
+            } else {
+                password.type = 'password';
+                icon.classList.remove('bi-eye-slash');
+                icon.classList.add('bi-eye');
+            }
+        });
+    </script>
     @include('partials.pwa-scripts')
 </body>
 
