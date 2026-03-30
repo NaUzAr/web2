@@ -182,15 +182,18 @@
                 Lanjut di Web
             </a>
         </div>
+        
+        <p id="auto-redirect-msg" class="text-muted mt-4 mb-0" style="font-size: 0.8rem; display: none;">
+            Membuka aplikasi secara otomatis...
+        </p>
     </div>
 
     <script>
         function openSwarataniApp(e) {
-            e.preventDefault();
+            if (e) e.preventDefault();
             
             var packageName = "id.swaratani.swaratani_mobile";
             var playStoreLink = "https://play.google.com/store/apps/details?id=" + packageName;
-            
             var userAgent = navigator.userAgent || navigator.vendor || window.opera;
             
             if (/android/i.test(userAgent)) {
@@ -200,6 +203,19 @@
                 window.location.href = playStoreLink;
             }
         }
+
+        // Auto redirect only for Android users after a short delay
+        window.onload = function() {
+            var userAgent = navigator.userAgent || navigator.vendor || window.opera;
+            if (/android/i.test(userAgent)) {
+                var redirectMsg = document.getElementById('auto-redirect-msg');
+                if(redirectMsg) redirectMsg.style.display = 'block';
+                
+                setTimeout(function() {
+                    openSwarataniApp();
+                }, 1500); // 1.5 seconds delay
+            }
+        };
     </script>
 </body>
 
