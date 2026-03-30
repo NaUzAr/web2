@@ -320,6 +320,10 @@
             .page-title {
                 font-size: 1.5rem;
             }
+            .btn-action-responsive {
+                padding: 0.5rem 1rem !important;
+                font-size: 0.85rem !important;
+            }
         }
     </style>
 </head>
@@ -358,11 +362,11 @@
             </h2>
             <div class="d-flex flex-wrap gap-2">
                 @if(!session('is_pwa'))
-                    <button onclick="openSwarataniApp(event)" class="btn btn-outline-primary" style="border-radius: 50px; font-weight: 600;">
+                    <button onclick="openSwarataniApp(event)" class="btn btn-outline-primary btn-action-responsive" style="border-radius: 50px; font-weight: 600;">
                         <i class="bi bi-phone me-1"></i> Buka Aplikasi
                     </button>
                 @endif
-                <a href="{{ route('monitoring.create') }}" class="btn btn-gradient">
+                <a href="{{ route('monitoring.create') }}" class="btn btn-gradient btn-action-responsive">
                     <i class="bi bi-plus-lg me-1"></i> Tambah Device
                 </a>
             </div>
