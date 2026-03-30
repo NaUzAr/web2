@@ -56,6 +56,28 @@
             color: var(--primary) !important;
         }
 
+        .back-btn-navbar {
+            background: rgba(14, 95, 138, 0.05);
+            color: var(--primary) !important;
+            border: 1px solid rgba(14, 95, 138, 0.15);
+            transition: all 0.3s ease;
+            font-weight: 600;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            border-radius: 50px;
+            display: inline-flex;
+            align-items: center;
+            padding: 0.4rem 1rem !important;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        .back-btn-navbar:hover {
+            background: var(--primary) !important;
+            color: white !important;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(14, 95, 138, 0.2);
+        }
+
         .page-header {
             background: var(--glass-bg);
             backdrop-filter: blur(20px);
@@ -584,6 +606,23 @@
                 --bs-gutter-x: 0.5rem;
                 --bs-gutter-y: 0.5rem;
             }
+
+            .back-btn-navbar {
+                width: 42px;
+                height: 42px;
+                padding: 0 !important;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: 50% !important;
+            }
+            .back-btn-navbar span {
+                display: none !important;
+            }
+            .back-btn-navbar i {
+                margin: 0 !important;
+                font-size: 1.2rem;
+            }
         }
 
         @media (max-width: 400px) {
@@ -710,14 +749,14 @@
                 <img src="{{ asset('images/logo.png') }}" alt="Swaratani" height="40" class="me-2">
                 <span class="fw-bold" style="color: var(--navbar_text, #333);">Swaratani IoT</span>
             </a>
-            <div class="navbar-nav ms-auto">
+            <div class="navbar-nav ms-auto flex-row align-items-center">
                 @if($isAdminView ?? false)
-                    <a class="nav-link" href="{{ route('admin.devices.index') }}">
-                        <i class="bi bi-arrow-left me-1"></i> Kembali ke Device Manager
+                    <a class="nav-link back-btn-navbar" href="{{ route('admin.devices.index') }}" title="Kembali">
+                        <i class="bi bi-arrow-left-circle me-sm-2"></i><span>Manager</span>
                     </a>
                 @else
-                    <a class="nav-link" href="{{ route('monitoring.index') }}">
-                        <i class="bi bi-arrow-left me-1"></i> Kembali ke Monitoring
+                    <a class="nav-link back-btn-navbar" href="{{ route('monitoring.index') }}" title="Kembali">
+                        <i class="bi bi-arrow-left-circle me-sm-2"></i><span>Monitoring</span>
                     </a>
                 @endif
             </div>
