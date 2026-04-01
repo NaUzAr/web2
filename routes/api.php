@@ -16,6 +16,8 @@ use App\Http\Controllers\Api\AuthController;
 
 // ==================== AUTH ROUTES (Flutter) ====================
 Route::post('/login', [AuthController::class, 'login']);
+Route::post('/register', [AuthController::class, 'register']);
+Route::post('/email/resend', [AuthController::class, 'resendVerification']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', [AuthController::class, 'user']);
@@ -244,6 +246,12 @@ Route::middleware('auth:sanctum')->group(function () {
             ]
         ]);
     });
+
+    // ==================== TICKETING SYSTEM ====================
+    Route::get('/tickets', [\App\Http\Controllers\Api\TicketController::class, 'index']);
+    Route::post('/tickets', [\App\Http\Controllers\Api\TicketController::class, 'store']);
+    Route::get('/tickets/{id}', [\App\Http\Controllers\Api\TicketController::class, 'show']);
+    Route::post('/tickets/{id}/reply', [\App\Http\Controllers\Api\TicketController::class, 'reply']);
 });
 
 // ==================== SENSOR DATA ROUTES (IoT Device) ====================

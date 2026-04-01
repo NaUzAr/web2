@@ -360,6 +360,14 @@ class MonitoringController extends Controller
             // Continue anyway, database already updated
         }
 
+        $actionName = $newValue ? 'Menghidupkan' : 'Mematikan';
+        ActivityLog::log('device_control', "{$actionName} {$output->output_label} pada device '{$device->name}'", null, [
+            'device_id' => $device->id,
+            'output_id' => $output->id,
+            'output_name' => $output->output_name,
+            'new_value' => $newValue,
+        ]);
+
         return response()->json([
             'success' => true,
             'output_id' => $output->id,
@@ -417,6 +425,14 @@ class MonitoringController extends Controller
             $mqtt->disconnect();
 
             \Log::info("MQTT Pump Control sent", ['topic' => $topic, 'message' => $message]);
+
+            $actionName = $action === 'on' ? 'Menghidupkan' : 'Mematikan';
+            ActivityLog::log('pump_control', "{$actionName} pompa spesial pada device '{$device->name}'", null, [
+                'device_id' => $device->id,
+                'action_type' => $action,
+                'zone' => $request->input('zone'),
+                'input_type' => $request->input('input_type'),
+            ]);
 
             return response()->json([
                 'success' => true,
@@ -493,6 +509,15 @@ class MonitoringController extends Controller
                 'output_id' => $outputId,
                 'zone' => $zone,
                 'water_type' => $waterType
+            ]);
+
+            $actionName = $turnOn ? 'Menghidupkan' : 'Mematikan';
+            ActivityLog::log('irrigation_control', "{$actionName} pompa irigasi pada device '{$device->name}' (Zona {$zone})", null, [
+                'device_id' => $device->id,
+                'output_id' => $outputId,
+                'zone' => $zone,
+                'water_type' => $waterType,
+                'turn_on' => $turnOn,
             ]);
 
             return response()->json([

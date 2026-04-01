@@ -11,6 +11,7 @@
     @include('partials.theme')
 
     <title>Daftar - Swaratani</title>
+    @include('partials.pwa-head')
     <style>
         body {
             display: flex;

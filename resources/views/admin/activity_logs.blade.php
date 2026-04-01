@@ -5,6 +5,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Activity Logs - Swaratani</title>
+    @include('partials.pwa-head')
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
@@ -141,6 +142,9 @@
                 <span class="fw-bold" style="color: var(--navbar_text, #333);">Swaratani IoT</span>
             </a>
             <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="{{ route('admin.tickets.index') }}">
+                    <i class="bi bi-inboxes me-1"></i> Tiket
+                </a>
                 <a class="nav-link" href="{{ route('admin.devices.index') }}">
                     <i class="bi bi-cpu me-1"></i> Devices
                 </a>
@@ -196,6 +200,7 @@
                             <th>User</th>
                             <th>Aksi</th>
                             <th>Deskripsi</th>
+                            <th>Detail</th>
                             <th>IP</th>
                         </tr>
                     </thead>
@@ -222,6 +227,18 @@
                                     <span class="badge-action {{ $badgeClass }}">{{ $log->action }}</span>
                                 </td>
                                 <td data-label="Deskripsi">{{ \Illuminate\Support\Str::limit($log->description, 80) }}</td>
+                                <td data-label="Detail">
+                                    @if($log->details)
+                                        <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#detail-{{ $log->id }}">
+                                            Lihat
+                                        </button>
+                                        <div class="collapse mt-2" id="detail-{{ $log->id }}">
+                                            <pre class="bg-dark text-light p-2 rounded" style="font-size: 0.75rem;">{{ json_encode($log->details, JSON_PRETTY_PRINT) }}</pre>
+                                        </div>
+                                    @else
+                                        -
+                                    @endif
+                                </td>
                                 <td data-label="IP"><small class="text-secondary-light">{{ $log->ip_address }}</small></td>
                             </tr>
                         @empty

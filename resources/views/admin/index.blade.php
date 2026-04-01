@@ -5,6 +5,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Manage Devices - Swaratani</title>
+    @include('partials.pwa-head')
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
@@ -390,6 +391,9 @@
                 <span class="fw-bold" style="color: var(--navbar_text, #333);">Swaratani IoT</span>
             </a>
             <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="{{ route('admin.tickets.index') }}">
+                    <i class="bi bi-inboxes me-1"></i> Tiket
+                </a>
                 <a class="nav-link" href="{{ route('admin.activity-logs') }}">
                     <i class="bi bi-journal-text me-1"></i> Activity Logs
                 </a>
@@ -406,6 +410,9 @@
                 <i class="bi bi-cpu-fill me-2"></i>Device Management
             </h2>
             <div class="d-flex gap-2">
+                <a href="{{ route('admin.tickets.index') }}" class="btn btn-outline-light">
+                    <i class="bi bi-inboxes me-1"></i> Tiket
+                </a>
                 <a href="{{ route('admin.activity-logs') }}" class="btn btn-outline-light">
                     <i class="bi bi-journal-text me-1"></i> Logs
                 </a>

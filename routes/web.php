@@ -47,6 +47,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // Activity Logs
         Route::get('/activity-logs', [ActivityLogController::class, 'index'])->name('activity-logs');
 
+        // Admin Tickets
+        Route::get('/tickets', [\App\Http\Controllers\AdminTicketController::class, 'index'])->name('tickets.index');
+        Route::get('/tickets/{ticket}', [\App\Http\Controllers\AdminTicketController::class, 'show'])->name('tickets.show');
+        Route::put('/tickets/{ticket}', [\App\Http\Controllers\AdminTicketController::class, 'update'])->name('tickets.update');
+
 
         // Status (Admin Polling)
         Route::get('/device/{id}/status', [AdminDeviceController::class, 'getStatus'])->name('device.status');
@@ -93,8 +98,18 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/', [ScheduleController::class, 'index'])->name('index');
         Route::post('/time', [ScheduleController::class, 'storeTimeSchedules'])->name('time.store');
         Route::delete('/{slotId}', [ScheduleController::class, 'destroy'])->name('destroy');
-        // Route::post('/sensor', [ScheduleController::class, 'storeSensorRule'])->name('sensor.store'); // Sensor rules might need rethink or move
     });
+
+    // === USER RIWAYAT (Activity Log Frontend) ===
+    Route::get('/riwayat', [\App\Http\Controllers\UserActivityController::class, 'index'])->name('riwayat.index');
+
+    // === TICKET SYSTEM (User Frontend) ===
+    Route::get('/tickets', [\App\Http\Controllers\TicketController::class, 'index'])->name('tickets.index');
+    Route::get('/tickets/create', [\App\Http\Controllers\TicketController::class, 'create'])->name('tickets.create');
+    Route::post('/tickets', [\App\Http\Controllers\TicketController::class, 'store'])->name('tickets.store');
+    Route::get('/tickets/{ticket}', [\App\Http\Controllers\TicketController::class, 'show'])->name('tickets.show');
+    Route::post('/tickets/{ticket}/reply', [\App\Http\Controllers\TicketController::class, 'reply'])->name('tickets.reply');
+
 });
 
 // === EMAIL VERIFICATION ROUTES ===

@@ -17,6 +17,11 @@ class ActivityLog extends Model
         'description',
         'ip_address',
         'user_agent',
+        'details',
+    ];
+
+    protected $casts = [
+        'details' => 'array',
     ];
 
     /**
@@ -30,7 +35,7 @@ class ActivityLog extends Model
     /**
      * Static helper: log activity
      */
-    public static function log(string $action, string $description, ?int $userId = null): self
+    public static function log(string $action, string $description, ?int $userId = null, ?array $details = null): self
     {
         return self::create([
             'user_id' => $userId ?? Auth::id(),
@@ -38,6 +43,7 @@ class ActivityLog extends Model
             'description' => $description,
             'ip_address' => Request::ip(),
             'user_agent' => substr(Request::userAgent() ?? '', 0, 255),
+            'details' => $details,
         ]);
     }
 }

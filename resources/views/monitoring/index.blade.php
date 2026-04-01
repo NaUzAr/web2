@@ -378,8 +378,14 @@
                         <i class="bi bi-phone me-sm-1"></i><span class="action-text"> Buka Aplikasi</span>
                     </button>
                 @endif
+                <a href="{{ route('riwayat.index') }}" class="btn btn-outline-primary btn-action" style="border-radius: 50px;" title="Riwayat">
+                    <i class="bi bi-clock-history me-sm-1"></i><span class="action-text"> Riwayat</span>
+                </a>
+                <a href="{{ route('tickets.index') }}" class="btn btn-outline-danger btn-action" style="border-radius: 50px;" title="Lapor Masalah">
+                    <i class="bi bi-bug me-sm-1"></i><span class="action-text"> Lapor Masalah</span>
+                </a>
                 <a href="{{ route('monitoring.create') }}" class="btn btn-gradient btn-action" style="border-radius: 50px;" title="Tambah Device">
-                    <i class="bi bi-plus-lg me-sm-1"></i><span class="action-text"> Tambah Device</span>
+                    <i class="bi bi-plus-lg me-sm-1"></i><span class="action-text"> Tambah</span>
                 </a>
             </div>
         </div>
