@@ -367,9 +367,9 @@
                                 <div class="sensors-container">
                                     @if($device->outputs->count() > 0)
                                         @foreach($device->outputs as $output)
-                                            <span class="badge-output">
-                                                <span class="badge-output-name"><i
-                                                        class="bi bi-toggle-on me-1"></i>{{ $output->output_label }}</span>
+                                            <span class="badge-output" style="border: 1px solid {{ $output->color }}30; background: {{ $output->color }}10;">
+                                                <span class="badge-output-name" style="color: {{ $output->color }};"><i
+                                                        class="bi {{ $output->icon }} me-1"></i>{{ $output->output_label }}</span>
                                                 <span class="badge-output-type">{{ $output->output_name }}
                                                     ({{ $output->output_type }})</span>
                                             </span>

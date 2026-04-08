@@ -6,7 +6,11 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 use App\Models\User;
+use App\Mail\ResetPasswordMail;
 
 class AuthController extends Controller
 {
@@ -16,7 +20,7 @@ class AuthController extends Controller
             'name' => 'required|string|max:255',
             'username' => 'required|string|max:50|unique:users',
             'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:6', // Flutter doesnt use _confirmation field for now, checking client side
+            'password' => 'required|string|min:6|confirmed',
         ]);
 
         $user = User::create([
@@ -39,6 +43,50 @@ class AuthController extends Controller
                 'email' => $user->email,
             ]
         ], 201);
+    }
+
+    public function forgotPassword(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+        ]);
+
+        $user = User::where('email', $request->email)->first();
+
+        if (!$user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Email tidak ditemukan di sistem kami.'
+            ], 404);
+        }
+
+        // Generate token
+        $token = Str::random(64);
+
+        // Delete old tokens for this email
+        DB::table('password_reset_tokens')->where('email', $request->email)->delete();
+
+        // Insert new token
+        DB::table('password_reset_tokens')->insert([
+            'email' => $request->email,
+            'token' => Hash::make($token),
+            'created_at' => now(),
+        ]);
+
+        // Send email
+        try {
+            Mail::to($request->email)->send(new ResetPasswordMail($token, $request->email, $user->username));
+            return response()->json([
+                'success' => true,
+                'message' => 'Link reset password telah dikirim ke email Anda. Silakan cek kotak masuk atau spam.'
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Failed to send reset password email via API: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal mengirim email. Silakan coba lagi nanti.'
+            ], 500);
+        }
     }
 
     public function resendVerification(Request $request)

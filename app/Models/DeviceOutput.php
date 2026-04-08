@@ -32,6 +32,52 @@ class DeviceOutput extends Model
     ];
 
     /**
+     * Get the customized icon based on output type/name
+     */
+    public function getIconAttribute()
+    {
+        $outLabel = strtolower($this->output_label);
+        $outName = strtolower($this->output_name);
+
+        if (str_contains($outLabel, 'ph')) return 'bi-speedometer2';
+        if (str_contains($outLabel, 'mix') || str_contains($outLabel, 'dosing') || str_contains($outLabel, 'nutrisi') || str_contains($outLabel, 'ab')) return 'bi-droplet-half';
+        if (str_contains($outLabel, 'pompa air') || str_contains($outLabel, 'water pump') || str_contains($outLabel, 'pompa utama') || str_contains($outLabel, 'pompa') || str_contains($outLabel, 'pump') || str_contains($outName, 'pump')) return 'bi-water';
+        if (str_contains($outLabel, 'fan') || str_contains($outLabel, 'kipas') || str_contains($outLabel, 'blower') || str_contains($outLabel, 'exhaust') || str_contains($outName, 'fan')) return 'bi-fan';
+        if (str_contains($outLabel, 'lamp') || str_contains($outLabel, 'cahaya') || str_contains($outLabel, 'light') || str_contains($outName, 'lamp')) return 'bi-lightbulb';
+        if (str_contains($outLabel, 'mist') || str_contains($outLabel, 'kabut') || str_contains($outLabel, 'pengkabutan') || str_contains($outName, 'mist')) return 'bi-cloud-fog';
+        if (str_contains($outLabel, 'heater') || str_contains($outLabel, 'pemanas')) return 'bi-fire';
+        if (str_contains($outLabel, 'valve') || str_contains($outLabel, 'katup') || str_contains($outLabel, 'kran')) return 'bi-sign-stop';
+        
+        $isStatusOnly = str_starts_with($this->output_name, 'sts_') || in_array($this->output_name, ['st_bak', 'st_ppk']);
+        if ($isStatusOnly) return 'bi-info-circle';
+        
+        return 'bi-plug';
+    }
+
+    /**
+     * Get the customized color based on output type/name
+     */
+    public function getColorAttribute()
+    {
+        $outLabel = strtolower($this->output_label);
+        $outName = strtolower($this->output_name);
+
+        if (str_contains($outLabel, 'ph')) return '#8E44AD';
+        if (str_contains($outLabel, 'mix') || str_contains($outLabel, 'dosing') || str_contains($outLabel, 'nutrisi') || str_contains($outLabel, 'ab')) return '#F39C12';
+        if (str_contains($outLabel, 'pompa air') || str_contains($outLabel, 'water pump') || str_contains($outLabel, 'pompa utama') || str_contains($outLabel, 'pompa') || str_contains($outLabel, 'pump') || str_contains($outName, 'pump')) return '#3498DB';
+        if (str_contains($outLabel, 'fan') || str_contains($outLabel, 'kipas') || str_contains($outLabel, 'blower') || str_contains($outLabel, 'exhaust') || str_contains($outName, 'fan')) return '#95A5A6';
+        if (str_contains($outLabel, 'lamp') || str_contains($outLabel, 'cahaya') || str_contains($outLabel, 'light') || str_contains($outName, 'lamp')) return '#F1C40F';
+        if (str_contains($outLabel, 'mist') || str_contains($outLabel, 'kabut') || str_contains($outLabel, 'pengkabutan') || str_contains($outName, 'mist')) return '#5DADE2';
+        if (str_contains($outLabel, 'heater') || str_contains($outLabel, 'pemanas')) return '#E74C3C';
+        if (str_contains($outLabel, 'valve') || str_contains($outLabel, 'katup') || str_contains($outLabel, 'kran')) return '#1ABC9C';
+        
+        $isStatusOnly = str_starts_with($this->output_name, 'sts_') || in_array($this->output_name, ['st_bak', 'st_ppk']);
+        if ($isStatusOnly) return '#22c55e';
+        
+        return 'var(--primary-gradient)';
+    }
+
+    /**
      * Relasi ke Device
      */
     public function device()

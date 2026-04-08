@@ -258,8 +258,8 @@
                                         <tr>
                                             <td>{{ $auto->automation_name }}</td>
                                             <td>
-                                                <span class="badge bg-warning text-dark">
-                                                    {{ $auto->deviceOutput->output_label }}
+                                                <span class="badge shadow-sm" style="background: {{ $auto->deviceOutput->color }}; color: #fff; padding: 0.5em 0.7em;">
+                                                    <i class="bi {{ $auto->deviceOutput->icon }} me-1"></i> {{ $auto->deviceOutput->output_label }}
                                                 </span>
                                             </td>
                                             <td>
@@ -329,8 +329,8 @@
                                         <tr>
                                             <td>{{ $auto->automation_name }}</td>
                                             <td>
-                                                <span class="badge bg-warning text-dark">
-                                                    {{ $auto->deviceOutput->output_label }}
+                                                <span class="badge shadow-sm" style="background: {{ $auto->deviceOutput->color }}; color: #fff; padding: 0.5em 0.7em;">
+                                                    <i class="bi {{ $auto->deviceOutput->icon }} me-1"></i> {{ $auto->deviceOutput->output_label }}
                                                 </span>
                                             </td>
                                             <td>

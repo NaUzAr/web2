@@ -1032,43 +1032,10 @@
 
                     @foreach($sortedOutputs as $output)
                         @php
-                            $outLabel = strtolower($output->output_label);
-                            $outIcon = 'bi-plug';
-                            $outBgColor = 'var(--primary-gradient)'; 
-
-                            if (str_contains($outLabel, 'ph')) {
-                                $outIcon = 'bi-speedometer2';
-                                $outBgColor = '#8E44AD';
-                            } elseif (str_contains($outLabel, 'mix') || str_contains($outLabel, 'dosing') || str_contains($outLabel, 'nutrisi') || str_contains($outLabel, 'ab')) {
-                                $outIcon = 'bi-droplet-half';
-                                $outBgColor = '#F39C12';
-                            } elseif (str_contains($outLabel, 'pompa air') || str_contains($outLabel, 'water pump') || str_contains($outLabel, 'pompa utama')) {
-                                $outIcon = 'bi-water';
-                                $outBgColor = '#3498DB';
-                            } elseif (str_contains($outLabel, 'fan') || str_contains($outLabel, 'kipas') || str_contains($outLabel, 'blower')) {
-                                $outIcon = 'bi-fan';
-                                $outBgColor = '#95A5A6';
-                            } elseif (str_contains($outLabel, 'lamp') || str_contains($outLabel, 'cahaya') || str_contains($outLabel, 'light')) {
-                                $outIcon = 'bi-lightbulb';
-                                $outBgColor = '#F1C40F';
-                            } elseif (str_contains($outLabel, 'mist') || str_contains($outLabel, 'kabut') || str_contains($outLabel, 'pengkabutan')) {
-                                $outIcon = 'bi-cloud-fog';
-                                $outBgColor = '#5DADE2';
-                            } elseif (str_contains($outLabel, 'heater') || str_contains($outLabel, 'pemanas')) {
-                                $outIcon = 'bi-fire';
-                                $outBgColor = '#E74C3C';
-                            } elseif (str_contains($outLabel, 'valve') || str_contains($outLabel, 'katup') || str_contains($outLabel, 'kran')) {
-                                $outIcon = 'bi-sign-stop';
-                                $outBgColor = '#1ABC9C';
-                            }
+                            $outIcon = $output->icon;
+                            $outBgColor = $output->color;
                             
-                            // Override for pure status sensors
                             $isStatusOnly = str_starts_with($output->output_name, 'sts_') || in_array($output->output_name, ['st_bak', 'st_ppk']);
-                            if($isStatusOnly) {
-                                $outIcon = 'bi-info-circle';
-                                $outBgColor = '#22c55e';
-                            }
-                            
                             $bgColorHex = (strpos($outBgColor, '#') === 0) ? $outBgColor : '#0ea5e9';
                         @endphp
                         <div class="col-6 col-md-4 col-lg-3">

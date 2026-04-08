@@ -452,7 +452,7 @@
                             @else
                                 <th>Waktu Selesai</th>
                             @endif
-                            @if($isSector) <th>Output</th> @endif
+                            @if($isSector) <th>Zona Tujuan</th> @endif
                             @if($isType) <th>Input</th> @endif
                             @if($isDays) <th>Hari</th> @endif
                             <th>Status</th>
@@ -488,10 +488,10 @@
                                 @endif
                                 
                                 @if($isSector) 
-                                    <td data-label="Output">
+                                    <td data-label="Zona Tujuan">
                                         @if($isActive)
-                                            <span class="badge rounded-pill" style="background: rgba(14, 95, 138, 0.05); color: var(--text-main); border: 1px solid rgba(14, 95, 138, 0.2);">
-                                                <i class="bi bi-outlet me-1" style="color: var(--primary);"></i> Output {{ $sch['sector'] }}
+                                            <span class="badge rounded-pill" style="background: rgba(14, 165, 233, 0.1); color: #0284c7; border: 1px solid rgba(14, 165, 233, 0.2);">
+                                                <i class="bi bi-geo-alt-fill me-1" style="color: #0ea5e9;"></i> Zona {{ $sch['sector'] }}
                                             </span>
                                         @else
                                             <span style="color: var(--text-secondary);">-</span>
@@ -602,10 +602,10 @@
                         <div class="form-section-title">💧 Sumber & Output</div>
                         @if($isSector)
                         <div class="mb-3">
-                            <label class="form-label fw-bold" style="color: #374151; font-size: 0.9rem;">Output Tujuan</label>
+                            <label class="form-label fw-bold" style="color: #374151; font-size: 0.9rem;">Zona Tujuan</label>
                             <select id="sector" class="form-select form-select-dark">
                                 @for($s = 1; $s <= ($scheduleConfig->max_sectors ?? 1); $s++)
-                                    <option value="{{ $s }}">🔌 Output {{ $s }}</option>
+                                    <option value="{{ $s }}">📍 Zona {{ $s }}</option>
                                 @endfor
                             </select>
                         </div>

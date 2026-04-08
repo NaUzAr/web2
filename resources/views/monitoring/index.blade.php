@@ -193,6 +193,50 @@
             box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
         }
 
+        /* Action Buttons */
+        .btn-action-custom {
+            font-weight: 600;
+            padding: 0.6rem 1.25rem;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .btn-app {
+            background: rgba(14, 165, 233, 0.1);
+            color: #0284c7;
+            border: 1px solid rgba(14, 165, 233, 0.3);
+        }
+        .btn-app:hover {
+            background: rgba(14, 165, 233, 0.2);
+            color: #0369a1;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(14, 165, 233, 0.15);
+        }
+
+        .btn-history {
+            background: rgba(99, 102, 241, 0.1);
+            color: #4f46e5;
+            border: 1px solid rgba(99, 102, 241, 0.3);
+        }
+        .btn-history:hover {
+            background: rgba(99, 102, 241, 0.2);
+            color: #4338ca;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15);
+        }
+
+        .btn-report {
+            background: rgba(239, 68, 68, 0.1);
+            color: #dc2626;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+        .btn-report:hover {
+            background: rgba(239, 68, 68, 0.2);
+            color: #b91c1c;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.15);
+        }
+
         /* Alert Custom */
         .alert-success-custom {
             background: rgba(16, 185, 129, 0.15);
@@ -374,14 +418,14 @@
             </h2>
             <div class="d-flex gap-2 header-actions flex-shrink-0">
                 @if(!session('is_pwa'))
-                    <button onclick="openSwarataniApp(event)" class="btn btn-outline-primary btn-action" style="border-radius: 50px; font-weight: 600;" title="Buka Aplikasi">
+                    <button onclick="openSwarataniApp(event)" class="btn btn-app btn-action btn-action-custom" title="Buka Aplikasi">
                         <i class="bi bi-phone me-sm-1"></i><span class="action-text"> Buka Aplikasi</span>
                     </button>
                 @endif
-                <a href="{{ route('riwayat.index') }}" class="btn btn-outline-primary btn-action" style="border-radius: 50px;" title="Riwayat">
+                <a href="{{ route('riwayat.index') }}" class="btn btn-history btn-action btn-action-custom" title="Riwayat">
                     <i class="bi bi-clock-history me-sm-1"></i><span class="action-text"> Riwayat</span>
                 </a>
-                <a href="{{ route('tickets.index') }}" class="btn btn-outline-danger btn-action" style="border-radius: 50px;" title="Lapor Masalah">
+                <a href="{{ route('tickets.index') }}" class="btn btn-report btn-action btn-action-custom" title="Lapor Masalah">
                     <i class="bi bi-bug me-sm-1"></i><span class="action-text"> Lapor Masalah</span>
                 </a>
                 <a href="{{ route('monitoring.create') }}" class="btn btn-gradient btn-action" style="border-radius: 50px;" title="Tambah Device">
