@@ -55,6 +55,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         // Status (Admin Polling)
         Route::get('/device/{id}/status', [AdminDeviceController::class, 'getStatus'])->name('device.status');
+
+        // Global Sensor Rules (Admin Peringatan Dini FCM)
+        Route::get('/sensor-rules', [\App\Http\Controllers\AdminSensorRuleController::class, 'index'])->name('sensor-rules.index');
+        Route::post('/sensor-rules', [\App\Http\Controllers\AdminSensorRuleController::class, 'store'])->name('sensor-rules.store');
+        Route::post('/sensor-rules/test', [\App\Http\Controllers\AdminSensorRuleController::class, 'testNotification'])->name('sensor-rules.test');
+        Route::put('/sensor-rules/{id}', [\App\Http\Controllers\AdminSensorRuleController::class, 'update'])->name('sensor-rules.update');
+        Route::delete('/sensor-rules/{id}', [\App\Http\Controllers\AdminSensorRuleController::class, 'destroy'])->name('sensor-rules.destroy');
     });
 
     // === MONITORING ROUTES (untuk semua user yang login) ===

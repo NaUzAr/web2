@@ -167,4 +167,20 @@ class AuthController extends Controller
             'message' => 'Logged out'
         ]);
     }
+
+    public function updateFcmToken(Request $request)
+    {
+        $request->validate([
+            'fcm_token' => 'required|string',
+        ]);
+
+        $user = $request->user();
+        if ($user) {
+            $user->fcm_token = $request->fcm_token;
+            $user->save();
+            return response()->json(['success' => true, 'message' => 'FCM Token updated']);
+        }
+
+        return response()->json(['success' => false, 'message' => 'Unauthorized'], 401);
+    }
 }

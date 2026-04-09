@@ -27,3 +27,5 @@ setup_nginx.sh
 setup_postgres.sh
 setup-laravel-project.sh
 setup-server.sh
+
+firebase-adminsdk.json

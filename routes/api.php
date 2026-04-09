@@ -23,6 +23,7 @@ Route::post('/password/forgot', [AuthController::class, 'forgotPassword']);
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', [AuthController::class, 'user']);
     Route::post('/logout', [AuthController::class, 'logout']);
+    Route::post('/fcm-token', [AuthController::class, 'updateFcmToken']);
 
     // Device routes untuk Flutter
     Route::get('/devices', function () {

@@ -82,6 +82,41 @@ class SensorDataController extends Controller
             $device->last_seen_at = now();
             $device->save();
 
+            // CHECK GLOBAL RULES & SEND FCM NOTIFICATION IF DANGEROUS
+            foreach ($receivedSensors as $rSensor) {
+                $val = $insertData[$rSensor];
+                $rule = \App\Models\GlobalSensorRule::where('sensor_key', $rSensor)->where('is_active', true)->first();
+                
+                if ($rule) {
+                    $isDanger = false;
+                    $reason = '';
+                    
+                    if ($rule->max_value !== null && $val > $rule->max_value) {
+                        $isDanger = true;
+                        $reason = "melewati batas " . $rule->max_value;
+                    } elseif ($rule->min_value !== null && $val < $rule->min_value) {
+                        $isDanger = true;
+                        $reason = "di bawah batas " . $rule->min_value;
+                    }
+
+                    if ($isDanger) {
+                        // Temukan semua user yang memiliki device ini
+                        $userIds = \App\Models\UserDevice::where('device_id', $device->id)->pluck('user_id');
+                        $users = \App\Models\User::whereIn('id', $userIds)->whereNotNull('fcm_token')->get();
+                        
+                        if ($users->count() > 0) {
+                            $firebase = app(\App\Services\FirebaseService::class);
+                            $title = "⚠️ CRITICAL: " . strtoupper(str_replace('ni_', '', $rSensor));
+                            $body = "Nilai terkini {$val} {$reason} pada perangkat {$device->name}!";
+                            
+                            foreach ($users as $userToNotify) {
+                                $firebase->sendToToken($userToNotify->fcm_token, $title, $body);
+                            }
+                        }
+                    }
+                }
+            }
+
             Log::info("Sensor data received", [
                 'device' => $device->name,
                 'token' => $token,
