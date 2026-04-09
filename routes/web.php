@@ -62,6 +62,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/sensor-rules/test', [\App\Http\Controllers\AdminSensorRuleController::class, 'testNotification'])->name('sensor-rules.test');
         Route::put('/sensor-rules/{id}', [\App\Http\Controllers\AdminSensorRuleController::class, 'update'])->name('sensor-rules.update');
         Route::delete('/sensor-rules/{id}', [\App\Http\Controllers\AdminSensorRuleController::class, 'destroy'])->name('sensor-rules.destroy');
+
+        // Broadcast Announcements
+        Route::get('/announcements', [\App\Http\Controllers\AdminAnnouncementController::class, 'index'])->name('announcements.index');
+        Route::post('/announcements/send', [\App\Http\Controllers\AdminAnnouncementController::class, 'send'])->name('announcements.send');
     });
 
     // === MONITORING ROUTES (untuk semua user yang login) ===

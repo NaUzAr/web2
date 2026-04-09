@@ -57,4 +57,40 @@ class FirebaseService
             return false;
         }
     }
+
+    /**
+     * Send multicast notification to multiple tokens
+     * 
+     * @param array $tokens Array of valid FCM tokens
+     * @return \Kreait\Firebase\Messaging\MulticastSendReport|null
+     */
+    public function sendToTokens(array $tokens, $title, $body, $data = [])
+    {
+        if (!$this->messaging || empty($tokens)) {
+            return null;
+        }
+
+        try {
+            // Maximum tokens per multicast limit by Firebase is 500
+            // The Firebase PHP SDK handles chunking automatically in sendMulticast()
+            $messageConfig = [
+                'notification' => [
+                    'title' => $title,
+                    'body' => $body,
+                ],
+            ];
+
+            if (!empty($data)) {
+                $messageConfig['data'] = $data;
+            }
+
+            $message = CloudMessage::fromArray($messageConfig);
+            $report = $this->messaging->sendMulticast($message, $tokens);
+
+            return $report;
+        } catch (\Throwable $e) {
+            \Log::error('Firebase Multicast Error: ' . $e->getMessage());
+            return null;
+        }
+    }
 }

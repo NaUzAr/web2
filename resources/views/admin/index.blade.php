@@ -390,7 +390,7 @@
                 <img src="{{ asset('images/logo.png') }}" alt="Swaratani" height="40" class="me-2">
                 <span class="fw-bold" style="color: var(--navbar_text, #333);">Swaratani IoT</span>
             </a>
-            <div class="navbar-nav ms-auto">
+            <div class="navbar-nav ms-auto gap-2 flex-row flex-wrap">
                 <a class="nav-link" href="{{ route('admin.sensor-rules.index') }}">
                     <i class="bi bi-sliders me-1"></i> Sensor Rules
                 </a>
@@ -399,6 +399,9 @@
                 </a>
                 <a class="nav-link" href="{{ route('admin.activity-logs') }}">
                     <i class="bi bi-journal-text me-1"></i> Activity Logs
+                </a>
+                <a class="nav-link" href="{{ route('admin.announcements.index') }}">
+                    <i class="bi bi-megaphone-fill me-1"></i> Broadcast
                 </a>
                 <a class="nav-link" href="{{ route('home') }}">
                     <i class="bi bi-house me-1"></i> Beranda
