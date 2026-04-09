@@ -36,13 +36,23 @@ class FirebaseService
         }
 
         try {
-            $message = CloudMessage::withTarget('token', $fcmToken)
-                ->withNotification(Notification::create($title, $body))
-                ->withData($data);
+            $messageConfig = [
+                'token' => $fcmToken,
+                'notification' => [
+                    'title' => $title,
+                    'body' => $body,
+                ],
+            ];
+
+            if (!empty($data)) {
+                $messageConfig['data'] = $data;
+            }
+
+            $message = CloudMessage::fromArray($messageConfig);
 
             $this->messaging->send($message);
             return true;
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             \Log::error('Firebase Notification Error: ' . $e->getMessage());
             return false;
         }
