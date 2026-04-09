@@ -32,6 +32,7 @@
                 <span class="fw-bold" style="color: var(--navbar_text, #333);">Admin Panel</span>
             </a>
             <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="{{ route('admin.sensor-rules.index') }}">Sensor Rules</a>
                 <a class="nav-link" href="{{ route('admin.devices.index') }}">Devices</a>
                 <a class="nav-link" href="{{ route('admin.activity-logs') }}">Logs</a>
                 <a class="nav-link" href="{{ route('home') }}">Beranda</a>

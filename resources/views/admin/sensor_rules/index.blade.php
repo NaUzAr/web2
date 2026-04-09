@@ -27,7 +27,7 @@
             </a>
             <div class="navbar-nav ms-auto flex-row gap-3">
                 <a class="nav-link" href="{{ route('admin.sensor-rules.index') }}">
-                    <i class="bi bi-bell-fill me-1"></i> Sensor Alert
+                    <i class="bi bi-sliders me-1"></i> Sensor Rules
                 </a>
                 <a class="nav-link" href="{{ route('admin.activity-logs') }}">
                     <i class="bi bi-journal-text me-1"></i> Logs

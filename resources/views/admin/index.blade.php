@@ -391,6 +391,9 @@
                 <span class="fw-bold" style="color: var(--navbar_text, #333);">Swaratani IoT</span>
             </a>
             <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="{{ route('admin.sensor-rules.index') }}">
+                    <i class="bi bi-sliders me-1"></i> Sensor Rules
+                </a>
                 <a class="nav-link" href="{{ route('admin.tickets.index') }}">
                     <i class="bi bi-inboxes me-1"></i> Tiket
                 </a>
