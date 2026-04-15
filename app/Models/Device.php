@@ -385,7 +385,8 @@ class Device extends Model
     }
 
     /**
-     * Cek apakah device memiliki sensor yang mendukung tipe otomasi tertentu
+     * Cek apakah device memiliki sensor DAN output yang mendukung tipe otomasi tertentu
+     * Device harus punya minimal 1 sensor cocok DAN minimal 1 output cocok
      * @param string $type 'climate' atau 'fertilizer'
      */
     public function hasAutomationType($type)
@@ -395,6 +396,7 @@ class Device extends Model
             return false;
 
         $requiredSensors = array_keys($presets[$type]['sensors']);
+        $requiredOutputs = array_keys($presets[$type]['outputs']);
 
         // Fetch all sensor names for this device
         if ($this->relationLoaded('sensors')) {
@@ -403,13 +405,35 @@ class Device extends Model
             $sensorNames = $this->sensors()->pluck('sensor_name')->toArray();
         }
 
+        // Fetch all output names for this device
+        if ($this->relationLoaded('outputs')) {
+            $outputNames = $this->outputs->pluck('output_name')->toArray();
+        } else {
+            $outputNames = $this->outputs()->pluck('output_name')->toArray();
+        }
+
+        // Cek apakah ada minimal 1 sensor yang cocok
+        $hasSensor = false;
         foreach ($requiredSensors as $req) {
             foreach ($sensorNames as $name) {
+                if ($name === $req || str_starts_with($name, $req . '_')) {
+                    $hasSensor = true;
+                    break 2;
+                }
+            }
+        }
+
+        if (!$hasSensor) return false;
+
+        // Cek apakah ada minimal 1 output yang cocok
+        foreach ($requiredOutputs as $req) {
+            foreach ($outputNames as $name) {
                 if ($name === $req || str_starts_with($name, $req . '_')) {
                     return true;
                 }
             }
         }
+
         return false;
     }
 
