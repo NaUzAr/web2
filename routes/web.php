@@ -79,6 +79,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/device/{id}/output/{outputId}/toggle', [MonitoringController::class, 'toggleOutput'])->name('output.toggle');
         Route::post('/device/{id}/pump/control', [MonitoringController::class, 'controlPump'])->name('pump.control');
         Route::post('/device/{id}/output/{outputId}/irrigation-pump', [MonitoringController::class, 'controlIrrigationPump'])->name('irrigation.pump');
+        Route::post('/device/{id}/dosing/volume', [MonitoringController::class, 'controlDosingByVolume'])->name('dosing.volume');
         Route::get('/device/{id}/status', [MonitoringController::class, 'getStatus'])->name('status');
         Route::post('/device/{id}/favorite', [MonitoringController::class, 'toggleFavorite'])->name('favorite');
     });

@@ -305,6 +305,7 @@ class MonitoringController extends Controller
             // 2. Main Pump (Pompa Utama / Irigasi)
             elseif (str_contains($name, 'pompa') || str_contains($name, 'pump') || $name === 'st_pmp') {
                 if ($newValue) {
+                    // Format: <PMP_ON#waterType#zone#> (1=pupuk/baku, 1=blok)
                     $message = "<PMP_ON#0#0#>";
                 } else {
                     $message = "<PMP_OFF#>";
@@ -396,9 +397,10 @@ class MonitoringController extends Controller
             $topic = rtrim($device->mqtt_topic, '/') . '/sub';
 
             if ($action === 'on') {
-                $zone = $request->input('zone', 1);
                 $inputType = $request->input('input_type', 0); // 0 = Air Baku, 1 = Air Pupuk
-                $message = "<PMP_ON#{$zone}#{$inputType}#>";
+                $zone = $request->input('zone', 1);
+                // Format: <PMP_ON#waterType#zone#>
+                $message = "<PMP_ON#{$inputType}#{$zone}#>";
             } else {
                 $message = "<PMP_OFF#>";
             }
@@ -452,8 +454,8 @@ class MonitoringController extends Controller
 
     /**
      * Control irrigation pump with zone selection (multi-zone)
-     * MQTT Format: <PMP_ON#zone#waterType#> or <PMP_OFF#zone#>
-     * Water Type: 1 = Air Baku (default), 2 = Air Pupuk
+     * MQTT Format: <PMP_ON#waterType#zone#> or <PMP_OFF#>
+     * Water Type: 1 = pupuk, 2 = baku
      */
     public function controlIrrigationPump(Request $request, $userDeviceId, $outputId)
     {
@@ -470,16 +472,17 @@ class MonitoringController extends Controller
 
         $device = $userDevice->device;
         $turnOn = filter_var($request->input('turnOn', false), FILTER_VALIDATE_BOOLEAN);
+        $waterType = $request->input('waterType', 1); // 1 = pupuk, 2 = baku
         $zone = $request->input('zone', 1);
-        $waterType = $request->input('waterType', 1); // 1 = Air Baku, 2 = Air Pupuk
 
         try {
             $topic = rtrim($device->mqtt_topic, '/') . '/sub';
 
             if ($turnOn) {
-                $message = "<PMP_ON#{$zone}#{$waterType}#>";
+                // Format: <PMP_ON#waterType#zone#>
+                $message = "<PMP_ON#{$waterType}#{$zone}#>";
             } else {
-                $message = "<PMP_OFF#{$zone}#>";
+                $message = "<PMP_OFF#>";
             }
 
             // MQTT Connection
@@ -530,6 +533,104 @@ class MonitoringController extends Controller
             ]);
         } catch (\Exception $e) {
             \Log::error("MQTT Irrigation Pump Control failed: " . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal mengirim perintah: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Control dosing/pH pump by volume (milliliter)
+     * MQTT Format (lowercase!):
+     *   Dosing AB:  <pmpab#10#>  → 10 = 10 milliliter
+     *   pH Up:      <pmpph#10#>  → 10 = 10 milliliter
+     *   pH Down:    <pmpph2#10#> → 10 = 10 milliliter
+     */
+    public function controlDosingByVolume(Request $request, $userDeviceId)
+    {
+        $userDevice = UserDevice::where('user_id', Auth::id())
+            ->where('id', $userDeviceId)
+            ->with('device')
+            ->firstOrFail();
+
+        $device = $userDevice->device;
+
+        $request->validate([
+            'pump_type' => 'required|string|in:dosing,ph_up,ph_down',
+            'volume' => 'required|integer|min:1|max:9999',
+        ]);
+
+        $pumpType = $request->input('pump_type');
+        $volume = $request->input('volume');
+
+        // Map pump type to MQTT command (lowercase!)
+        $commandMap = [
+            'dosing'  => 'pmpab',
+            'ph_up'   => 'pmpph',
+            'ph_down' => 'pmpph2',
+        ];
+
+        $command = $commandMap[$pumpType] ?? null;
+        if (!$command) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Tipe pompa tidak valid.',
+            ], 400);
+        }
+
+        $message = "<{$command}#{$volume}#>";
+
+        try {
+            $topic = rtrim($device->mqtt_topic, '/') . '/sub';
+
+            $host = config('mqtt.host', env('MQTT_HOST', 'smartagri.web.id'));
+            $port = config('mqtt.port', env('MQTT_PORT', 1883));
+            $username = config('mqtt.username', env('MQTT_USERNAME'));
+            $password = config('mqtt.password', env('MQTT_PASSWORD'));
+
+            $connectionSettings = new \PhpMqtt\Client\ConnectionSettings();
+            if ($username && $password) {
+                $connectionSettings = $connectionSettings
+                    ->setUsername($username)
+                    ->setPassword($password);
+            }
+            $connectionSettings = $connectionSettings
+                ->setKeepAliveInterval(60)
+                ->setConnectTimeout(10);
+
+            $mqtt = new \PhpMqtt\Client\MqttClient($host, $port, 'laravel-dosing-' . uniqid());
+            $mqtt->connect($connectionSettings, true);
+            $mqtt->publish($topic, $message, 1);
+            $mqtt->disconnect();
+
+            \Log::info("MQTT Dosing by Volume sent", [
+                'topic' => $topic,
+                'message' => $message,
+                'pump_type' => $pumpType,
+                'volume' => $volume,
+            ]);
+
+            $pumpLabels = [
+                'dosing' => 'Dosing AB',
+                'ph_up' => 'pH Up',
+                'ph_down' => 'pH Down',
+            ];
+
+            ActivityLog::log('dosing_control', "Mengirim {$pumpLabels[$pumpType]} {$volume} mL pada device '{$device->name}'", null, [
+                'device_id' => $device->id,
+                'pump_type' => $pumpType,
+                'volume' => $volume,
+                'mqtt_message' => $message,
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => "{$pumpLabels[$pumpType]} {$volume} mL berhasil dikirim!",
+            ]);
+
+        } catch (\Exception $e) {
+            \Log::error("MQTT Dosing by Volume failed: " . $e->getMessage());
             return response()->json([
                 'success' => false,
                 'message' => 'Gagal mengirim perintah: ' . $e->getMessage(),

@@ -207,6 +207,7 @@ class MqttAutomationService
             elseif (str_contains($name, 'pompa') || str_contains($name, 'pump')) {
                 // Special case for main pump
                 if ($value) {
+                    // Format: <PMP_ON#waterType#zone#>
                     $message = "<PMP_ON#0#0#>";
                 } else {
                     $message = "<PMP_OFF#>";

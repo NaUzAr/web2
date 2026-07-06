@@ -63,7 +63,7 @@ class ChatbotController extends Controller
         // Report Bug
         [
             'keywords' => ['bug', 'error', 'masalah', 'lapor', 'report', 'rusak', 'tidak bisa', 'gagal', 'crash', 'hang', 'lambat', 'problem'],
-            'reply' => "🐛 **Report Bug / Laporkan Masalah:**\n\nUntuk melaporkan bug, silakan sertakan informasi berikut:\n\n1. **Halaman** yang bermasalah\n2. **Langkah** untuk memunculkan bug\n3. **Pesan error** yang muncul (jika ada)\n4. **Perangkat** yang digunakan (HP/PC, browser)\n\n📧 Kirim laporan ke:\n**swaratani.iot@gmail.com**\n\nAtau hubungi Admin melalui sistem.\n\n⚡ Tim kami akan merespons secepat mungkin!",
+            'reply' => "🐛 **Report Bug / Laporkan Masalah:**\n\nUntuk melaporkan bug, silakan sertakan informasi berikut:\n\n1. **Halaman** yang bermasalah\n2. **Langkah** untuk memunculkan bug\n3. **Pesan error** yang muncul (jika ada)\n4. **Perangkat** yang digunakan (HP/PC, browser)\n\n📧 Kirim laporan ke:\n**swaratani.dev@gmail.com**\n\nAtau hubungi Admin melalui sistem.\n\n⚡ Tim kami akan merespons secepat mungkin!",
         ],
         // Bantuan / Fitur
         [

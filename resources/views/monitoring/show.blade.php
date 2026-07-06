@@ -1063,6 +1063,14 @@
                                         </div>
                                     @else
                                         {{-- ON/OFF Buttons for Boolean --}}
+                                        @php
+                                            $outName = strtolower($output->output_name);
+                                            $isDosingPump = str_contains($outName, 'pump_ab') || str_contains($outName, 'dosing') || $outName === 'st_dos';
+                                            $isPhUp = str_contains($outName, 'ph_up') || str_contains($outName, 'ph1') || $outName === 'st_ph_u';
+                                            $isPhDown = str_contains($outName, 'ph_down') || str_contains($outName, 'ph2') || $outName === 'st_ph_d';
+                                            $hasDosingMl = $isDosingPump || $isPhUp || $isPhDown;
+                                            $dosingType = $isDosingPump ? 'dosing' : ($isPhUp ? 'ph_up' : ($isPhDown ? 'ph_down' : ''));
+                                        @endphp
                                         <div class="d-flex gap-2 justify-content-center">
                                             <button type="button"
                                                 class="btn btn-sm {{ $output->current_value ? 'btn-success' : 'btn-outline-success' }}"
@@ -1077,6 +1085,13 @@
                                                 <i class="bi bi-x-lg"></i> OFF
                                             </button>
                                         </div>
+                                        @if($hasDosingMl)
+                                            <button type="button" class="btn btn-sm mt-1" style="background: rgba(139, 92, 246, 0.15); border: 1px solid rgba(139, 92, 246, 0.4); color: #8b5cf6; border-radius: 10px; font-size: 0.75rem; padding: 0.25rem 0.6rem;"
+                                                onclick="openDosingVolumeModal('{{ $dosingType }}')"
+                                                title="Kirim per mL">
+                                                <i class="bi bi-eyedropper"></i> mL
+                                            </button>
+                                        @endif
                                         <div class="output-status {{ $output->current_value ? 'on' : 'off' }}"
                                             id="output-status-{{ $output->id }}">
                                             {{ $output->current_value ? 'ON' : 'OFF' }}
@@ -1482,7 +1497,7 @@
                                 <i class="bi bi-water me-1" style="color: #0ea5e9;"></i> Jenis Air
                             </label>
                             <select id="irrigationWaterType" class="form-select form-select-dark">
-                                <option value="0">Air Baku</option>
+                                <option value="2">Air Baku</option>
                                 <option value="1">Air Pupuk</option>
                             </select>
                         </div>
@@ -1500,6 +1515,49 @@
                         <button type="button" class="btn" onclick="sendIrrigationPumpOn()"
                             style="background: linear-gradient(135deg, #0ea5e9, #0284c7); border-radius: 16px; padding: 1rem; font-size: 1.15rem; font-weight: 700; width: 100%; color: #fff; box-shadow: 0 6px 20px rgba(14, 165, 233, 0.3);">
                             <i class="bi bi-play-fill me-1"></i> Nyalakan Pompa
+                        </button>
+                        <button type="button" class="btn"
+                            style="background: #f3f4f6; color: #6b7280; border-radius: 16px; padding: 0.85rem; font-size: 1.05rem; font-weight: 600; width: 100%; border: none;"
+                            data-bs-dismiss="modal">Batal</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dosing by mL Modal (Bottom Sheet Style) -->
+        <div class="modal fade" id="dosingVolumeModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content modal-content-glass">
+                    <div class="modal-handle"></div>
+                    <div class="modal-header-custom">
+                        <h5 id="dosingVolumeModalLabel">
+                            <i class="bi bi-eyedropper me-2" style="color: #8b5cf6;"></i>Dosing by Milliliter
+                        </h5>
+                        <div class="subtitle" id="dosingVolumeSubtitle">Masukkan volume dalam mL</div>
+                    </div>
+                    <div class="modal-body-custom">
+                        <input type="hidden" id="dosingPumpType" value="">
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold" style="color: #374151; font-size: 0.9rem;">
+                                <i class="bi bi-droplet-half me-1" style="color: #8b5cf6;"></i> Volume (mL)
+                            </label>
+                            <input type="number" id="dosingVolume" class="form-control form-control-dark"
+                                min="1" max="9999" value="10" placeholder="Masukkan volume dalam mL">
+                        </div>
+
+                        <div class="d-flex gap-2 flex-wrap">
+                            <button type="button" class="btn btn-sm" style="border: 1px solid #8b5cf6; color: #8b5cf6; border-radius: 12px; padding: 6px 12px;" onclick="document.getElementById('dosingVolume').value=5">5 mL</button>
+                            <button type="button" class="btn btn-sm" style="border: 1px solid #8b5cf6; color: #8b5cf6; border-radius: 12px; padding: 6px 12px;" onclick="document.getElementById('dosingVolume').value=10">10 mL</button>
+                            <button type="button" class="btn btn-sm" style="border: 1px solid #8b5cf6; color: #8b5cf6; border-radius: 12px; padding: 6px 12px;" onclick="document.getElementById('dosingVolume').value=20">20 mL</button>
+                            <button type="button" class="btn btn-sm" style="border: 1px solid #8b5cf6; color: #8b5cf6; border-radius: 12px; padding: 6px 12px;" onclick="document.getElementById('dosingVolume').value=50">50 mL</button>
+                            <button type="button" class="btn btn-sm" style="border: 1px solid #8b5cf6; color: #8b5cf6; border-radius: 12px; padding: 6px 12px;" onclick="document.getElementById('dosingVolume').value=100">100 mL</button>
+                        </div>
+                    </div>
+                    <div class="modal-actions">
+                        <button type="button" class="btn" onclick="sendDosingByVolume()"
+                            style="background: linear-gradient(135deg, #8b5cf6, #7c3aed); border-radius: 16px; padding: 1rem; font-size: 1.15rem; font-weight: 700; width: 100%; color: #fff; box-shadow: 0 6px 20px rgba(139, 92, 246, 0.3);">
+                            <i class="bi bi-send-fill me-1"></i> Kirim
                         </button>
                         <button type="button" class="btn"
                             style="background: #f3f4f6; color: #6b7280; border-radius: 16px; padding: 0.85rem; font-size: 1.05rem; font-weight: 600; width: 100%; border: none;"
@@ -1624,7 +1682,7 @@
                             // Update status display
                             const statusEl = document.getElementById(`pump-status-${outputId}`);
                             if (statusEl) {
-                                const waterTypeName = waterType === '1' ? 'Air Baku' : 'Air Pupuk';
+                            const waterTypeName = waterType === '1' ? 'Air Pupuk' : 'Air Baku';
                                 statusEl.textContent = `Zona ${zone} - ${waterTypeName} - ON`;
                                 statusEl.style.color = '#22c55e';
                             }
@@ -1692,6 +1750,74 @@
                     .catch(error => {
                         console.error('Error:', error);
                         alert('Terjadi kesalahan saat mengirim perintah.');
+                    });
+            }
+
+            // ============= DOSING BY MILLILITER FUNCTIONS =============
+
+            function openDosingVolumeModal(pumpType) {
+                document.getElementById('dosingPumpType').value = pumpType;
+
+                const labels = {
+                    'dosing': 'Dosing AB',
+                    'ph_up': 'pH Up',
+                    'ph_down': 'pH Down',
+                };
+
+                document.getElementById('dosingVolumeModalLabel').innerHTML =
+                    '<i class="bi bi-eyedropper me-2" style="color: #8b5cf6;"></i>' + (labels[pumpType] || 'Dosing') + ' by mL';
+                document.getElementById('dosingVolumeSubtitle').textContent =
+                    'Masukkan volume ' + (labels[pumpType] || 'dosing') + ' dalam mL';
+
+                document.getElementById('dosingVolume').value = 10;
+
+                const modal = new bootstrap.Modal(document.getElementById('dosingVolumeModal'));
+                modal.show();
+            }
+
+            function sendDosingByVolume() {
+                const pumpType = document.getElementById('dosingPumpType').value;
+                const volume = parseInt(document.getElementById('dosingVolume').value);
+
+                if (!volume || volume < 1) {
+                    alert('Masukkan volume yang valid (minimal 1 mL).');
+                    return;
+                }
+
+                const url = `/monitoring/device/${userDeviceId}/dosing/volume`;
+                const btn = document.querySelector('#dosingVolumeModal .modal-actions .btn:first-child');
+                const originalText = btn.innerHTML;
+                btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Mengirim...';
+                btn.disabled = true;
+
+                fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken
+                    },
+                    body: JSON.stringify({
+                        pump_type: pumpType,
+                        volume: volume
+                    })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            const modal = bootstrap.Modal.getInstance(document.getElementById('dosingVolumeModal'));
+                            modal.hide();
+                            alert(data.message);
+                        } else {
+                            alert('Gagal: ' + (data.message || 'Silakan coba lagi.'));
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Terjadi kesalahan saat mengirim perintah.');
+                    })
+                    .finally(() => {
+                        btn.innerHTML = originalText;
+                        btn.disabled = false;
                     });
             }
 

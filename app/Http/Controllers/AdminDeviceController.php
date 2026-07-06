@@ -383,6 +383,7 @@ class AdminDeviceController extends Controller
             // 2. Main Pump (Pompa Utama / Irigasi)
             elseif (str_contains($name, 'pompa') || str_contains($name, 'pump') || $name === 'st_pmp') {
                 if ($newValue) {
+                    // Format: <PMP_ON#waterType#zone#>
                     $message = "<PMP_ON#0#0#>";
                 } else {
                     $message = "<PMP_OFF#>";
