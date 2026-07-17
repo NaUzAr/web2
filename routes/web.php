@@ -44,6 +44,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // Toggle Output (Admin)
         Route::post('/device/{deviceId}/output/{outputId}/toggle', [AdminDeviceController::class, 'toggleOutput'])->name('device.output.toggle');
 
+        // Dosing by Volume (Admin)
+        Route::post('/device/{deviceId}/dosing/volume', [AdminDeviceController::class, 'controlDosingByVolume'])->name('device.dosing.volume');
+
         // Activity Logs
         Route::get('/activity-logs', [ActivityLogController::class, 'index'])->name('activity-logs');
 

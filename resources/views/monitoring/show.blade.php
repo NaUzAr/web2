@@ -2304,6 +2304,127 @@
                 }
             }
 
+            // ============= pH CONTROL MODAL FUNCTIONS (Admin) =============
+
+            function openPhControlModal(outputId, phType) {
+                document.getElementById('phControlOutputId').value = outputId;
+                document.getElementById('phControlType').value = phType;
+
+                const isUp = phType === 'ph_up';
+                document.getElementById('phControlModalLabel').innerHTML =
+                    '<i class="bi bi-' + (isUp ? 'arrow-up-circle' : 'arrow-down-circle') + ' me-2" style="color: #8b5cf6;"></i>' +
+                    (isUp ? 'pH Up' : 'pH Down') + ' Control';
+                document.getElementById('phControlSubtitle').textContent =
+                    'Pilih mode kontrol ' + (isUp ? 'pH Up' : 'pH Down');
+
+                document.getElementById('phDosingVolume').value = 10;
+
+                const modal = new bootstrap.Modal(document.getElementById('phControlModal'));
+                modal.show();
+            }
+
+            // pH Manual ON (Admin) - sends <pmpPH#1#> or <pmpPH2#1#>
+            function sendPhManualOn() {
+                const outputId = document.getElementById('phControlOutputId').value;
+                const btn = document.getElementById('btnPhManualOn');
+                const originalText = btn.innerHTML;
+                btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>';
+                btn.disabled = true;
+
+                const url = `/admin/device/${deviceId}/output/${outputId}/toggle`;
+
+                fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken
+                    },
+                    body: JSON.stringify({ value: true })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            const modal = bootstrap.Modal.getInstance(document.getElementById('phControlModal'));
+                            modal.hide();
+
+                            const btnOn = document.getElementById(`btn-on-${outputId}`);
+                            const btnOff = document.getElementById(`btn-off-${outputId}`);
+                            const statusEl = document.getElementById(`output-status-${outputId}`);
+
+                            if (btnOn) btnOn.className = 'btn btn-sm btn-success';
+                            if (btnOff) btnOff.className = 'btn btn-sm btn-outline-danger';
+                            if (statusEl) {
+                                statusEl.textContent = 'ON';
+                                statusEl.className = 'output-status on';
+                            }
+
+                            const card = document.getElementById(`output-card-${outputId}`);
+                            if (card) {
+                                card.style.borderColor = '#22c55e';
+                                setTimeout(() => { card.style.borderColor = 'rgba(250, 204, 21, 0.3)'; }, 500);
+                            }
+                        } else {
+                            alert('Gagal: ' + (data.message || 'Silakan coba lagi.'));
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Terjadi kesalahan saat mengirim perintah.');
+                    })
+                    .finally(() => {
+                        btn.innerHTML = originalText;
+                        btn.disabled = false;
+                    });
+            }
+
+            // pH by Volume (Admin) - sends <pmpph#10#> or <pmpph2#10#>
+            function sendPhByVolume() {
+                const phType = document.getElementById('phControlType').value;
+                const volume = parseInt(document.getElementById('phDosingVolume').value);
+
+                if (!volume || volume < 1) {
+                    alert('Masukkan volume yang valid (minimal 1 mL).');
+                    return;
+                }
+
+                const btn = document.getElementById('btnPhByVolume');
+                const originalText = btn.innerHTML;
+                btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Mengirim...';
+                btn.disabled = true;
+
+                const url = `/admin/device/${deviceId}/dosing/volume`;
+
+                fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken
+                    },
+                    body: JSON.stringify({
+                        pump_type: phType,
+                        volume: volume
+                    })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            const modal = bootstrap.Modal.getInstance(document.getElementById('phControlModal'));
+                            modal.hide();
+                            alert(data.message);
+                        } else {
+                            alert('Gagal: ' + (data.message || 'Silakan coba lagi.'));
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Terjadi kesalahan saat mengirim perintah.');
+                    })
+                    .finally(() => {
+                        btn.innerHTML = originalText;
+                        btn.disabled = false;
+                    });
+            }
+
             // Auto-reload status every 2 seconds
             setInterval(fetchStatus, 2000);
 
