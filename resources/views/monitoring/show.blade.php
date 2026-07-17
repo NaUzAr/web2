@@ -1068,29 +1068,51 @@
                                             $isDosingPump = str_contains($outName, 'pump_ab') || str_contains($outName, 'dosing') || $outName === 'st_dos';
                                             $isPhUp = str_contains($outName, 'ph_up') || str_contains($outName, 'ph1') || $outName === 'st_ph_u';
                                             $isPhDown = str_contains($outName, 'ph_down') || str_contains($outName, 'ph2') || $outName === 'st_ph_d';
-                                            $hasDosingMl = $isDosingPump || $isPhUp || $isPhDown;
+                                            $isPhPump = $isPhUp || $isPhDown;
+                                            $hasDosingMl = $isDosingPump;
                                             $dosingType = $isDosingPump ? 'dosing' : ($isPhUp ? 'ph_up' : ($isPhDown ? 'ph_down' : ''));
+                                            $phType = $isPhUp ? 'ph_up' : ($isPhDown ? 'ph_down' : '');
                                         @endphp
-                                        <div class="d-flex gap-2 justify-content-center">
-                                            <button type="button"
-                                                class="btn btn-sm {{ $output->current_value ? 'btn-success' : 'btn-outline-success' }}"
-                                                onclick="setOutput({{ $output->id }}, true)" id="btn-on-{{ $output->id }}"
-                                                style="min-width: 50px;">
-                                                <i class="bi bi-power"></i> ON
-                                            </button>
-                                            <button type="button"
-                                                class="btn btn-sm {{ !$output->current_value ? 'btn-danger' : 'btn-outline-danger' }}"
-                                                onclick="setOutput({{ $output->id }}, false)" id="btn-off-{{ $output->id }}"
-                                                style="min-width: 50px;">
-                                                <i class="bi bi-x-lg"></i> OFF
-                                            </button>
-                                        </div>
-                                        @if($hasDosingMl)
-                                            <button type="button" class="btn btn-sm mt-1" style="background: rgba(139, 92, 246, 0.15); border: 1px solid rgba(139, 92, 246, 0.4); color: #8b5cf6; border-radius: 10px; font-size: 0.75rem; padding: 0.25rem 0.6rem;"
-                                                onclick="openDosingVolumeModal('{{ $dosingType }}')"
-                                                title="Kirim per mL">
-                                                <i class="bi bi-eyedropper"></i> mL
-                                            </button>
+
+                                        @if($isPhPump)
+                                            {{-- pH Up / pH Down: ON opens popup with Manual & mL options --}}
+                                            <div class="d-flex gap-2 justify-content-center">
+                                                <button type="button"
+                                                    class="btn btn-sm {{ $output->current_value ? 'btn-success' : 'btn-outline-success' }}"
+                                                    onclick="openPhControlModal({{ $output->id }}, '{{ $phType }}')" id="btn-on-{{ $output->id }}"
+                                                    style="min-width: 50px;">
+                                                    <i class="bi bi-power"></i> ON
+                                                </button>
+                                                <button type="button"
+                                                    class="btn btn-sm {{ !$output->current_value ? 'btn-danger' : 'btn-outline-danger' }}"
+                                                    onclick="setOutput({{ $output->id }}, false)" id="btn-off-{{ $output->id }}"
+                                                    style="min-width: 50px;">
+                                                    <i class="bi bi-x-lg"></i> OFF
+                                                </button>
+                                            </div>
+                                        @else
+                                            {{-- Normal Boolean ON/OFF --}}
+                                            <div class="d-flex gap-2 justify-content-center">
+                                                <button type="button"
+                                                    class="btn btn-sm {{ $output->current_value ? 'btn-success' : 'btn-outline-success' }}"
+                                                    onclick="setOutput({{ $output->id }}, true)" id="btn-on-{{ $output->id }}"
+                                                    style="min-width: 50px;">
+                                                    <i class="bi bi-power"></i> ON
+                                                </button>
+                                                <button type="button"
+                                                    class="btn btn-sm {{ !$output->current_value ? 'btn-danger' : 'btn-outline-danger' }}"
+                                                    onclick="setOutput({{ $output->id }}, false)" id="btn-off-{{ $output->id }}"
+                                                    style="min-width: 50px;">
+                                                    <i class="bi bi-x-lg"></i> OFF
+                                                </button>
+                                            </div>
+                                            @if($hasDosingMl)
+                                                <button type="button" class="btn btn-sm mt-1" style="background: rgba(139, 92, 246, 0.15); border: 1px solid rgba(139, 92, 246, 0.4); color: #8b5cf6; border-radius: 10px; font-size: 0.75rem; padding: 0.25rem 0.6rem;"
+                                                    onclick="openDosingVolumeModal('{{ $dosingType }}')"
+                                                    title="Kirim per mL">
+                                                    <i class="bi bi-eyedropper"></i> mL
+                                                </button>
+                                            @endif
                                         @endif
                                         <div class="output-status {{ $output->current_value ? 'on' : 'off' }}"
                                             id="output-status-{{ $output->id }}">
@@ -1567,6 +1589,81 @@
             </div>
         </div>
 
+        <!-- pH Control Modal (Bottom Sheet Style) -->
+        <div class="modal fade" id="phControlModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content modal-content-glass">
+                    <div class="modal-handle"></div>
+                    <div class="modal-header-custom">
+                        <h5 id="phControlModalLabel">
+                            <i class="bi bi-droplet-half me-2" style="color: #8b5cf6;"></i>pH Control
+                        </h5>
+                        <div class="subtitle" id="phControlSubtitle">Pilih mode kontrol pH</div>
+                    </div>
+                    <div class="modal-body-custom">
+                        <input type="hidden" id="phControlOutputId" value="">
+                        <input type="hidden" id="phControlType" value="">
+
+                        <!-- Option 1: Manual ON -->
+                        <div class="mb-3 p-3" style="background: rgba(34, 197, 94, 0.08); border: 1px solid rgba(34, 197, 94, 0.25); border-radius: 16px;">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div>
+                                    <div style="font-weight: 700; color: #166534; font-size: 0.95rem;">
+                                        <i class="bi bi-power me-1"></i> ON Manual
+                                    </div>
+                                    <div style="font-size: 0.78rem; color: #6b7280; margin-top: 2px;">
+                                        Nyalakan pompa secara manual (ON terus sampai dimatikan)
+                                    </div>
+                                </div>
+                                <button type="button" class="btn btn-success btn-sm px-3" onclick="sendPhManualOn()"
+                                    id="btnPhManualOn"
+                                    style="border-radius: 12px; font-weight: 600; min-width: 70px;">
+                                    <i class="bi bi-power me-1"></i> ON
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Option 2: By Volume (mL) -->
+                        <div class="p-3" style="background: rgba(139, 92, 246, 0.08); border: 1px solid rgba(139, 92, 246, 0.25); border-radius: 16px;">
+                            <div style="font-weight: 700; color: #5b21b6; font-size: 0.95rem; margin-bottom: 8px;">
+                                <i class="bi bi-eyedropper me-1"></i> ON by Volume (mL)
+                            </div>
+                            <div style="font-size: 0.78rem; color: #6b7280; margin-bottom: 10px;">
+                                Pompa berjalan sesuai volume lalu berhenti otomatis
+                            </div>
+
+                            <div class="mb-2">
+                                <label class="form-label fw-bold" style="color: #374151; font-size: 0.85rem;">
+                                    Volume (mL)
+                                </label>
+                                <input type="number" id="phDosingVolume" class="form-control form-control-dark"
+                                    min="1" max="9999" value="10" placeholder="Masukkan volume dalam mL">
+                            </div>
+
+                            <div class="d-flex gap-2 flex-wrap mb-3">
+                                <button type="button" class="btn btn-sm" style="border: 1px solid #8b5cf6; color: #8b5cf6; border-radius: 12px; padding: 4px 10px; font-size: 0.8rem;" onclick="document.getElementById('phDosingVolume').value=5">5 mL</button>
+                                <button type="button" class="btn btn-sm" style="border: 1px solid #8b5cf6; color: #8b5cf6; border-radius: 12px; padding: 4px 10px; font-size: 0.8rem;" onclick="document.getElementById('phDosingVolume').value=10">10 mL</button>
+                                <button type="button" class="btn btn-sm" style="border: 1px solid #8b5cf6; color: #8b5cf6; border-radius: 12px; padding: 4px 10px; font-size: 0.8rem;" onclick="document.getElementById('phDosingVolume').value=20">20 mL</button>
+                                <button type="button" class="btn btn-sm" style="border: 1px solid #8b5cf6; color: #8b5cf6; border-radius: 12px; padding: 4px 10px; font-size: 0.8rem;" onclick="document.getElementById('phDosingVolume').value=50">50 mL</button>
+                                <button type="button" class="btn btn-sm" style="border: 1px solid #8b5cf6; color: #8b5cf6; border-radius: 12px; padding: 4px 10px; font-size: 0.8rem;" onclick="document.getElementById('phDosingVolume').value=100">100 mL</button>
+                            </div>
+
+                            <button type="button" class="btn w-100" onclick="sendPhByVolume()"
+                                id="btnPhByVolume"
+                                style="background: linear-gradient(135deg, #8b5cf6, #7c3aed); border-radius: 12px; padding: 0.7rem; font-size: 1rem; font-weight: 700; color: #fff; box-shadow: 0 4px 14px rgba(139, 92, 246, 0.3);">
+                                <i class="bi bi-send-fill me-1"></i> Kirim Volume
+                            </button>
+                        </div>
+                    </div>
+                    <div class="modal-actions">
+                        <button type="button" class="btn"
+                            style="background: #f3f4f6; color: #6b7280; border-radius: 16px; padding: 0.85rem; font-size: 1.05rem; font-weight: 600; width: 100%; border: none;"
+                            data-bs-dismiss="modal">Batal</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <script>
             // Setup CSRF token for AJAX requests
             const csrfToken = '{{ csrf_token() }}';
@@ -1805,6 +1902,130 @@
                     .then(data => {
                         if (data.success) {
                             const modal = bootstrap.Modal.getInstance(document.getElementById('dosingVolumeModal'));
+                            modal.hide();
+                            alert(data.message);
+                        } else {
+                            alert('Gagal: ' + (data.message || 'Silakan coba lagi.'));
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Terjadi kesalahan saat mengirim perintah.');
+                    })
+                    .finally(() => {
+                        btn.innerHTML = originalText;
+                        btn.disabled = false;
+                    });
+            }
+
+            // ============= pH CONTROL MODAL FUNCTIONS =============
+
+            function openPhControlModal(outputId, phType) {
+                document.getElementById('phControlOutputId').value = outputId;
+                document.getElementById('phControlType').value = phType;
+
+                const isUp = phType === 'ph_up';
+                document.getElementById('phControlModalLabel').innerHTML =
+                    '<i class="bi bi-' + (isUp ? 'arrow-up-circle' : 'arrow-down-circle') + ' me-2" style="color: #8b5cf6;"></i>' +
+                    (isUp ? 'pH Up' : 'pH Down') + ' Control';
+                document.getElementById('phControlSubtitle').textContent =
+                    'Pilih mode kontrol ' + (isUp ? 'pH Up' : 'pH Down');
+
+                document.getElementById('phDosingVolume').value = 10;
+
+                const modal = new bootstrap.Modal(document.getElementById('phControlModal'));
+                modal.show();
+            }
+
+            // pH Manual ON - sends <pmpPH#1#> or <pmpPH2#1#>
+            function sendPhManualOn() {
+                const outputId = document.getElementById('phControlOutputId').value;
+                const btn = document.getElementById('btnPhManualOn');
+                const originalText = btn.innerHTML;
+                btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>';
+                btn.disabled = true;
+
+                // Use the existing toggle endpoint to send manual ON
+                const url = `/monitoring/device/${userDeviceId}/output/${outputId}/toggle`;
+
+                fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken
+                    },
+                    body: JSON.stringify({ value: true })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            const modal = bootstrap.Modal.getInstance(document.getElementById('phControlModal'));
+                            modal.hide();
+
+                            // Update button styles on the output card
+                            const btnOn = document.getElementById(`btn-on-${outputId}`);
+                            const btnOff = document.getElementById(`btn-off-${outputId}`);
+                            const statusEl = document.getElementById(`output-status-${outputId}`);
+
+                            if (btnOn) btnOn.className = 'btn btn-sm btn-success';
+                            if (btnOff) btnOff.className = 'btn btn-sm btn-outline-danger';
+                            if (statusEl) {
+                                statusEl.textContent = 'ON';
+                                statusEl.className = 'output-status on';
+                            }
+
+                            // Flash card border
+                            const card = document.getElementById(`output-card-${outputId}`);
+                            if (card) {
+                                card.style.borderColor = '#22c55e';
+                                setTimeout(() => { card.style.borderColor = 'rgba(250, 204, 21, 0.3)'; }, 500);
+                            }
+                        } else {
+                            alert('Gagal: ' + (data.message || 'Silakan coba lagi.'));
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Terjadi kesalahan saat mengirim perintah.');
+                    })
+                    .finally(() => {
+                        btn.innerHTML = originalText;
+                        btn.disabled = false;
+                    });
+            }
+
+            // pH by Volume - sends <pmpph#10#> or <pmpph2#10#>
+            function sendPhByVolume() {
+                const phType = document.getElementById('phControlType').value;
+                const volume = parseInt(document.getElementById('phDosingVolume').value);
+
+                if (!volume || volume < 1) {
+                    alert('Masukkan volume yang valid (minimal 1 mL).');
+                    return;
+                }
+
+                const btn = document.getElementById('btnPhByVolume');
+                const originalText = btn.innerHTML;
+                btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Mengirim...';
+                btn.disabled = true;
+
+                const url = `/monitoring/device/${userDeviceId}/dosing/volume`;
+
+                fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken
+                    },
+                    body: JSON.stringify({
+                        pump_type: phType,
+                        volume: volume
+                    })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            const modal = bootstrap.Modal.getInstance(document.getElementById('phControlModal'));
                             modal.hide();
                             alert(data.message);
                         } else {
