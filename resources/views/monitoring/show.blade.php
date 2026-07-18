@@ -86,49 +86,151 @@
             background: var(--glass-bg);
             backdrop-filter: blur(20px);
             border: 1px solid var(--glass-border);
-            border-radius: 20px;
+            border-radius: 24px;
             padding: 1.5rem;
-            text-align: center;
-            transition: all 0.3s ease;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+        }
+
+        .sensor-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0) 100%);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            pointer-events: none;
         }
 
         .sensor-card:hover {
-            transform: translateY(-5px);
-            border-color: var(--primary);
+            transform: translateY(-8px);
+            border-color: rgba(255, 255, 255, 0.8);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        .sensor-card:hover::before {
+            opacity: 1;
+        }
+
+        .sensor-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
         }
 
         .sensor-icon {
-            width: 50px;
-            height: 50px;
-            background: var(--primary-gradient);
-            border-radius: 14px;
+            width: 48px;
+            height: 48px;
+            border-radius: 16px;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 1rem;
-            font-size: 1.3rem;
+            font-size: 1.4rem;
             color: white;
+            box-shadow: inset 0 2px 4px rgba(255,255,255,0.3);
+            flex-shrink: 0;
         }
 
         .sensor-label {
             color: var(--text-secondary);
-            font-size: 0.85rem;
-            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+            font-weight: 600;
+            line-height: 1.3;
+            text-align: right;
+            max-width: 65%;
+        }
+
+        .sensor-value-container {
+            display: flex;
+            align-items: baseline;
+            gap: 6px;
         }
 
         .sensor-value {
             color: var(--text-main);
-            font-size: 2rem;
+            font-size: 2.2rem;
             font-weight: 800;
             line-height: 1;
+            letter-spacing: -1px;
         }
 
         .sensor-unit {
-            color: var(--primary);
-            font-size: 1rem;
-            font-weight: 600;
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            font-weight: 700;
         }
+
+        .output-panel {
+            background: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.5);
+            border-radius: 24px;
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+            box-shadow: inset 0 2px 15px rgba(255,255,255,0.5);
+        }
+
+        .output-card, .output-card-special {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            border-radius: 20px;
+            padding: 1.5rem;
+            text-align: center;
+            height: 100%;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+        
+        .output-card:hover, .output-card-special:hover {
+            transform: translateY(-5px);
+            background: #ffffff;
+            box-shadow: 0 15px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        .output-icon, .output-icon-special {
+            width: 55px;
+            height: 55px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.25rem;
+            font-size: 1.5rem;
+            color: white;
+            box-shadow: inset 0 2px 4px rgba(255,255,255,0.3);
+        }
+
+        .output-label {
+            color: var(--text-main);
+            font-weight: 700;
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+            line-height: 1.3;
+        }
+
+        .output-status {
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: auto;
+            padding-top: 1rem;
+        }
+        .output-status.on { color: #10B981; }
+        .output-status.off { color: #EF4444; }
 
         .glass-card {
             background: var(--glass-bg);
@@ -961,18 +1063,22 @@
                     @endphp
                     <div class="col-6 col-md-4 col-lg-3">
                         <div class="sensor-card">
-                            <div class="sensor-icon" style="background: {{ $bgColor }}; box-shadow: 0 4px 10px {{ $bgColor }}40;">
-                                <i class="bi {{ $icon }} text-white"></i>
+                            <div class="sensor-header">
+                                <div class="sensor-icon" style="background: {{ $bgColor }};">
+                                    <i class="bi {{ $icon }}"></i>
+                                </div>
+                                <div class="sensor-label">{{ $sensor->sensor_label }}</div>
                             </div>
-                            <div class="sensor-label">{{ $sensor->sensor_label }}</div>
-                            <div class="sensor-value" id="sensor-val-{{ $sensor->id }}">
-                                @if($value !== null)
-                                    {{ number_format($value, 1) }}
-                                @else
-                                    --
-                                @endif
+                            <div class="sensor-value-container">
+                                <div class="sensor-value" id="sensor-val-{{ $sensor->id }}">
+                                    @if($value !== null)
+                                        {{ number_format($value, 1) }}
+                                    @else
+                                        --
+                                    @endif
+                                </div>
+                                <div class="sensor-unit">{{ $stdUnit }}</div>
                             </div>
-                            <div class="sensor-unit">{{ $stdUnit }}</div>
                         </div>
                     </div>
                 @endforeach
@@ -981,12 +1087,11 @@
 
         @if($outputs->count() > 0)
             <!-- Output Control Panel -->
-            <div class="glass-card"
-                style="background: rgba(250, 204, 21, 0.05); border-color: rgba(250, 204, 21, 0.2); margin-top: 1.5rem;">
-                <h5 class="card-title" style="color: #000000;">
-                    <i class="bi bi-sliders me-2"></i>Kontrol Output
+            <div class="output-panel">
+                <h5 class="card-title mb-4" style="color: var(--text-main);">
+                    <i class="bi bi-sliders me-2 text-primary"></i>Kontrol Output
                 </h5>
-                <div class="row g-4 mt-2">
+                <div class="row g-4">
                     @php
                         // Sort outputs by priority then name (excluding multi_zone)
                         $sortedOutputs = $outputs->where('output_type', '!=', 'multi_zone')->sortBy(function ($output) {
@@ -1034,32 +1139,32 @@
                     @foreach($irrigationPumps as $pump)
                         <div class="col-6 col-md-4 col-lg-3">
                             <div class="output-card-special" id="output-card-irrigation-{{ $pump->id }}">
-                                <div class="output-icon-special mb-3">
-                                    <i class="bi bi-droplet-fill text-white"></i>
+                                <div class="output-icon-special" style="background: linear-gradient(135deg, #0ea5e9, #0284c7);">
+                                    <i class="bi bi-droplet-fill"></i>
                                 </div>
                                 <div class="output-label">{{ $pump->output_label }}</div>
 
                                 @if($pump->max_sectors > 1)
                                     <div class="mb-3 text-center">
-                                        <span class="badge bg-primary text-white rounded-pill px-3 py-2">
-                                            <i class="bi bi-grid-3x3-gap-fill me-1"></i> {{ $pump->max_sectors }} Zona Tersedia
+                                        <span class="badge" style="background: rgba(14, 165, 233, 0.15); color: #0284c7; border: 1px solid rgba(14, 165, 233, 0.3); border-radius: 12px; padding: 0.5rem 0.8rem;">
+                                            <i class="bi bi-grid-3x3-gap-fill me-1"></i> {{ $pump->max_sectors }} Zona
                                         </span>
                                     </div>
                                 @endif
 
-                                <div class="d-flex gap-2 justify-content-center mt-3">
-                                    <button type="button" class="btn btn-sm btn-outline-success"
+                                <div class="output-controls">
+                                    <button type="button" class="btn btn-sm btn-outline-success rounded-pill fw-bold"
                                         onclick="openIrrigationModal({{ $pump->id }}, {{ $pump->max_sectors ?? 1 }})"
-                                        id="btn-on-{{ $pump->id }}" style="min-width: 50px;">
+                                        id="btn-on-{{ $pump->id }}" style="padding: 0.4rem 1rem;">
                                         <i class="bi bi-power"></i> ON
                                     </button>
-                                    <button type="button" class="btn btn-sm btn-outline-danger"
+                                    <button type="button" class="btn btn-sm btn-outline-danger rounded-pill fw-bold"
                                         onclick="sendIrrigationPumpOff({{ $pump->id }})" id="btn-off-{{ $pump->id }}"
-                                        style="min-width: 50px;">
+                                        style="padding: 0.4rem 1rem;">
                                         <i class="bi bi-x-lg"></i> OFF
                                     </button>
                                 </div>
-                                <div class="output-status off mt-2" id="pump-status-{{ $pump->id }}">
+                                <div class="output-status off" id="pump-status-{{ $pump->id }}">
                                     OFF
                                 </div>
                             </div>
@@ -1075,27 +1180,24 @@
                             $bgColorHex = (strpos($outBgColor, '#') === 0) ? $outBgColor : '#0ea5e9';
                         @endphp
                         <div class="col-6 col-md-4 col-lg-3">
-                            <div class="output-card" id="output-card-{{ $output->id }}"
-                                @if($isStatusOnly) style="background: rgba(34, 197, 94, 0.08); border-color: rgba(34, 197, 94, 0.3);" @endif>
-                                <div class="output-icon" style="background: {{ $outBgColor }}; box-shadow: 0 4px 10px {{ $bgColorHex }}40;">
-                                    <i class="bi {{ $outIcon }} text-white"></i>
+                            <div class="output-card" id="output-card-{{ $output->id }}">
+                                <div class="output-icon" style="background: {{ $outBgColor }};">
+                                    <i class="bi {{ $outIcon }}"></i>
                                 </div>
                                 <div class="output-label">{{ $output->output_label }}</div>
 
                                 @if($output->output_type === 'boolean')
                                     @if(in_array($output->output_name, ['st_bak', 'st_ppk']))
                                         {{-- Display-only status for Air Baku & Air Pupuk Valve --}}
-                                        <div class="d-flex justify-content-center mt-1">
-                                            <span
-                                                class="badge rounded-pill px-3 py-2 {{ $output->current_value ? 'bg-success' : 'bg-secondary' }}"
-                                                id="badge-status-{{ $output->id }}" style="font-size: 0.85rem;">
+                                        <div class="d-flex justify-content-center mt-2">
+                                            <span class="badge rounded-pill px-3 py-2 {{ $output->current_value ? 'bg-success' : 'bg-secondary' }}" id="badge-status-{{ $output->id }}">
                                                 <i class="bi {{ $output->current_value ? 'bi-check-circle' : 'bi-x-circle' }} me-1"></i>
                                                 {{ $output->current_value ? 'ON' : 'OFF' }}
                                             </span>
                                         </div>
-                                        <div class="output-status {{ $output->current_value ? 'on' : 'off' }} mt-1"
-                                            id="output-status-{{ $output->id }}" style="font-size: 0.7rem;">
-                                            Dikontrol otomatis
+                                        <div class="output-status {{ $output->current_value ? 'on' : 'off' }}"
+                                            id="output-status-{{ $output->id }}" style="font-size: 0.7rem; color: var(--text-muted);">
+                                            Otomatis
                                         </div>
                                     @else
                                         {{-- ON/OFF Buttons for Boolean --}}
