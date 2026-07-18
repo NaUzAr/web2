@@ -86,13 +86,13 @@
             background: var(--glass-bg);
             backdrop-filter: blur(20px);
             border: 1px solid var(--glass-border);
-            border-radius: 20px;
-            padding: 1.25rem;
+            border-radius: 16px;
+            padding: 0.85rem;
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             height: 100%;
             display: flex;
             align-items: center;
-            gap: 1.25rem;
+            gap: 0.85rem;
             position: relative;
             overflow: hidden;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
@@ -122,13 +122,13 @@
         }
 
         .sensor-icon {
-            width: 56px;
-            height: 56px;
+            width: 44px;
+            height: 44px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.6rem;
+            font-size: 1.3rem;
             color: white;
             box-shadow: inset 0 2px 4px rgba(255,255,255,0.3), 0 4px 8px rgba(0,0,0,0.1);
             flex-shrink: 0;
@@ -148,13 +148,13 @@
 
         .sensor-label {
             color: var(--text-secondary);
-            font-size: 0.85rem;
+            font-size: 0.7rem;
             font-weight: 700;
             line-height: 1.2;
             text-align: left;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            margin-bottom: 4px;
+            margin-bottom: 2px;
         }
 
         .sensor-value-container {
@@ -165,7 +165,7 @@
 
         .sensor-value {
             color: var(--text-main);
-            font-size: 1.8rem;
+            font-size: 1.4rem;
             font-weight: 800;
             line-height: 1;
             letter-spacing: -0.5px;
@@ -191,14 +191,14 @@
             background: var(--glass-bg);
             backdrop-filter: blur(20px);
             border: 1px solid var(--glass-border);
-            border-radius: 20px;
-            padding: 1.25rem;
+            border-radius: 16px;
+            padding: 0.85rem;
             text-align: left;
             height: 100%;
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             display: flex;
             align-items: center;
-            gap: 1rem;
+            gap: 0.85rem;
             position: relative;
             overflow: hidden;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
@@ -228,14 +228,14 @@
         }
 
         .output-icon, .output-icon-special {
-            width: 56px;
-            height: 56px;
+            width: 44px;
+            height: 44px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             margin: 0;
-            font-size: 1.6rem;
+            font-size: 1.3rem;
             color: white;
             box-shadow: inset 0 2px 4px rgba(255,255,255,0.3), 0 4px 8px rgba(0,0,0,0.1);
             flex-shrink: 0;
@@ -255,13 +255,13 @@
 
         .output-label {
             color: var(--text-secondary);
-            font-size: 0.85rem;
+            font-size: 0.7rem;
             font-weight: 700;
             line-height: 1.2;
             text-align: left;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            margin-bottom: 8px;
+            margin-bottom: 4px;
         }
 
         .output-status {
@@ -398,11 +398,11 @@
         .segmented-control {
             background: rgba(0, 0, 0, 0.05);
             border-radius: 50px;
-            padding: 4px;
+            padding: 3px;
             display: flex;
             gap: 4px;
             width: 100%;
-            margin-top: 1rem;
+            margin-top: 0.5rem;
         }
         
         .segmented-btn {
@@ -410,8 +410,8 @@
             border: none;
             background: transparent;
             border-radius: 50px;
-            padding: 0.5rem;
-            font-size: 0.85rem;
+            padding: 0.4rem;
+            font-size: 0.75rem;
             font-weight: 700;
             color: var(--text-secondary);
             transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
