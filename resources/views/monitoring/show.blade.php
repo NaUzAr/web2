@@ -849,7 +849,7 @@
                 <span class="device-type-badge">
                     {{ strtoupper($device->type ?? 'DEVICE') }}
                 </span>
-                <a href="{{ isset($isAdminView) && $isAdminView ? route('admin.device.history', $device->id) : route('monitoring.history', $device->id) }}" class="btn-glass" style="background: var(--primary-gradient); color: white; border-color: transparent;">
+                <a href="{{ isset($isAdminView) && $isAdminView ? route('admin.device.history', $device->id) : route('monitoring.history', $userDevice->id) }}" class="btn-glass" style="background: var(--primary-gradient); color: white; border-color: transparent;">
                     <i class="bi bi-clock-history me-1"></i> Riwayat Data
                 </a>
                 @if(!($isAdminView ?? false))
