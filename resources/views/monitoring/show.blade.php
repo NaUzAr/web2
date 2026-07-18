@@ -1541,7 +1541,7 @@
                 }
 
                 // Reset to default values
-                document.getElementById('irrigationWaterType').value = '0'; // Default Air Baku (0)
+                document.getElementById('irrigationWaterType').value = '2'; // Default Air Baku (2)
 
                 // Show modal
                 const modal = new bootstrap.Modal(document.getElementById('irrigationPumpModal'));
