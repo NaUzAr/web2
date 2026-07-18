@@ -87,12 +87,11 @@
             backdrop-filter: blur(20px);
             border: 1px solid var(--glass-border);
             border-radius: 16px;
-            padding: 0.85rem;
+            padding: 1rem;
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             height: 100%;
             display: flex;
-            align-items: center;
-            gap: 0.85rem;
+            flex-direction: column;
             position: relative;
             overflow: hidden;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
@@ -121,14 +120,21 @@
             opacity: 1;
         }
 
+        .card-header-flex {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 0.75rem;
+        }
+
         .sensor-icon {
-            width: 44px;
-            height: 44px;
-            border-radius: 50%;
+            width: 38px;
+            height: 38px;
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.3rem;
+            font-size: 1.2rem;
             color: white;
             box-shadow: inset 0 2px 4px rgba(255,255,255,0.3), 0 4px 8px rgba(0,0,0,0.1);
             flex-shrink: 0;
@@ -139,33 +145,27 @@
             transform: scale(1.1) rotate(-10deg);
         }
 
-        .sensor-info {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            width: 100%;
-        }
-
         .sensor-label {
             color: var(--text-secondary);
-            font-size: 0.7rem;
+            font-size: 0.75rem;
             font-weight: 700;
             line-height: 1.2;
             text-align: left;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            margin-bottom: 2px;
+            margin: 0;
         }
 
         .sensor-value-container {
             display: flex;
             align-items: baseline;
             gap: 4px;
+            margin-top: auto;
         }
 
         .sensor-value {
             color: var(--text-main);
-            font-size: 1.4rem;
+            font-size: 1.6rem;
             font-weight: 800;
             line-height: 1;
             letter-spacing: -0.5px;
@@ -173,7 +173,7 @@
 
         .sensor-unit {
             color: var(--text-muted);
-            font-size: 1.1rem;
+            font-size: 0.95rem;
             font-weight: 700;
         }
 
@@ -192,13 +192,12 @@
             backdrop-filter: blur(20px);
             border: 1px solid var(--glass-border);
             border-radius: 16px;
-            padding: 0.85rem;
+            padding: 1rem;
             text-align: left;
             height: 100%;
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             display: flex;
-            align-items: center;
-            gap: 0.85rem;
+            flex-direction: column;
             position: relative;
             overflow: hidden;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
@@ -228,14 +227,14 @@
         }
 
         .output-icon, .output-icon-special {
-            width: 44px;
-            height: 44px;
-            border-radius: 50%;
+            width: 38px;
+            height: 38px;
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
             margin: 0;
-            font-size: 1.3rem;
+            font-size: 1.2rem;
             color: white;
             box-shadow: inset 0 2px 4px rgba(255,255,255,0.3), 0 4px 8px rgba(0,0,0,0.1);
             flex-shrink: 0;
@@ -246,31 +245,24 @@
             transform: scale(1.1) rotate(-10deg);
         }
 
-        .output-info {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            width: 100%;
-        }
-
         .output-label {
             color: var(--text-secondary);
-            font-size: 0.7rem;
+            font-size: 0.75rem;
             font-weight: 700;
             line-height: 1.2;
             text-align: left;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            margin-bottom: 4px;
+            margin: 0;
         }
 
         .output-status {
-            font-size: 0.75rem;
-            font-weight: 700;
+            font-size: 0.9rem;
+            font-weight: 800;
             text-transform: uppercase;
             letter-spacing: 1px;
-            margin-top: 6px;
-            text-align: left;
+            margin: 0.75rem 0;
+            text-align: center; /* CENTER AS REQUESTED */
         }
         .output-status.on { color: #10B981; }
         .output-status.off { color: #EF4444; }
@@ -1202,21 +1194,21 @@
                     @endphp
                     <div class="col-6 col-md-4 col-lg-3">
                         <div class="sensor-card">
-                            <div class="sensor-icon" style="background: {{ $bgColor }};">
-                                <i class="bi {{ $icon }}"></i>
-                            </div>
-                            <div class="sensor-info">
-                                <div class="sensor-label">{{ $sensor->sensor_label }}</div>
-                                <div class="sensor-value-container">
-                                    <div class="sensor-value" id="sensor-val-{{ $sensor->id }}">
-                                        @if($value !== null)
-                                            {{ number_format($value, 1) }}
-                                        @else
-                                            --
-                                        @endif
-                                    </div>
-                                    <div class="sensor-unit">{{ $stdUnit }}</div>
+                            <div class="card-header-flex">
+                                <div class="sensor-icon" style="background: {{ $bgColor }};">
+                                    <i class="bi {{ $icon }}"></i>
                                 </div>
+                                <div class="sensor-label">{{ $sensor->sensor_label }}</div>
+                            </div>
+                            <div class="sensor-value-container">
+                                <div class="sensor-value" id="sensor-val-{{ $sensor->id }}">
+                                    @if($value !== null)
+                                        {{ number_format($value, 1) }}
+                                    @else
+                                        --
+                                    @endif
+                                </div>
+                                <div class="sensor-unit">{{ $stdUnit }}</div>
                             </div>
                         </div>
                     </div>
@@ -1278,25 +1270,27 @@
                     @foreach($irrigationPumps as $pump)
                         <div class="col-6 col-md-4 col-lg-3">
                             <div class="output-card-special" id="output-card-irrigation-{{ $pump->id }}">
-                                <div class="output-icon-special" style="background: linear-gradient(135deg, #0ea5e9, #0284c7);">
-                                    <i class="bi bi-droplet-fill"></i>
-                                </div>
-                                <div class="output-info">
+                                <div class="card-header-flex">
+                                    <div class="output-icon-special" style="background: linear-gradient(135deg, #0ea5e9, #0284c7);">
+                                        <i class="bi bi-droplet-fill"></i>
+                                    </div>
                                     <div class="output-label">{{ $pump->output_label }}</div>
-                                    <div class="output-status off" id="pump-status-{{ $pump->id }}" style="margin-top: 2px; margin-bottom: 4px;">
+                                </div>
+                                
+                                <div class="output-status off" id="pump-status-{{ $pump->id }}">
+                                    OFF
+                                </div>
+
+                                <div class="segmented-control">
+                                    <button type="button" class="segmented-btn"
+                                        onclick="openIrrigationModal({{ $pump->id }}, {{ $pump->max_sectors ?? 1 }})"
+                                        id="btn-on-{{ $pump->id }}">
+                                        ON
+                                    </button>
+                                    <button type="button" class="segmented-btn"
+                                        onclick="sendIrrigationPumpOff({{ $pump->id }})" id="btn-off-{{ $pump->id }}">
                                         OFF
-                                    </div>
-                                    <div class="segmented-control" style="margin-top: 0;">
-                                        <button type="button" class="segmented-btn"
-                                            onclick="openIrrigationModal({{ $pump->id }}, {{ $pump->max_sectors ?? 1 }})"
-                                            id="btn-on-{{ $pump->id }}">
-                                            ON
-                                        </button>
-                                        <button type="button" class="segmented-btn"
-                                            onclick="sendIrrigationPumpOff({{ $pump->id }})" id="btn-off-{{ $pump->id }}">
-                                            OFF
-                                        </button>
-                                    </div>
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -1312,88 +1306,88 @@
                         @endphp
                         <div class="col-6 col-md-4 col-lg-3">
                             <div class="output-card" id="output-card-{{ $output->id }}">
-                                <div class="output-icon" style="background: {{ $outBgColor }};">
-                                    <i class="bi {{ $outIcon }}"></i>
-                                </div>
-                                <div class="output-info">
+                                <div class="card-header-flex">
+                                    <div class="output-icon" style="background: {{ $outBgColor }};">
+                                        <i class="bi {{ $outIcon }}"></i>
+                                    </div>
                                     <div class="output-label">{{ $output->output_label }}</div>
+                                </div>
 
-                                    @if($output->output_type === 'boolean')
-                                        @if(in_array($output->output_name, ['st_bak', 'st_ppk']))
-                                            {{-- Display-only status for Air Baku & Air Pupuk Valve --}}
-                                            <div class="d-flex justify-content-start mt-1 mb-1">
-                                                <span class="badge rounded-pill px-3 py-1 {{ $output->current_value ? 'bg-success' : 'bg-secondary' }}" id="badge-status-{{ $output->id }}">
-                                                    <i class="bi {{ $output->current_value ? 'bi-check-circle' : 'bi-x-circle' }} me-1"></i>
-                                                    {{ $output->current_value ? 'ON' : 'OFF' }}
-                                                </span>
-                                            </div>
-                                            <div class="output-status {{ $output->current_value ? 'on' : 'off' }}"
-                                                id="output-status-{{ $output->id }}" style="font-size: 0.7rem; color: var(--text-muted); margin-top: 0;">
-                                                Otomatis
+                                @if($output->output_type === 'boolean')
+                                    @if(in_array($output->output_name, ['st_bak', 'st_ppk']))
+                                        {{-- Display-only status for Air Baku & Air Pupuk Valve --}}
+                                        <div class="output-status {{ $output->current_value ? 'on' : 'off' }}"
+                                            id="output-status-{{ $output->id }}">
+                                            Otomatis
+                                        </div>
+                                        <div class="d-flex justify-content-center mt-auto">
+                                            <span class="badge rounded-pill px-3 py-1 {{ $output->current_value ? 'bg-success' : 'bg-secondary' }}" id="badge-status-{{ $output->id }}">
+                                                <i class="bi {{ $output->current_value ? 'bi-check-circle' : 'bi-x-circle' }} me-1"></i>
+                                                {{ $output->current_value ? 'ON' : 'OFF' }}
+                                            </span>
+                                        </div>
+                                    @else
+                                        <div class="output-status {{ $output->current_value ? 'on' : 'off' }}"
+                                            id="output-status-{{ $output->id }}">
+                                            {{ $output->current_value ? 'ON' : 'OFF' }}
+                                        </div>
+                                        
+                                        {{-- ON/OFF Buttons for Boolean --}}
+                                        @php
+                                            $outName = strtolower($output->output_name);
+                                            $isDosingPump = str_contains($outName, 'pump_ab') || str_contains($outName, 'dosing') || $outName === 'st_dos';
+                                            $isPhUp = str_contains($outName, 'ph_up') || str_contains($outName, 'ph1') || $outName === 'st_ph_u';
+                                            $isPhDown = str_contains($outName, 'ph_down') || str_contains($outName, 'ph2') || $outName === 'st_ph_d';
+                                            
+                                            $isModalPump = $isPhUp || $isPhDown || $isDosingPump;
+                                            $pumpType = $isDosingPump ? 'dosing' : ($isPhUp ? 'ph_up' : ($isPhDown ? 'ph_down' : ''));
+                                        @endphp
+
+                                        @if($isModalPump)
+                                            {{-- Dosing/pH: ON opens popup with Manual & mL options --}}
+                                            <div class="segmented-control">
+                                                <button type="button"
+                                                    class="segmented-btn {{ $output->current_value ? 'active-on' : '' }}"
+                                                    onclick="openPhControlModal({{ $output->id }}, '{{ $pumpType }}')" id="btn-on-{{ $output->id }}">
+                                                    ON
+                                                </button>
+                                                <button type="button"
+                                                    class="segmented-btn {{ !$output->current_value ? 'active-off' : '' }}"
+                                                    onclick="setOutput({{ $output->id }}, false)" id="btn-off-{{ $output->id }}">
+                                                    OFF
+                                                </button>
                                             </div>
                                         @else
-                                            <div class="output-status {{ $output->current_value ? 'on' : 'off' }}"
-                                                id="output-status-{{ $output->id }}" style="margin-top: 2px; margin-bottom: 4px;">
-                                                {{ $output->current_value ? 'ON' : 'OFF' }}
+                                            {{-- Normal Boolean ON/OFF --}}
+                                            <div class="segmented-control">
+                                                <button type="button"
+                                                    class="segmented-btn {{ $output->current_value ? 'active-on' : '' }}"
+                                                    onclick="setOutput({{ $output->id }}, true)" id="btn-on-{{ $output->id }}">
+                                                    ON
+                                                </button>
+                                                <button type="button"
+                                                    class="segmented-btn {{ !$output->current_value ? 'active-off' : '' }}"
+                                                    onclick="setOutput({{ $output->id }}, false)" id="btn-off-{{ $output->id }}">
+                                                    OFF
+                                                </button>
                                             </div>
-                                            
-                                            {{-- ON/OFF Buttons for Boolean --}}
-                                            @php
-                                                $outName = strtolower($output->output_name);
-                                                $isDosingPump = str_contains($outName, 'pump_ab') || str_contains($outName, 'dosing') || $outName === 'st_dos';
-                                                $isPhUp = str_contains($outName, 'ph_up') || str_contains($outName, 'ph1') || $outName === 'st_ph_u';
-                                                $isPhDown = str_contains($outName, 'ph_down') || str_contains($outName, 'ph2') || $outName === 'st_ph_d';
-                                                
-                                                $isModalPump = $isPhUp || $isPhDown || $isDosingPump;
-                                                $pumpType = $isDosingPump ? 'dosing' : ($isPhUp ? 'ph_up' : ($isPhDown ? 'ph_down' : ''));
-                                            @endphp
-
-                                            @if($isModalPump)
-                                                {{-- Dosing/pH: ON opens popup with Manual & mL options --}}
-                                                <div class="segmented-control" style="margin-top: 0;">
-                                                    <button type="button"
-                                                        class="segmented-btn {{ $output->current_value ? 'active-on' : '' }}"
-                                                        onclick="openPhControlModal({{ $output->id }}, '{{ $pumpType }}')" id="btn-on-{{ $output->id }}">
-                                                        ON
-                                                    </button>
-                                                    <button type="button"
-                                                        class="segmented-btn {{ !$output->current_value ? 'active-off' : '' }}"
-                                                        onclick="setOutput({{ $output->id }}, false)" id="btn-off-{{ $output->id }}">
-                                                        OFF
-                                                    </button>
-                                                </div>
-                                            @else
-                                                {{-- Normal Boolean ON/OFF --}}
-                                                <div class="segmented-control" style="margin-top: 0;">
-                                                    <button type="button"
-                                                        class="segmented-btn {{ $output->current_value ? 'active-on' : '' }}"
-                                                        onclick="setOutput({{ $output->id }}, true)" id="btn-on-{{ $output->id }}">
-                                                        ON
-                                                    </button>
-                                                    <button type="button"
-                                                        class="segmented-btn {{ !$output->current_value ? 'active-off' : '' }}"
-                                                        onclick="setOutput({{ $output->id }}, false)" id="btn-off-{{ $output->id }}">
-                                                        OFF
-                                                    </button>
-                                                </div>
-                                            @endif
                                         @endif
-                                    @else
-                                        <!-- Range Slider for Number/Percentage -->
-                                        <div class="range-value" id="output-value-{{ $output->id }}" style="margin-top: 2px;">
-                                            {{ (int) $output->current_value }}{{ $output->unit }}
-                                        </div>
-                                        <div class="output-status on mt-1" style="margin-bottom: 4px;">
-                                            {{ $output->output_type === 'percentage' ? '0-100%' : '0-180°' }}
-                                        </div>
-                                        <input type="range" class="range-slider" id="output-{{ $output->id }}"
-                                            data-output-id="{{ $output->id }}" data-output-type="{{ $output->output_type }}" min="0"
-                                            max="{{ $output->output_type === 'percentage' ? 100 : 180 }}"
-                                            value="{{ (int) $output->current_value }}"
-                                            oninput="updateRangeValue({{ $output->id }}, this.value, '{{ $output->unit }}')"
-                                            onchange="toggleOutput({{ $output->id }}, this.value)">
                                     @endif
-                                </div>
+                                @else
+                                    <!-- Range Slider for Number/Percentage -->
+                                    <div class="output-status on">
+                                        {{ $output->output_type === 'percentage' ? '0-100%' : '0-180°' }}
+                                    </div>
+                                    <div class="range-value text-center" id="output-value-{{ $output->id }}">
+                                        {{ (int) $output->current_value }}{{ $output->unit }}
+                                    </div>
+                                    <input type="range" class="range-slider mt-auto" id="output-{{ $output->id }}"
+                                        data-output-id="{{ $output->id }}" data-output-type="{{ $output->output_type }}" min="0"
+                                        max="{{ $output->output_type === 'percentage' ? 100 : 180 }}"
+                                        value="{{ (int) $output->current_value }}"
+                                        oninput="updateRangeValue({{ $output->id }}, this.value, '{{ $output->unit }}')"
+                                        onchange="toggleOutput({{ $output->id }}, this.value)">
+                                @endif
                             </div>
                         </div>
                     @endforeach
