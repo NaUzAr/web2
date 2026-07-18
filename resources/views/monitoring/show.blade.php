@@ -266,6 +266,9 @@
             color: var(--text-main);
             font-size: 0.9rem;
             font-weight: 500;
+            min-width: 140px !important;
+            flex-grow: 1;
+            width: 100%;
         }
         
         .date-pill input::placeholder {
