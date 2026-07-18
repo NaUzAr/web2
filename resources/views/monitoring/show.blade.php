@@ -350,6 +350,52 @@
             text-decoration: none;
         }
 
+        /* Segmented Control for Outputs */
+        .segmented-control {
+            background: rgba(0, 0, 0, 0.05);
+            border-radius: 50px;
+            padding: 4px;
+            display: flex;
+            gap: 4px;
+            width: 100%;
+            margin-top: 1rem;
+        }
+        
+        .segmented-btn {
+            flex: 1;
+            border: none;
+            background: transparent;
+            border-radius: 50px;
+            padding: 0.5rem;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            text-align: center;
+        }
+
+        .segmented-btn:hover {
+            background: rgba(0,0,0,0.05);
+            color: var(--text-main);
+        }
+
+        .segmented-btn.active-on {
+            background: #10B981;
+            color: white;
+            box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3);
+        }
+
+        .segmented-btn.active-off {
+            background: #EF4444;
+            color: white;
+            box-shadow: 0 4px 10px rgba(239, 68, 68, 0.3);
+        }
+
+        .segmented-btn.active-on:hover, .segmented-btn.active-off:hover {
+            transform: translateY(-2px);
+            color: white;
+        }
+
         .date-pill {
             background: rgba(255, 255, 255, 0.7);
             border: 1px solid var(--glass-border);
@@ -1152,16 +1198,15 @@
                                     </div>
                                 @endif
 
-                                <div class="output-controls">
-                                    <button type="button" class="btn btn-sm btn-outline-success rounded-pill fw-bold"
+                                <div class="segmented-control">
+                                    <button type="button" class="segmented-btn"
                                         onclick="openIrrigationModal({{ $pump->id }}, {{ $pump->max_sectors ?? 1 }})"
-                                        id="btn-on-{{ $pump->id }}" style="padding: 0.4rem 1rem;">
-                                        <i class="bi bi-power"></i> ON
+                                        id="btn-on-{{ $pump->id }}">
+                                        ON
                                     </button>
-                                    <button type="button" class="btn btn-sm btn-outline-danger rounded-pill fw-bold"
-                                        onclick="sendIrrigationPumpOff({{ $pump->id }})" id="btn-off-{{ $pump->id }}"
-                                        style="padding: 0.4rem 1rem;">
-                                        <i class="bi bi-x-lg"></i> OFF
+                                    <button type="button" class="segmented-btn"
+                                        onclick="sendIrrigationPumpOff({{ $pump->id }})" id="btn-off-{{ $pump->id }}">
+                                        OFF
                                     </button>
                                 </div>
                                 <div class="output-status off" id="pump-status-{{ $pump->id }}">
@@ -1213,34 +1258,30 @@
 
                                         @if($isModalPump)
                                             {{-- Dosing/pH: ON opens popup with Manual & mL options --}}
-                                            <div class="d-flex gap-2 justify-content-center">
+                                            <div class="segmented-control">
                                                 <button type="button"
-                                                    class="btn btn-sm {{ $output->current_value ? 'btn-success' : 'btn-outline-success' }}"
-                                                    onclick="openPhControlModal({{ $output->id }}, '{{ $pumpType }}')" id="btn-on-{{ $output->id }}"
-                                                    style="min-width: 50px;">
-                                                    <i class="bi bi-power"></i> ON
+                                                    class="segmented-btn {{ $output->current_value ? 'active-on' : '' }}"
+                                                    onclick="openPhControlModal({{ $output->id }}, '{{ $pumpType }}')" id="btn-on-{{ $output->id }}">
+                                                    ON
                                                 </button>
                                                 <button type="button"
-                                                    class="btn btn-sm {{ !$output->current_value ? 'btn-danger' : 'btn-outline-danger' }}"
-                                                    onclick="setOutput({{ $output->id }}, false)" id="btn-off-{{ $output->id }}"
-                                                    style="min-width: 50px;">
-                                                    <i class="bi bi-x-lg"></i> OFF
+                                                    class="segmented-btn {{ !$output->current_value ? 'active-off' : '' }}"
+                                                    onclick="setOutput({{ $output->id }}, false)" id="btn-off-{{ $output->id }}">
+                                                    OFF
                                                 </button>
                                             </div>
                                         @else
                                             {{-- Normal Boolean ON/OFF --}}
-                                            <div class="d-flex gap-2 justify-content-center">
+                                            <div class="segmented-control">
                                                 <button type="button"
-                                                    class="btn btn-sm {{ $output->current_value ? 'btn-success' : 'btn-outline-success' }}"
-                                                    onclick="setOutput({{ $output->id }}, true)" id="btn-on-{{ $output->id }}"
-                                                    style="min-width: 50px;">
-                                                    <i class="bi bi-power"></i> ON
+                                                    class="segmented-btn {{ $output->current_value ? 'active-on' : '' }}"
+                                                    onclick="setOutput({{ $output->id }}, true)" id="btn-on-{{ $output->id }}">
+                                                    ON
                                                 </button>
                                                 <button type="button"
-                                                    class="btn btn-sm {{ !$output->current_value ? 'btn-danger' : 'btn-outline-danger' }}"
-                                                    onclick="setOutput({{ $output->id }}, false)" id="btn-off-{{ $output->id }}"
-                                                    style="min-width: 50px;">
-                                                    <i class="bi bi-x-lg"></i> OFF
+                                                    class="segmented-btn {{ !$output->current_value ? 'active-off' : '' }}"
+                                                    onclick="setOutput({{ $output->id }}, false)" id="btn-off-{{ $output->id }}">
+                                                    OFF
                                                 </button>
                                             </div>
                                         @endif
@@ -1509,11 +1550,11 @@
                             const statusEl = document.getElementById(`output-status-${outputId}`);
 
                             if (isOn) {
-                                btnOn.className = 'btn btn-sm btn-success';
-                                btnOff.className = 'btn btn-sm btn-outline-danger';
+                                btnOn.className = 'segmented-btn active-on';
+                                btnOff.className = 'segmented-btn';
                             } else {
-                                btnOn.className = 'btn btn-sm btn-outline-success';
-                                btnOff.className = 'btn btn-sm btn-danger';
+                                btnOn.className = 'segmented-btn';
+                                btnOff.className = 'segmented-btn active-off';
                             }
 
                             if (statusEl) {
@@ -1729,8 +1770,8 @@
                             const btnOff = document.getElementById(`btn-off-${outputId}`);
                             const statusEl = document.getElementById(`output-status-${outputId}`);
 
-                            if (btnOn) btnOn.className = 'btn btn-sm btn-success';
-                            if (btnOff) btnOff.className = 'btn btn-sm btn-outline-danger';
+                            if (btnOn) btnOn.className = 'segmented-btn active-on';
+                            if (btnOff) btnOff.className = 'segmented-btn';
                             if (statusEl) {
                                 statusEl.textContent = 'ON';
                                 statusEl.className = 'output-status on';
