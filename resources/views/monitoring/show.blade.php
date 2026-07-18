@@ -159,23 +159,24 @@
         .sensor-value-container {
             display: flex;
             align-items: baseline;
-            justify-content: center;
-            gap: 4px;
+            justify-content: flex-end;
+            gap: 6px;
             margin-top: auto;
-            margin-bottom: 0.5rem;
+            padding-top: 0.5rem;
         }
 
         .sensor-value {
             color: var(--text-main);
-            font-size: 1.6rem;
+            font-size: 1.9rem;
             font-weight: 800;
             line-height: 1;
             letter-spacing: -0.5px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
 
         .sensor-unit {
             color: var(--text-muted);
-            font-size: 0.95rem;
+            font-size: 1rem;
             font-weight: 700;
         }
 
