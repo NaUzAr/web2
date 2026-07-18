@@ -123,6 +123,8 @@
         .card-header-flex {
             display: flex;
             align-items: center;
+            flex-direction: row-reverse;
+            justify-content: space-between;
             gap: 10px;
             margin-bottom: 0.75rem;
         }
