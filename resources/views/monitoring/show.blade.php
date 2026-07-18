@@ -1163,11 +1163,11 @@
                 <div class="tab-pane fade {{ !$isTableActive ? 'show active' : '' }}" id="chartTab">
                     <div class="glass-card mt-0" style="border-radius: 0 0 20px 20px;">
                         <!-- Header: Sensor Select & Date Filter -->
-                        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-3">
-                            <div class="d-flex align-items-center">
-                                <label class="me-2" style="color: var(--text-main);"><i class="bi bi-bar-chart-line me-1"></i>Pilih Sensor:</label>
-                                <select id="chartSensorSelect" class="form-select form-select-sm"
-                                    style="width: auto; background: #ffffff; color: var(--text-main); border: 1px solid var(--glass-border);">
+                        <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 mb-3">
+                            <div class="d-flex align-items-center w-100 w-md-auto">
+                                <label class="me-2 text-nowrap" style="color: var(--text-main);"><i class="bi bi-bar-chart-line me-1"></i>Pilih Sensor:</label>
+                                <select id="chartSensorSelect" class="form-select form-select-sm w-100 w-md-auto"
+                                    style="background: #ffffff; color: var(--text-main); border: 1px solid var(--glass-border);">
                                     @foreach($sensors as $index => $sensor)
                                         <option value="{{ $index }}" style="color: #333; background-color: #ffffff;">
                                             {{ $sensor->sensor_label }} ({{ $sensor->unit }})
@@ -1202,11 +1202,11 @@
                 <div class="tab-pane fade {{ $isTableActive ? 'show active' : '' }}" id="tableTab">
                     <div class="glass-card mt-0" style="border-radius: 0 0 20px 20px;">
                         <!-- Header: Sensor Select & Date Filter -->
-                        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-3">
-                            <div class="d-flex align-items-center">
-                                <label class="me-2" style="color: var(--text-main);"><i class="bi bi-filter me-1"></i>Filter Sensor:</label>
-                                <select id="tableSensorSelect" class="form-select form-select-sm"
-                                    style="width: auto; background: #ffffff; color: var(--text-main); border: 1px solid var(--glass-border);">
+                        <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 mb-3">
+                            <div class="d-flex align-items-center w-100 w-md-auto">
+                                <label class="me-2 text-nowrap" style="color: var(--text-main);"><i class="bi bi-filter me-1"></i>Filter Sensor:</label>
+                                <select id="tableSensorSelect" class="form-select form-select-sm w-100 w-md-auto"
+                                    style="background: #ffffff; color: var(--text-main); border: 1px solid var(--glass-border);">
                                     <option value="all" style="color: #333; background-color: #ffffff;">Semua Sensor</option>
                                     @foreach($sensors as $index => $sensor)
                                         <option value="{{ $index }}" style="color: #333; background-color: #ffffff;">
