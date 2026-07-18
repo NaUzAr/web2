@@ -1132,17 +1132,17 @@
                                     <div class="output-label">{{ $pump->output_label }}</div>
                                 </div>
                                 
-                                <div class="output-status off" id="pump-status-{{ $pump->id }}">
-                                    OFF
+                                <div class="output-status {{ $pump->current_value ? 'on' : 'off' }}" id="pump-status-{{ $pump->id }}">
+                                    {{ $pump->current_value ? 'ON' : 'OFF' }}
                                 </div>
 
                                 <div class="segmented-control">
-                                    <button type="button" class="segmented-btn"
+                                    <button type="button" class="segmented-btn {{ $pump->current_value ? 'active-on' : '' }}"
                                         onclick="openIrrigationModal({{ $pump->id }}, {{ $pump->max_sectors ?? 1 }})"
                                         id="btn-on-{{ $pump->id }}">
                                         ON
                                     </button>
-                                    <button type="button" class="segmented-btn"
+                                    <button type="button" class="segmented-btn {{ !$pump->current_value ? 'active-off' : '' }}"
                                         onclick="sendIrrigationPumpOff({{ $pump->id }})" id="btn-off-{{ $pump->id }}">
                                         OFF
                                     </button>
@@ -2215,17 +2215,13 @@
                         const isOn = parseFloat(output.value) > 0;
 
                         if (isOn) {
-                            btnOn.classList.remove('btn-outline-success');
-                            btnOn.classList.add('btn-success');
-                            btnOff.classList.remove('btn-danger');
-                            btnOff.classList.add('btn-outline-danger');
+                            btnOn.className = 'segmented-btn active-on';
+                            btnOff.className = 'segmented-btn';
                             statusEl.className = 'output-status on';
                             statusEl.innerText = 'ON';
                         } else {
-                            btnOn.classList.remove('btn-success');
-                            btnOn.classList.add('btn-outline-success');
-                            btnOff.classList.remove('btn-outline-danger');
-                            btnOff.classList.add('btn-danger');
+                            btnOn.className = 'segmented-btn';
+                            btnOff.className = 'segmented-btn active-off';
                             statusEl.className = 'output-status off';
                             statusEl.innerText = 'OFF';
                         }
@@ -2343,17 +2339,13 @@
                     const isOn = parseFloat(output.value) > 0;
 
                     if (isOn) {
-                        btnOn.classList.remove('btn-outline-success');
-                        btnOn.classList.add('btn-success');
-                        btnOff.classList.remove('btn-danger');
-                        btnOff.classList.add('btn-outline-danger');
+                        btnOn.className = 'segmented-btn active-on';
+                        btnOff.className = 'segmented-btn';
                         statusEl.className = 'output-status on';
                         statusEl.innerText = 'ON';
                     } else {
-                        btnOn.classList.remove('btn-success');
-                        btnOn.classList.add('btn-outline-success');
-                        btnOff.classList.remove('btn-outline-danger');
-                        btnOff.classList.add('btn-danger');
+                        btnOn.className = 'segmented-btn';
+                        btnOff.className = 'segmented-btn active-off';
                         statusEl.className = 'output-status off';
                         statusEl.innerText = 'OFF';
                     }
