@@ -159,8 +159,10 @@
         .sensor-value-container {
             display: flex;
             align-items: baseline;
+            justify-content: center;
             gap: 4px;
             margin-top: auto;
+            margin-bottom: 0.5rem;
         }
 
         .sensor-value {
