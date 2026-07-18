@@ -1471,6 +1471,35 @@
             // Setup CSRF token for AJAX requests
             const csrfToken = '{{ csrf_token() }}';
             const userDeviceId = {{ $userDevice->id }};
+            const pendingOutputs = {}; // Store pending UI states to prevent polling flicker
+
+            // Optimistically update UI and lock it for polling
+            function setOptimisticUI(outputId, isOn) {
+                pendingOutputs[outputId] = { expectedValue: isOn, timestamp: Date.now() };
+                
+                const btnOn = document.getElementById(`btn-on-${outputId}`);
+                const btnOff = document.getElementById(`btn-off-${outputId}`);
+                let statusEl = document.getElementById(`output-status-${outputId}`);
+                if (!statusEl) statusEl = document.getElementById(`pump-status-${outputId}`);
+
+                if (btnOn && btnOff) {
+                    if (isOn) {
+                        btnOn.className = 'segmented-btn active-on';
+                        btnOff.className = 'segmented-btn';
+                        if (statusEl) {
+                            statusEl.className = 'output-status on';
+                            statusEl.innerText = 'ON';
+                        }
+                    } else {
+                        btnOn.className = 'segmented-btn';
+                        btnOff.className = 'segmented-btn active-off';
+                        if (statusEl) {
+                            statusEl.className = 'output-status off';
+                            statusEl.innerText = 'OFF';
+                        }
+                    }
+                }
+            }
 
             // Set output ON/OFF (for buttons)
             function setOutput(outputId, isOn) {
@@ -1487,34 +1516,21 @@
                     .then(response => response.json())
                     .then(data => {
                         if (data.success) {
-                            // Update button styles
-                            const btnOn = document.getElementById(`btn-on-${outputId}`);
-                            const btnOff = document.getElementById(`btn-off-${outputId}`);
-                            const statusEl = document.getElementById(`output-status-${outputId}`);
+                            setOptimisticUI(outputId, isOn);
 
-                            if (isOn) {
-                                btnOn.className = 'segmented-btn active-on';
-                                btnOff.className = 'segmented-btn';
-                            } else {
-                                btnOn.className = 'segmented-btn';
-                                btnOff.className = 'segmented-btn active-off';
-                            }
-
-                            // Status text update removed here (delegated to device updater)
-
-                            // Show success feedback
+                            // Flash card border
                             const card = document.getElementById(`output-card-${outputId}`);
                             if (card) {
-                                card.style.borderColor = '#22c55e';
+                                card.style.borderColor = isOn ? '#22c55e' : '#ef4444';
                                 setTimeout(() => {
                                     card.style.borderColor = 'rgba(250, 204, 21, 0.3)';
                                 }, 500);
                             }
 
-                            console.log('Output updated:', data.message);
+                            console.log('Output toggled:', data.message);
                         } else {
                             console.error('Failed to update output');
-                            showToast('Gagal mengupdate output. Silakan coba lagi.');
+                            showToast('Gagal mengubah status: ' + (data.message || 'Silakan coba lagi.'));
                         }
                     })
                     .catch(error => {
@@ -1576,7 +1592,7 @@
                             const modal = bootstrap.Modal.getInstance(document.getElementById('irrigationPumpModal'));
                             modal.hide();
 
-                            // Status text update removed here (delegated to device updater)
+                            setOptimisticUI(outputId, true);
 
                             // Flash card border for feedback
                             const card = document.getElementById(`output-card-irrigation-${outputId}`);
@@ -1617,7 +1633,7 @@
                     .then(response => response.json())
                     .then(data => {
                         if (data.success) {
-                            // Status text update removed here (delegated to device updater)
+                            setOptimisticUI(outputId, false);
 
                             // Flash card border for feedback
                             const card = document.getElementById(`output-card-irrigation-${outputId}`);
@@ -1694,15 +1710,7 @@
                             const modal = bootstrap.Modal.getInstance(document.getElementById('phControlModal'));
                             modal.hide();
 
-                            // Update button styles on the output card
-                            const btnOn = document.getElementById(`btn-on-${outputId}`);
-                            const btnOff = document.getElementById(`btn-off-${outputId}`);
-                            const statusEl = document.getElementById(`output-status-${outputId}`);
-
-                            if (btnOn) btnOn.className = 'segmented-btn active-on';
-                            if (btnOff) btnOff.className = 'segmented-btn';
-                            // Status text update removed here (delegated to device updater)
-
+                            setOptimisticUI(outputId, true);
 
                             // Flash card border
                             const card = document.getElementById(`output-card-${outputId}`);
@@ -1787,13 +1795,7 @@
                     .then(response => response.json())
                     .then(data => {
                         if (data.success) {
-                            // Update status text for boolean
-                            const statusEl = document.getElementById(`output-status-${outputId}`);
-                            if (statusEl) {
-                                const isOn = data.new_value == 1 || data.new_value === true;
-                                statusEl.textContent = isOn ? 'ON' : 'OFF';
-                                statusEl.className = isOn ? 'output-status on' : 'output-status off';
-                            }
+                            setOptimisticUI(outputId, data.new_value == 1 || data.new_value === true);
 
                             // Show success feedback
                             const card = document.getElementById(`output-card-${outputId}`);
@@ -2330,6 +2332,24 @@
 
         function updateOutputs(outputs) {
             outputs.forEach(output => {
+                // Check if there's a pending optimistic update
+                if (pendingOutputs[output.id]) {
+                    const pending = pendingOutputs[output.id];
+                    const isOn = parseFloat(output.value) > 0;
+                    if (Date.now() - pending.timestamp < 15000) { // 15 seconds timeout
+                        if (isOn === pending.expectedValue) {
+                            // Device state matches expected, clear lock
+                            delete pendingOutputs[output.id];
+                        } else {
+                            // Device hasn't updated yet, skip UI update to prevent flickering
+                            return; 
+                        }
+                    } else {
+                        // Timeout expired, clear lock and let it update
+                        delete pendingOutputs[output.id];
+                    }
+                }
+
                 // Update Boolean Outputs (Buttons)
                 const btnOn = document.getElementById(`btn-on-${output.id}`);
                 const btnOff = document.getElementById(`btn-off-${output.id}`);
