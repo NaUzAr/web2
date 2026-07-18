@@ -111,10 +111,17 @@
 
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-glass">
-        <div class="container py-2">
-            <a href="{{ route('monitoring.index') }}" class="btn-back">
-                <i class="bi bi-arrow-left me-2"></i> Kembali
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="{{ route('home') }}">
+                <img src="{{ asset('images/logo.png') }}" alt="Swaratani" height="40" class="me-2">
+                <span class="fw-bold" style="color: var(--navbar_text, #333);">Swaratani IoT</span>
             </a>
+            <div class="navbar-nav ms-auto flex-row align-items-center gap-4 gap-sm-3">
+                <a class="nav-link px-0 text-decoration-none" href="{{ route('monitoring.index') }}" title="Kembali ke List Device" style="color: var(--navbar-text);">
+                    <i class="bi bi-arrow-left fs-5 me-2 me-sm-1" style="-webkit-text-stroke: 1px currentColor;"></i>
+                    <i class="bi bi-grid-1x2 fs-5 me-sm-1"></i><span class="d-none d-sm-inline"> List Device</span>
+                </a>
+            </div>
         </div>
     </nav>
 
