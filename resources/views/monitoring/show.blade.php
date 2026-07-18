@@ -1173,13 +1173,6 @@
                                 </div>
                                 <div class="output-label">{{ $pump->output_label }}</div>
 
-                                @if($pump->max_sectors > 1)
-                                    <div class="mb-3 text-center">
-                                        <span class="badge" style="background: rgba(14, 165, 233, 0.15); color: #0284c7; border: 1px solid rgba(14, 165, 233, 0.3); border-radius: 12px; padding: 0.5rem 0.8rem;">
-                                            <i class="bi bi-grid-3x3-gap-fill me-1"></i> {{ $pump->max_sectors }} Zona
-                                        </span>
-                                    </div>
-                                @endif
 
                                 <div class="segmented-control">
                                     <button type="button" class="segmented-btn"
