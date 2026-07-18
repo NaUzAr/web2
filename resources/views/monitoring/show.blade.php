@@ -903,9 +903,9 @@
                         <i class="bi bi-hdd-network fs-5 me-sm-1"></i><span class="d-none d-sm-inline"> Manager</span>
                     </a>
                 @else
-                    <a class="nav-link px-0 text-decoration-none" href="{{ route('monitoring.index') }}" title="Kembali ke Monitoring" style="color: var(--navbar-text);">
+                    <a class="nav-link px-0 text-decoration-none" href="{{ route('monitoring.index') }}" title="Kembali ke Tampilan Device" style="color: var(--navbar-text);">
                         <i class="bi bi-arrow-left fs-5 me-2 me-sm-1" style="-webkit-text-stroke: 1px currentColor;"></i>
-                        <i class="bi bi-grid-1x2 fs-5 me-sm-1"></i><span class="d-none d-sm-inline"> Monitoring</span>
+                        <i class="bi bi-display fs-5 me-sm-1"></i><span class="d-none d-sm-inline"> Tampilan Device</span>
                     </a>
                 @endif
             </div>
