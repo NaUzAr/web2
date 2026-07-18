@@ -21,31 +21,52 @@
         }
 
         .log-card {
-            background: var(--glass-bg);
-            backdrop-filter: blur(20px);
-            border: 1px solid var(--glass-border);
+            background: #ffffff;
+            border: 1px solid rgba(14, 165, 233, 0.15);
             border-radius: 16px;
             padding: 1.25rem;
             margin-bottom: 1rem;
             transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
         }
 
         .log-card:hover {
-            border-color: var(--primary);
+            border-color: rgba(14, 165, 233, 0.4);
             transform: translateY(-2px);
+            box-shadow: 0 12px 30px rgba(14, 165, 233, 0.1);
         }
 
         .log-icon {
             width: 48px;
             height: 48px;
             border-radius: 12px;
-            background: rgba(14, 95, 138, 0.1);
-            color: var(--primary);
+            background: linear-gradient(135deg, #e0f2fe, #bae6fd);
+            color: #0ea5e9;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 1.25rem;
             flex-shrink: 0;
+        }
+
+        .btn-back {
+            color: #0ea5e9;
+            border: 1px solid rgba(14, 165, 233, 0.2);
+            border-radius: 50px;
+            padding: 0.5rem 1.2rem;
+            font-weight: 600;
+            text-decoration: none;
+            background: #ffffff;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+        }
+        .btn-back:hover {
+            background: #f0f9ff;
+            color: #0284c7;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(14, 165, 233, 0.15);
         }
 
         .log-time {
@@ -90,10 +111,9 @@
 
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-glass">
-        <div class="container">
-            <a class="navbar-brand d-flex align-items-center" href="{{ route('monitoring.index') }}">
-                <i class="bi bi-arrow-left me-2"></i>
-                <span class="fw-bold" style="color: var(--navbar_text, #333);">Kembali</span>
+        <div class="container py-2">
+            <a href="{{ route('monitoring.index') }}" class="btn-back">
+                <i class="bi bi-arrow-left me-2"></i> Kembali
             </a>
         </div>
     </nav>
