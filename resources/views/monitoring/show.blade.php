@@ -2586,8 +2586,9 @@
                 enableTime: true,
                 dateFormat: "Y-m-d H:i",
                 time_24hr: true,
-                allowInput: false,
-                disableMobile: true
+                altInput: true,
+                altFormat: "Y-m-d H:i",
+                disableMobile: false
             });
         });
     </script>
