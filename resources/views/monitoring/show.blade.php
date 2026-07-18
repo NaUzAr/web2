@@ -1473,30 +1473,20 @@
             const userDeviceId = {{ $userDevice->id }};
             const pendingOutputs = {}; // Store pending UI states to prevent polling flicker
 
-            // Optimistically update UI and lock it for polling
+            // Optimistically update UI and lock it for polling (buttons only)
             function setOptimisticUI(outputId, isOn) {
                 pendingOutputs[outputId] = { expectedValue: isOn, timestamp: Date.now() };
                 
                 const btnOn = document.getElementById(`btn-on-${outputId}`);
                 const btnOff = document.getElementById(`btn-off-${outputId}`);
-                let statusEl = document.getElementById(`output-status-${outputId}`);
-                if (!statusEl) statusEl = document.getElementById(`pump-status-${outputId}`);
 
                 if (btnOn && btnOff) {
                     if (isOn) {
                         btnOn.className = 'segmented-btn active-on';
                         btnOff.className = 'segmented-btn';
-                        if (statusEl) {
-                            statusEl.className = 'output-status on';
-                            statusEl.innerText = 'ON';
-                        }
                     } else {
                         btnOn.className = 'segmented-btn';
                         btnOff.className = 'segmented-btn active-off';
-                        if (statusEl) {
-                            statusEl.className = 'output-status off';
-                            statusEl.innerText = 'OFF';
-                        }
                     }
                 }
             }
