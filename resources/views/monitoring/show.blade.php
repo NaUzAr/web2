@@ -823,15 +823,27 @@
         <!-- Header -->
         <div class="page-header d-flex flex-wrap justify-content-between align-items-center gap-3">
             <div>
-                <h1 class="device-title">
-                    <i class="bi {{ $device->type === 'aws' ? 'bi-cloud-sun' : 'bi-flower1' }} me-2"></i>
-                    @if($isAdminView ?? false)
-                        {{ $device->name }}
-                    @else
-                        {{ $userDevice->custom_name }}
-                    @endif
-                </h1>
-                <p class="mb-0 mt-1" style="color: var(--text-secondary);">
+                <div class="d-flex align-items-center gap-3 flex-wrap">
+                    <h1 class="device-title mb-0">
+                        <i class="bi {{ $device->type === 'aws' ? 'bi-cloud-sun' : 'bi-flower1' }} me-2"></i>
+                        @if($isAdminView ?? false)
+                            {{ $device->name }}
+                        @else
+                            {{ $userDevice->custom_name }}
+                        @endif
+                    </h1>
+                    <div class="d-flex gap-2 align-items-center">
+                        @if($isAdminView ?? false)
+                            <span class="device-type-badge" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); font-size: 0.8rem; padding: 0.35rem 0.8rem; height: fit-content;">
+                                <i class="bi bi-shield-check me-1"></i> Admin View
+                            </span>
+                        @endif
+                        <span class="device-type-badge" style="font-size: 0.8rem; padding: 0.35rem 0.8rem; height: fit-content;">
+                            {{ strtoupper($device->type ?? 'DEVICE') }}
+                        </span>
+                    </div>
+                </div>
+                <p class="mb-0 mt-2" style="color: var(--text-secondary);">
                     <span class="live-dot me-2"></span>
                     @if($latestData)
                         Terakhir update: {{ \Carbon\Carbon::parse($latestData->recorded_at)->diffForHumans() }}
@@ -841,30 +853,22 @@
                 </p>
             </div>
             <div class="d-flex gap-2 align-items-center flex-wrap justify-content-md-end">
-                @if($isAdminView ?? false)
-                    <span class="device-type-badge" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);">
-                        <i class="bi bi-shield-check me-1"></i> Admin View
-                    </span>
-                @endif
-                <span class="device-type-badge">
-                    {{ strtoupper($device->type ?? 'DEVICE') }}
-                </span>
-                <a href="{{ isset($isAdminView) && $isAdminView ? route('admin.device.history', $device->id) : route('monitoring.history', $userDevice->id) }}" class="btn-glass" style="background: var(--primary-gradient); color: white; border-color: transparent;">
-                    <i class="bi bi-clock-history me-1"></i> Riwayat Data
+                <a href="{{ isset($isAdminView) && $isAdminView ? route('admin.device.history', $device->id) : route('monitoring.history', $userDevice->id) }}" class="btn-glass">
+                    <i class="bi bi-clock-history me-1" style="color: var(--primary);"></i> Riwayat Data
                 </a>
                 @if(!($isAdminView ?? false))
                     @if($scheduleConfig ?? false)
                         <a href="{{ route('schedule.index', $userDevice->id) }}" class="btn-glass">
-                            <i class="bi bi-calendar-check me-1"></i> Jadwal
+                            <i class="bi bi-calendar-check me-1" style="color: var(--primary);"></i> Jadwal
                         </a>
                     @endif
                     @if($hasAutomation ?? false)
                         <a href="{{ route('automasi.index', $userDevice->id) }}" class="btn-glass">
-                            <i class="bi bi-cpu me-1"></i> Otomasi
+                            <i class="bi bi-cpu me-1" style="color: var(--primary);"></i> Otomasi
                         </a>
                     @endif
                     <button type="button" class="btn-glass" data-bs-toggle="modal" data-bs-target="#exportModal">
-                        <i class="bi bi-download me-1"></i> Download CSV
+                        <i class="bi bi-download me-1" style="color: var(--primary);"></i> Download CSV
                     </button>
                 @endif
             </div>
