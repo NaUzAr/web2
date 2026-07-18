@@ -1582,10 +1582,7 @@
                                 btnOff.className = 'segmented-btn active-off';
                             }
 
-                            if (statusEl) {
-                                statusEl.textContent = isOn ? 'ON' : 'OFF';
-                                statusEl.className = isOn ? 'output-status on' : 'output-status off';
-                            }
+                            // Status text update removed here (delegated to device updater)
 
                             // Show success feedback
                             const card = document.getElementById(`output-card-${outputId}`);
@@ -1661,13 +1658,7 @@
                             const modal = bootstrap.Modal.getInstance(document.getElementById('irrigationPumpModal'));
                             modal.hide();
 
-                            // Update status display
-                            const statusEl = document.getElementById(`pump-status-${outputId}`);
-                            if (statusEl) {
-                            const waterTypeName = waterType === '1' ? 'Air Pupuk' : 'Air Baku';
-                                statusEl.textContent = `Zona ${zone} - ${waterTypeName} - ON`;
-                                statusEl.style.color = '#22c55e';
-                            }
+                            // Status text update removed here (delegated to device updater)
 
                             // Flash card border for feedback
                             const card = document.getElementById(`output-card-irrigation-${outputId}`);
@@ -1708,12 +1699,7 @@
                     .then(response => response.json())
                     .then(data => {
                         if (data.success) {
-                            // Update status display
-                            const statusEl = document.getElementById(`pump-status-${outputId}`);
-                            if (statusEl) {
-                                statusEl.textContent = 'OFF';
-                                statusEl.style.color = 'var(--text-secondary)';
-                            }
+                            // Status text update removed here (delegated to device updater)
 
                             // Flash card border for feedback
                             const card = document.getElementById(`output-card-irrigation-${outputId}`);
@@ -1797,10 +1783,8 @@
 
                             if (btnOn) btnOn.className = 'segmented-btn active-on';
                             if (btnOff) btnOff.className = 'segmented-btn';
-                            if (statusEl) {
-                                statusEl.textContent = 'ON';
-                                statusEl.className = 'output-status on';
-                            }
+                            // Status text update removed here (delegated to device updater)
+
 
                             // Flash card border
                             const card = document.getElementById(`output-card-${outputId}`);
@@ -2435,7 +2419,12 @@
                 // Update Boolean Outputs (Buttons)
                 const btnOn = document.getElementById(`btn-on-${output.id}`);
                 const btnOff = document.getElementById(`btn-off-${output.id}`);
-                const statusEl = document.getElementById(`output-status-${output.id}`);
+                let statusEl = document.getElementById(`output-status-${output.id}`);
+                
+                // Fallback for irrigation pump which uses a different ID prefix
+                if (!statusEl) {
+                    statusEl = document.getElementById(`pump-status-${output.id}`);
+                }
 
                 if (btnOn && btnOff && statusEl) {
                     const isOn = parseFloat(output.value) > 0;
