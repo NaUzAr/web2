@@ -1177,17 +1177,19 @@
                             </div>
                             
                             <!-- Date Filter -->
-                            <form action="{{ url()->current() }}" method="GET" class="d-flex align-items-center gap-2 m-0 ms-auto">
-                                <div class="d-flex align-items-center bg-white rounded-3 px-2 py-1" style="border: 1px solid var(--glass-border);">
-                                    <i class="bi bi-calendar3 text-muted me-2 ms-1"></i>
-                                    <input type="datetime-local" class="flatpickr-datetime form-control form-control-sm border-0 shadow-none bg-transparent p-0" name="start_date" value="{{ request('start_date') }}" title="Mulai Tanggal/Jam" style="width: auto; outline: none; box-shadow: none;" placeholder="Mulai...">
-                                    <span class="mx-2 text-muted">-</span>
-                                    <input type="datetime-local" class="flatpickr-datetime form-control form-control-sm border-0 shadow-none bg-transparent p-0" name="end_date" value="{{ request('end_date') }}" title="Sampai Tanggal/Jam" style="width: auto; outline: none; box-shadow: none;" placeholder="Sampai...">
+                            <form action="{{ url()->current() }}" method="GET" class="d-flex flex-column flex-md-row align-items-stretch align-items-md-center gap-2 m-0 ms-md-auto mt-3 mt-md-0 w-100" style="max-width: 100%; flex: 1; justify-content: flex-end;">
+                                <div class="d-flex align-items-center bg-white rounded-3 px-2 py-1 w-100 w-md-auto" style="border: 1px solid var(--glass-border);">
+                                    <i class="bi bi-calendar3 text-muted me-1 d-none d-sm-block"></i>
+                                    <input type="datetime-local" class="flatpickr-datetime form-control form-control-sm border-0 shadow-none bg-transparent p-0 w-50" name="start_date" value="{{ request('start_date') }}" title="Mulai Tanggal/Jam" style="outline: none; box-shadow: none;" placeholder="Mulai...">
+                                    <span class="mx-1 mx-sm-2 text-muted">-</span>
+                                    <input type="datetime-local" class="flatpickr-datetime form-control form-control-sm border-0 shadow-none bg-transparent p-0 w-50" name="end_date" value="{{ request('end_date') }}" title="Sampai Tanggal/Jam" style="outline: none; box-shadow: none;" placeholder="Sampai...">
                                 </div>
-                                <button type="submit" class="btn btn-sm btn-primary" title="Filter"><i class="bi bi-search"></i></button>
-                                @if(request()->has('start_date') || request()->has('end_date'))
-                                    <a href="{{ url()->current() }}" class="btn btn-sm btn-secondary text-white" title="Reset"><i class="bi bi-x-lg"></i></a>
-                                @endif
+                                <div class="d-flex gap-2 mt-2 mt-md-0">
+                                    <button type="submit" class="btn btn-sm btn-primary flex-grow-1 flex-md-grow-0 px-3" title="Filter"><i class="bi bi-search"></i> <span class="d-md-none">Filter</span></button>
+                                    @if(request()->has('start_date') || request()->has('end_date'))
+                                        <a href="{{ url()->current() }}" class="btn btn-sm btn-secondary text-white" title="Reset"><i class="bi bi-x-lg"></i></a>
+                                    @endif
+                                </div>
                             </form>
                         </div>
                         <div style="position: relative; height: 50vh; min-height: 300px; max-height: 500px; width: 100%;">
@@ -1215,18 +1217,20 @@
                             </div>
                             
                             <!-- Date Filter -->
-                            <form action="{{ url()->current() }}" method="GET" class="d-flex align-items-center gap-2 m-0 ms-auto">
+                            <form action="{{ url()->current() }}" method="GET" class="d-flex flex-column flex-md-row align-items-stretch align-items-md-center gap-2 m-0 ms-md-auto mt-3 mt-md-0 w-100" style="max-width: 100%; flex: 1; justify-content: flex-end;">
                                 <input type="hidden" name="page" value="1">
-                                <div class="d-flex align-items-center bg-white rounded-3 px-2 py-1" style="border: 1px solid var(--glass-border);">
-                                    <i class="bi bi-calendar3 text-muted me-2 ms-1"></i>
-                                    <input type="datetime-local" class="flatpickr-datetime form-control form-control-sm border-0 shadow-none bg-transparent p-0" name="start_date" value="{{ request('start_date') }}" title="Mulai Tanggal/Jam" style="width: auto; outline: none; box-shadow: none;" placeholder="Mulai...">
-                                    <span class="mx-2 text-muted">-</span>
-                                    <input type="datetime-local" class="flatpickr-datetime form-control form-control-sm border-0 shadow-none bg-transparent p-0" name="end_date" value="{{ request('end_date') }}" title="Sampai Tanggal/Jam" style="width: auto; outline: none; box-shadow: none;" placeholder="Sampai...">
+                                <div class="d-flex align-items-center bg-white rounded-3 px-2 py-1 w-100 w-md-auto" style="border: 1px solid var(--glass-border);">
+                                    <i class="bi bi-calendar3 text-muted me-1 d-none d-sm-block"></i>
+                                    <input type="datetime-local" class="flatpickr-datetime form-control form-control-sm border-0 shadow-none bg-transparent p-0 w-50" name="start_date" value="{{ request('start_date') }}" title="Mulai Tanggal/Jam" style="outline: none; box-shadow: none;" placeholder="Mulai...">
+                                    <span class="mx-1 mx-sm-2 text-muted">-</span>
+                                    <input type="datetime-local" class="flatpickr-datetime form-control form-control-sm border-0 shadow-none bg-transparent p-0 w-50" name="end_date" value="{{ request('end_date') }}" title="Sampai Tanggal/Jam" style="outline: none; box-shadow: none;" placeholder="Sampai...">
                                 </div>
-                                <button type="submit" class="btn btn-sm btn-primary" title="Filter"><i class="bi bi-search"></i></button>
-                                @if(request()->has('start_date') || request()->has('end_date'))
-                                    <a href="{{ url()->current() }}?page=1" class="btn btn-sm btn-secondary text-white" title="Reset"><i class="bi bi-x-lg"></i></a>
-                                @endif
+                                <div class="d-flex gap-2 mt-2 mt-md-0">
+                                    <button type="submit" class="btn btn-sm btn-primary flex-grow-1 flex-md-grow-0 px-3" title="Filter"><i class="bi bi-search"></i> <span class="d-md-none">Filter</span></button>
+                                    @if(request()->has('start_date') || request()->has('end_date'))
+                                        <a href="{{ url()->current() }}?page=1" class="btn btn-sm btn-secondary text-white" title="Reset"><i class="bi bi-x-lg"></i></a>
+                                    @endif
+                                </div>
                             </form>
                         </div>
                         <div class="table-responsive">
