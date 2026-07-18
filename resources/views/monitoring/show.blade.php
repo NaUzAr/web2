@@ -123,20 +123,20 @@
         .card-header-flex {
             display: flex;
             align-items: center;
-            flex-direction: row-reverse;
-            justify-content: flex-start;
-            gap: 10px;
+            flex-direction: column;
+            justify-content: center;
+            gap: 12px;
             margin-bottom: 0.75rem;
         }
 
         .sensor-icon {
-            width: 38px;
-            height: 38px;
-            border-radius: 12px;
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.2rem;
+            font-size: 1.5rem;
             color: white;
             box-shadow: inset 0 2px 4px rgba(255,255,255,0.3), 0 4px 8px rgba(0,0,0,0.1);
             flex-shrink: 0;
@@ -149,10 +149,10 @@
 
         .sensor-label {
             color: var(--text-secondary);
-            font-size: 0.75rem;
+            font-size: 0.8rem;
             font-weight: 700;
             line-height: 1.2;
-            text-align: right;
+            text-align: center;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             margin: 0;
@@ -161,7 +161,7 @@
         .sensor-value-container {
             display: flex;
             align-items: baseline;
-            justify-content: flex-start;
+            justify-content: center;
             gap: 6px;
             margin-top: auto;
             padding-top: 0.5rem;
@@ -232,14 +232,14 @@
         }
 
         .output-icon, .output-icon-special {
-            width: 38px;
-            height: 38px;
-            border-radius: 12px;
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
             display: flex;
             align-items: center;
             justify-content: center;
             margin: 0;
-            font-size: 1.2rem;
+            font-size: 1.5rem;
             color: white;
             box-shadow: inset 0 2px 4px rgba(255,255,255,0.3), 0 4px 8px rgba(0,0,0,0.1);
             flex-shrink: 0;
@@ -252,10 +252,10 @@
 
         .output-label {
             color: var(--text-secondary);
-            font-size: 0.75rem;
+            font-size: 0.8rem;
             font-weight: 700;
             line-height: 1.2;
-            text-align: right;
+            text-align: center;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             margin: 0;
