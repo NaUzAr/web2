@@ -163,7 +163,7 @@
                 <span class="fw-bold" style="color: var(--navbar_text, #333);">Swaratani IoT</span>
             </a>
             <div class="navbar-nav ms-auto flex-row align-items-center gap-4 gap-sm-3">
-                <a class="nav-link px-0 text-decoration-none" href="{{ isset($isAdminView) && $isAdminView ? route('admin.device.monitoring', $device->id) : route('monitoring.show', $device->id) }}" title="Kembali ke Device" style="color: var(--navbar-text);">
+                <a class="nav-link px-0 text-decoration-none" href="{{ isset($isAdminView) && $isAdminView ? route('admin.device.monitoring', $device->id) : route('monitoring.show', $userDevice->id) }}" title="Kembali ke Device" style="color: var(--navbar-text);">
                     <i class="bi bi-arrow-left fs-5 me-2 me-sm-1" style="-webkit-text-stroke: 1px currentColor;"></i>
                     <i class="bi bi-display fs-5 me-sm-1"></i><span class="d-none d-sm-inline"> Tampilan Device</span>
                 </a>

@@ -196,7 +196,7 @@ class MonitoringController extends Controller
             $logData = new \Illuminate\Pagination\LengthAwarePaginator([], 0, 20);
         }
 
-        return view('monitoring.history', compact('device', 'sensors', 'logData', 'chartData', 'isAdminView'));
+        return view('monitoring.history', compact('device', 'userDevice', 'sensors', 'logData', 'chartData', 'isAdminView'));
     }
 
     /**
