@@ -86,13 +86,13 @@
             background: var(--glass-bg);
             backdrop-filter: blur(20px);
             border: 1px solid var(--glass-border);
-            border-radius: 24px;
-            padding: 1.5rem;
+            border-radius: 20px;
+            padding: 1.25rem;
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             height: 100%;
             display: flex;
-            flex-direction: column;
-            justify-content: space-between;
+            align-items: center;
+            gap: 1.25rem;
             position: relative;
             overflow: hidden;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
@@ -112,7 +112,7 @@
         }
 
         .sensor-card:hover {
-            transform: translateY(-8px);
+            transform: translateY(-5px) scale(1.02);
             border-color: rgba(255, 255, 255, 0.8);
             box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
         }
@@ -121,46 +121,54 @@
             opacity: 1;
         }
 
-        .sensor-header {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            margin-bottom: 1rem;
-        }
-
         .sensor-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 16px;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.4rem;
+            font-size: 1.6rem;
             color: white;
-            box-shadow: inset 0 2px 4px rgba(255,255,255,0.3);
+            box-shadow: inset 0 2px 4px rgba(255,255,255,0.3), 0 4px 8px rgba(0,0,0,0.1);
             flex-shrink: 0;
+            transition: transform 0.4s ease;
+        }
+
+        .sensor-card:hover .sensor-icon {
+            transform: scale(1.1) rotate(-10deg);
+        }
+
+        .sensor-info {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            width: 100%;
         }
 
         .sensor-label {
             color: var(--text-secondary);
-            font-size: 0.95rem;
-            font-weight: 600;
-            line-height: 1.3;
+            font-size: 0.85rem;
+            font-weight: 700;
+            line-height: 1.2;
             text-align: left;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
         }
 
         .sensor-value-container {
             display: flex;
             align-items: baseline;
-            gap: 6px;
+            gap: 4px;
         }
 
         .sensor-value {
             color: var(--text-main);
-            font-size: 2.2rem;
+            font-size: 1.8rem;
             font-weight: 800;
             line-height: 1;
-            letter-spacing: -1px;
+            letter-spacing: -0.5px;
         }
 
         .sensor-unit {
@@ -1177,21 +1185,21 @@
                     @endphp
                     <div class="col-6 col-md-4 col-lg-3">
                         <div class="sensor-card">
-                            <div class="sensor-header">
-                                <div class="sensor-icon" style="background: {{ $bgColor }};">
-                                    <i class="bi {{ $icon }}"></i>
-                                </div>
-                                <div class="sensor-label">{{ $sensor->sensor_label }}</div>
+                            <div class="sensor-icon" style="background: {{ $bgColor }};">
+                                <i class="bi {{ $icon }}"></i>
                             </div>
-                            <div class="sensor-value-container">
-                                <div class="sensor-value" id="sensor-val-{{ $sensor->id }}">
-                                    @if($value !== null)
-                                        {{ number_format($value, 1) }}
-                                    @else
-                                        --
-                                    @endif
+                            <div class="sensor-info">
+                                <div class="sensor-label">{{ $sensor->sensor_label }}</div>
+                                <div class="sensor-value-container">
+                                    <div class="sensor-value" id="sensor-val-{{ $sensor->id }}">
+                                        @if($value !== null)
+                                            {{ number_format($value, 1) }}
+                                        @else
+                                            --
+                                        @endif
+                                    </div>
+                                    <div class="sensor-unit">{{ $stdUnit }}</div>
                                 </div>
-                                <div class="sensor-unit">{{ $stdUnit }}</div>
                             </div>
                         </div>
                     </div>
