@@ -1139,7 +1139,10 @@
                 $isTableActive = request()->has('page');
             @endphp
             <div id="data-section"></div>
-            <ul class="nav nav-tabs nav-tabs-glass mt-4" id="dataTabs" role="tablist">
+            
+
+
+            <ul class="nav nav-tabs nav-tabs-glass" id="dataTabs" role="tablist">
                 <li class="nav-item">
                     <button class="nav-link {{ !$isTableActive ? 'active' : '' }}" data-bs-toggle="tab"
                         data-bs-target="#chartTab">
@@ -1158,20 +1161,33 @@
                 <!-- Chart Tab -->
                 <div class="tab-pane fade {{ !$isTableActive ? 'show active' : '' }}" id="chartTab">
                     <div class="glass-card mt-0" style="border-radius: 0 0 20px 20px;">
-                        <!-- Sensor Dropdown -->
-                        <div class="d-flex align-items-center mb-3">
-                            <label class="me-2" style="color: var(--text-main);"><i
-                                    class="bi bi-bar-chart-line me-1"></i>Pilih
-                                Sensor:</label>
-                            <select id="chartSensorSelect" class="form-select form-select-sm"
-                                style="width: auto; background: #ffffff; color: var(--text-main); border: 1px solid var(--glass-border);">
-                                @foreach($sensors as $index => $sensor)
-                                    <option value="{{ $index }}" style="color: #333; background-color: #ffffff;">
-                                        {{ $sensor->sensor_label }}
-                                        ({{ $sensor->unit }})
-                                    </option>
-                                @endforeach
-                            </select>
+                        <!-- Header: Sensor Select & Date Filter -->
+                        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-3">
+                            <div class="d-flex align-items-center">
+                                <label class="me-2" style="color: var(--text-main);"><i class="bi bi-bar-chart-line me-1"></i>Pilih Sensor:</label>
+                                <select id="chartSensorSelect" class="form-select form-select-sm"
+                                    style="width: auto; background: #ffffff; color: var(--text-main); border: 1px solid var(--glass-border);">
+                                    @foreach($sensors as $index => $sensor)
+                                        <option value="{{ $index }}" style="color: #333; background-color: #ffffff;">
+                                            {{ $sensor->sensor_label }} ({{ $sensor->unit }})
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            
+                            <!-- Date Filter -->
+                            <form action="{{ url()->current() }}" method="GET" class="d-flex align-items-center gap-2 m-0 ms-auto">
+                                <div class="d-flex align-items-center bg-white rounded-3 px-2 py-1" style="border: 1px solid var(--glass-border);">
+                                    <i class="bi bi-calendar3 text-muted me-2 ms-1"></i>
+                                    <input type="date" class="form-control form-control-sm border-0 shadow-none bg-transparent p-0" name="start_date" value="{{ request('start_date') }}" title="Mulai Tanggal" style="width: auto; outline: none; box-shadow: none;">
+                                    <span class="mx-2 text-muted">-</span>
+                                    <input type="date" class="form-control form-control-sm border-0 shadow-none bg-transparent p-0" name="end_date" value="{{ request('end_date') }}" title="Sampai Tanggal" style="width: auto; outline: none; box-shadow: none;">
+                                </div>
+                                <button type="submit" class="btn btn-sm btn-primary" title="Filter"><i class="bi bi-search"></i></button>
+                                @if(request()->has('start_date') || request()->has('end_date'))
+                                    <a href="{{ url()->current() }}" class="btn btn-sm btn-secondary text-white" title="Reset"><i class="bi bi-x-lg"></i></a>
+                                @endif
+                            </form>
                         </div>
                         <div style="position: relative; height: 50vh; min-height: 300px; max-height: 500px; width: 100%;">
                             <canvas id="sensorChart"></canvas>
@@ -1182,20 +1198,35 @@
                 <!-- Table Tab -->
                 <div class="tab-pane fade {{ $isTableActive ? 'show active' : '' }}" id="tableTab">
                     <div class="glass-card mt-0" style="border-radius: 0 0 20px 20px;">
-                        <!-- Sensor Dropdown for Table -->
-                        <div class="d-flex align-items-center mb-3">
-                            <label class="me-2" style="color: var(--text-main);"><i class="bi bi-filter me-1"></i>Filter
-                                Sensor:</label>
-                            <select id="tableSensorSelect" class="form-select form-select-sm"
-                                style="width: auto; background: #ffffff; color: var(--text-main); border: 1px solid var(--glass-border);">
-                                <option value="all" style="color: #333; background-color: #ffffff;">Semua Sensor</option>
-                                @foreach($sensors as $index => $sensor)
-                                    <option value="{{ $index }}" style="color: #333; background-color: #ffffff;">
-                                        {{ $sensor->sensor_label }}
-                                        ({{ $sensor->unit }})
-                                    </option>
-                                @endforeach
-                            </select>
+                        <!-- Header: Sensor Select & Date Filter -->
+                        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-3">
+                            <div class="d-flex align-items-center">
+                                <label class="me-2" style="color: var(--text-main);"><i class="bi bi-filter me-1"></i>Filter Sensor:</label>
+                                <select id="tableSensorSelect" class="form-select form-select-sm"
+                                    style="width: auto; background: #ffffff; color: var(--text-main); border: 1px solid var(--glass-border);">
+                                    <option value="all" style="color: #333; background-color: #ffffff;">Semua Sensor</option>
+                                    @foreach($sensors as $index => $sensor)
+                                        <option value="{{ $index }}" style="color: #333; background-color: #ffffff;">
+                                            {{ $sensor->sensor_label }} ({{ $sensor->unit }})
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            
+                            <!-- Date Filter -->
+                            <form action="{{ url()->current() }}" method="GET" class="d-flex align-items-center gap-2 m-0 ms-auto">
+                                <input type="hidden" name="page" value="1">
+                                <div class="d-flex align-items-center bg-white rounded-3 px-2 py-1" style="border: 1px solid var(--glass-border);">
+                                    <i class="bi bi-calendar3 text-muted me-2 ms-1"></i>
+                                    <input type="date" class="form-control form-control-sm border-0 shadow-none bg-transparent p-0" name="start_date" value="{{ request('start_date') }}" title="Mulai Tanggal" style="width: auto; outline: none; box-shadow: none;">
+                                    <span class="mx-2 text-muted">-</span>
+                                    <input type="date" class="form-control form-control-sm border-0 shadow-none bg-transparent p-0" name="end_date" value="{{ request('end_date') }}" title="Sampai Tanggal" style="width: auto; outline: none; box-shadow: none;">
+                                </div>
+                                <button type="submit" class="btn btn-sm btn-primary" title="Filter"><i class="bi bi-search"></i></button>
+                                @if(request()->has('start_date') || request()->has('end_date'))
+                                    <a href="{{ url()->current() }}?page=1" class="btn btn-sm btn-secondary text-white" title="Reset"><i class="bi bi-x-lg"></i></a>
+                                @endif
+                            </form>
                         </div>
                         <div class="table-responsive">
                             <table class="table table-glass mb-0" id="sensorDataTable">
@@ -1586,7 +1617,7 @@
                                     Volume (mL)
                                 </label>
                                 <input type="number" id="phDosingVolume" class="form-control form-control-dark"
-                                    min="1" max="9999" value="10" placeholder="Masukkan volume dalam mL">
+                                    min="1" max="9999" value="100" placeholder="Masukkan volume dalam mL">
                             </div>
 
                             <div class="d-flex gap-2 flex-wrap mb-3">

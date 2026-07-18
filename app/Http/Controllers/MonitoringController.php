@@ -115,8 +115,22 @@ class MonitoringController extends Controller
         $latestData = null;
 
         if ($device->table_name && \Schema::hasTable($device->table_name)) {
-            // Ambil 50 data terbaru untuk chart (tidak di-paginate)
-            $chartData = DB::table($device->table_name)
+            $query = DB::table($device->table_name);
+            
+            // Apply date filters if they exist
+            if ($request->has('start_date') && $request->start_date) {
+                $query->where('recorded_at', '>=', $request->start_date . ' 00:00:00');
+            }
+            if ($request->has('end_date') && $request->end_date) {
+                $query->where('recorded_at', '<=', $request->end_date . ' 23:59:59');
+            }
+            
+            // Clone query for pagination and chart
+            $logQuery = clone $query;
+            $chartQuery = clone $query;
+
+            // Ambil 50 data terbaru untuk chart
+            $chartData = $chartQuery
                 ->orderBy('recorded_at', 'desc')
                 ->limit(50)
                 ->get()
@@ -124,9 +138,10 @@ class MonitoringController extends Controller
                 ->values();
 
             // Ambil data untuk tabel dengan pagination (20 per halaman)
-            $logData = DB::table($device->table_name)
+            $logData = $logQuery
                 ->orderBy('recorded_at', 'desc')
-                ->paginate(20);
+                ->paginate(20)
+                ->appends($request->all());
 
             // Ambil data terbaru PER SENSOR (bukan dari satu baris)
             // Ini memastikan setiap sensor card menampilkan nilai terbaru meskipun datang dari paket berbeda

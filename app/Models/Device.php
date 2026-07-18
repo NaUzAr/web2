@@ -224,7 +224,7 @@ class Device extends Model
             'sprinkler' => ['label' => 'Sprinkler', 'type' => 'boolean', 'unit' => '', 'icon' => 'bi-cloud-drizzle'],
 
             // Custom Outputs (User Request)
-            'sts_air_input' => ['label' => 'Air Input', 'type' => 'boolean', 'unit' => '', 'icon' => 'bi-arrow-right-circle'],
+            'sts_air_input' => ['label' => 'Air Baku', 'type' => 'boolean', 'unit' => '', 'icon' => 'bi-arrow-right-circle'],
             'sts_mixing' => ['label' => 'Mixing Process', 'type' => 'boolean', 'unit' => '', 'icon' => 'bi-arrow-repeat'],
             'sts_pompa' => ['label' => 'Pompa Utama', 'type' => 'boolean', 'unit' => '', 'icon' => 'bi-droplet-fill'],
             'sts_fan' => ['label' => 'Kipas Exhaust', 'type' => 'boolean', 'unit' => '', 'icon' => 'bi-fan'],
@@ -385,12 +385,38 @@ class Device extends Model
     }
 
     /**
+     * Relasi ke DeviceSetting
+     */
+    public function settings()
+    {
+        return $this->hasMany(DeviceSetting::class);
+    }
+
+    /**
      * Cek apakah device memiliki sensor DAN output yang mendukung tipe otomasi tertentu
      * Device harus punya minimal 1 sensor cocok DAN minimal 1 output cocok
+     * ATAU admin secara eksplisit mengaktifkan otomasi (tersimpan di device_settings)
      * @param string $type 'climate' atau 'fertilizer'
      */
     public function hasAutomationType($type)
     {
+        // 1. Cek dari explicit toggle (DeviceSettings)
+        $settingKeys = [];
+        if ($type === 'climate') {
+            $settingKeys = ['ats_suhu', 'ats_kelem', 'ats_lux', 'ats_co2'];
+        } elseif ($type === 'fertilizer') {
+            $settingKeys = ['ats_tds', 'ats_ph', 'ats_wlevel'];
+        }
+        
+        $hasExplicitSettings = \App\Models\DeviceSetting::where('device_id', $this->id)
+            ->whereIn('key', $settingKeys)
+            ->exists();
+            
+        if ($hasExplicitSettings) {
+            return true;
+        }
+
+        // 2. Fallback: Cek implicit dari nama sensor & output
         $presets = self::getAutomationPresets();
         if (!isset($presets[$type]))
             return false;

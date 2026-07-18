@@ -66,6 +66,9 @@ class MqttListener extends Command
             // Get all devices and subscribe to their topics + /sub
             $devices = Device::all();
 
+            // Track subscribed topics
+            $subscribedTopics = [];
+
             if ($devices->isEmpty()) {
                 $this->warn("⚠️  No devices found. Create devices first via admin panel.");
             } else {
@@ -77,11 +80,45 @@ class MqttListener extends Command
                     $mqtt->subscribe($subTopic, function ($topic, $message) {
                         $this->processMessage($topic, $message);
                     }, 0);
+                    
+                    $subscribedTopics[] = $subTopic;
                 }
             }
 
+            // Register loop event handler to dynamically check for new devices
+            $lastCheckTime = time();
+            $mqtt->registerLoopEventHandler(function (\PhpMqtt\Client\MqttClient $client, float $elapsedTime) use (&$lastCheckTime, &$subscribedTopics) {
+                // Check every 5 seconds
+                if (time() - $lastCheckTime >= 5) {
+                    $lastCheckTime = time();
+                    
+                    // Only fetch from DB if the cache flag was set by AdminDeviceController
+                    if (\Illuminate\Support\Facades\Cache::pull('mqtt_devices_changed')) {
+                        $this->info("🔄 Device changes detected! Updating subscriptions...");
+                        
+                        // Fetch current devices from DB
+                        $currentDevices = \App\Models\Device::all();
+                        
+                        foreach ($currentDevices as $device) {
+                            $subTopic = rtrim($device->mqtt_topic, '/') . '/pub';
+                            
+                            // If we haven't subscribed to this device's topic yet
+                            if (!in_array($subTopic, $subscribedTopics)) {
+                                $this->info("🆕 New device detected dynamically! Subscribing to: {$subTopic} (Device: {$device->name})");
+                                
+                                $client->subscribe($subTopic, function ($topic, $message) {
+                                    $this->processMessage($topic, $message);
+                                }, 0);
+                                
+                                $subscribedTopics[] = $subTopic;
+                            }
+                        }
+                    }
+                }
+            });
+
             $this->info("");
-            $this->info("👂 Listening for messages... (Press Ctrl+C to stop)");
+            $this->info("👂 Listening for messages... (Dynamic auto-discovery enabled)");
             $this->info("─────────────────────────────────────────────────");
 
             // Loop forever

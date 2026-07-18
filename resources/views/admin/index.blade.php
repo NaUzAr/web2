@@ -117,6 +117,17 @@
             transform: translateY(-2px);
         }
 
+        .btn-action-copy {
+            background: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+        }
+
+        .btn-action-copy:hover {
+            background: rgba(16, 185, 129, 0.4);
+            color: #fff;
+            transform: translateY(-2px);
+        }
+
         .btn-action-delete {
             background: rgba(239, 68, 68, 0.2);
             color: #ef4444;
@@ -411,22 +422,35 @@
     </nav>
 
     <div class="container py-5">
-        <div class="d-flex justify-content-between align-items-center mb-4">
+        <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
             <h2 class="page-title mb-0">
                 <i class="bi bi-cpu-fill me-2"></i>Device Management
             </h2>
-            <div class="d-flex gap-2">
+            <div class="d-flex flex-wrap gap-2 align-items-center">
                 <a href="{{ route('admin.tickets.index') }}" class="btn btn-outline-light">
                     <i class="bi bi-inboxes me-1"></i> Tiket
                 </a>
                 <a href="{{ route('admin.activity-logs') }}" class="btn btn-outline-light">
                     <i class="bi bi-journal-text me-1"></i> Logs
                 </a>
+
+                <!-- Search Form -->
+                <form action="{{ route('admin.devices.index') }}" method="GET" class="d-flex mb-0">
+                    <div class="input-group shadow-sm" style="max-width: 250px; background: #ffffff; border-radius: 8px; overflow: hidden; border: 1px solid #e2e8f0;">
+                        <input type="text" name="search" class="form-control border-0 shadow-none text-dark" placeholder="Cari device..." value="{{ request('search') }}" style="background: transparent;">
+                        <button type="submit" class="btn btn-light border-0 shadow-none" style="color: #0ea5e9;">
+                            <i class="bi bi-search"></i>
+                        </button>
+                    </div>
+                </form>
+
                 <a href="{{ route('admin.device.create') }}" class="btn btn-gradient">
                     <i class="bi bi-plus-lg me-1"></i> Tambah Device
                 </a>
             </div>
         </div>
+
+
 
         @if(session('success'))
             <div class="alert alert-success-custom mb-4">
@@ -440,12 +464,31 @@
                     <thead class="table-dark-custom">
                         <tr>
                             <th>#</th>
-                            <th>Nama Device</th>
+                            <th>
+                                <a href="{{ request()->fullUrlWithQuery(['sort' => 'name', 'order' => request('sort') == 'name' && request('order') == 'asc' ? 'desc' : 'asc']) }}" class="text-decoration-none" style="color: var(--primary-light);">
+                                    Nama Device
+                                    @if(request('sort') == 'name')
+                                        <i class="bi bi-sort-alpha-{{ request('order') == 'asc' ? 'down' : 'up-alt' }}"></i>
+                                    @else
+                                        <i class="bi bi-arrow-down-up opacity-50" style="font-size: 0.8em;"></i>
+                                    @endif
+                                </a>
+                            </th>
                             <th>Tipe</th>
                             <th>Sensors</th>
                             <th>Outputs</th>
                             <th>MQTT Topic</th>
-                            <th>Token</th>
+
+                            <th>
+                                <a href="{{ request()->fullUrlWithQuery(['sort' => 'created_at', 'order' => request('sort', 'created_at') == 'created_at' && request('order', 'desc') == 'desc' ? 'asc' : 'desc']) }}" class="text-decoration-none" style="color: var(--primary-light);">
+                                    Dibuat
+                                    @if(request('sort', 'created_at') == 'created_at')
+                                        <i class="bi bi-sort-numeric-{{ request('order', 'desc') == 'asc' ? 'up-alt' : 'down' }}"></i>
+                                    @else
+                                        <i class="bi bi-arrow-down-up opacity-50" style="font-size: 0.8em;"></i>
+                                    @endif
+                                </a>
+                            </th>
                             <th class="text-center">Aksi</th>
                         </tr>
                     </thead>
@@ -461,9 +504,8 @@
                                     </a>
                                 </td>
                                 <td data-label="Tipe">
-                                    <span class="badge-type">
-                                        <i
-                                            class="bi {{ $device->type === 'aws' ? 'bi-cloud-sun' : 'bi-flower1' }} me-1"></i>
+                                    <span style="background: rgba(14, 165, 233, 0.1); color: #0ea5e9; padding: 4px 10px; border-radius: 6px; font-weight: 600; font-size: 0.85rem; display: inline-flex; align-items: center;">
+                                        <i class="bi {{ $device->type === 'aws' ? 'bi-cloud-sun' : 'bi-flower1' }} me-1"></i>
                                         {{ strtoupper($device->type ?? 'N/A') }}
                                     </span>
                                 </td>
@@ -498,14 +540,32 @@
                                 <td data-label="MQTT" class="d-mobile-none">
                                     <code class="text-info">{{ $device->mqtt_topic }}</code>
                                 </td>
-                                <td data-label="Token" class="d-mobile-none">
-                                    <span class="badge-token">{{ $device->token }}</span>
+
+                                <td data-label="Dibuat" class="d-mobile-none">
+                                    <small style="color: #64748b;">{{ $device->created_at ? $device->created_at->format('d M Y, H:i') : '-' }}</small>
                                 </td>
                                 <td data-label="" class="text-center">
                                     <button type="button" class="btn-action btn-action-qr" title="QR Code"
                                         onclick="showQrModal('{{ $device->token }}', '{{ $device->name }}')">
                                         <i class="bi bi-qr-code"></i>
                                     </button>
+                                    <div class="dropdown d-inline">
+                                        <button class="btn-action btn-action-copy" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="Copy Data">
+                                            <i class="bi bi-clipboard"></i>
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-menu-end shadow-sm" style="border-radius: 12px; font-size: 0.9rem;">
+                                            <li>
+                                                <a class="dropdown-item py-2 d-flex align-items-center" href="#" onclick="copyToClipboard(event, '{{ $device->token }}', this)">
+                                                    <i class="bi bi-key me-2 text-secondary"></i> Copy Token
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="dropdown-item py-2 d-flex align-items-center" href="#" onclick="copyToClipboard(event, '{{ $device->mqtt_topic }}', this)">
+                                                    <i class="bi bi-broadcast me-2 text-secondary"></i> Copy MQTT Topic
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </div>
                                     <a href="{{ route('admin.device.edit', $device->id) }}"
                                         class="btn-action btn-action-edit" title="Edit">
                                         <i class="bi bi-pencil"></i>
@@ -719,6 +779,28 @@
                 link.download = 'QR_Swaratani_' + safeName + '.png';
                 link.href = canvas.toDataURL('image/png');
                 link.click();
+            });
+        }
+
+        function copyToClipboard(e, text, el) {
+            e.preventDefault();
+            navigator.clipboard.writeText(text).then(() => {
+                const icon = el.querySelector('i');
+                const originalClass = icon.className;
+                const originalText = el.innerHTML;
+                
+                // Ubah icon jadi centang hijau
+                icon.className = 'bi bi-check2 text-success me-2';
+                const textNode = el.lastChild;
+                if(textNode && textNode.nodeType === 3) textNode.nodeValue = ' Copied!';
+                
+                // Kembalikan ke asal setelah 2 detik
+                setTimeout(() => {
+                    el.innerHTML = originalText;
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy data: ', err);
+                alert('Gagal menyalin data.');
             });
         }
     </script>

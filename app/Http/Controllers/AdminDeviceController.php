@@ -38,10 +38,31 @@ class AdminDeviceController extends Controller
     }
 
     // 1. HALAMAN LIST DEVICE (INDEX)
-    public function index()
+    public function index(Request $request)
     {
         $this->checkAdmin();
-        $devices = Device::all();
+        
+        $query = Device::query();
+        
+        if ($request->has('search') && $request->search != '') {
+            $search = $request->search;
+            $query->where('name', 'like', '%' . $search . '%')
+                  ->orWhere('table_name', 'like', '%' . $search . '%')
+                  ->orWhere('type', 'like', '%' . $search . '%');
+        }
+
+        // Sorting logic
+        $sort = $request->get('sort', 'created_at'); // default sort
+        $order = $request->get('order', 'desc'); // default order
+        
+        $allowedSorts = ['name', 'created_at'];
+        if (in_array($sort, $allowedSorts)) {
+            $query->orderBy($sort, $order === 'asc' ? 'asc' : 'desc');
+        } else {
+            $query->latest();
+        }
+        
+        $devices = $query->get();
         return view('admin.index', compact('devices'));
     }
 
@@ -171,6 +192,47 @@ class AdminDeviceController extends Controller
             ]);
         }
 
+        // F2. Simpan setting otomasi jika diaktifkan (dari form Create)
+        $autoKeyMap = [
+            'ni_SUHU' => 'suhu',
+            'ni_KELEM' => 'kelem',
+            'ni_PH' => 'ph',
+            'ni_TDS' => 'tds'
+        ];
+
+        $processedAutoKeys = [];
+
+        foreach ($sensors as $sensor) {
+            $type = $sensor['type'] ?? '';
+            // Periksa jika auto_enabled dicentang dan tipenya ada di map
+            if (!empty($sensor['auto_enabled']) && isset($autoKeyMap[$type])) {
+                $settingKey = $autoKeyMap[$type];
+
+                // Cegah duplikat jika user menambahkan 2 sensor suhu dan mencentang keduanya
+                if (in_array($settingKey, $processedAutoKeys)) {
+                    continue;
+                }
+                $processedAutoKeys[] = $settingKey;
+
+                $atsVal = $sensor['ats_val'] ?? 0;
+                $bwhVal = $sensor['bwh_val'] ?? 0;
+
+                // Simpan batas atas
+                \App\Models\DeviceSetting::create([
+                    'device_id' => $device->id,
+                    'key' => "ats_{$settingKey}",
+                    'value' => $atsVal,
+                ]);
+
+                // Simpan batas bawah
+                \App\Models\DeviceSetting::create([
+                    'device_id' => $device->id,
+                    'key' => "bwh_{$settingKey}",
+                    'value' => $bwhVal,
+                ]);
+            }
+        }
+
         // G. Simpan Outputs ke device_outputs (tanpa automation fields - pindah ke schedules)
         if ($request->has('outputs')) {
             $outputCounter = [];
@@ -236,6 +298,7 @@ class AdminDeviceController extends Controller
         }
 
         // I. Redirect ke Halaman List Device
+        \Illuminate\Support\Facades\Cache::put('mqtt_devices_changed', true, now()->addMinutes(5));
         return redirect()->route('admin.devices.index')
             ->with('success', "Sukses! Device '{$request->name}' berhasil dibuat dengan " . count($sensorColumns) . " sensor.");
     }
@@ -294,7 +357,7 @@ class AdminDeviceController extends Controller
     }
 
     // 7. HALAMAN MONITORING DEVICE (ADMIN VIEW)
-    public function showMonitoring($id)
+    public function showMonitoring(Request $request, $id)
     {
         $this->checkAdmin();
         $isAdminView = true;
@@ -309,8 +372,22 @@ class AdminDeviceController extends Controller
         $latestData = null;
 
         if ($device->table_name && Schema::hasTable($device->table_name)) {
+            $query = \DB::table($device->table_name);
+            
+            // Apply date filters if they exist
+            if ($request->has('start_date') && $request->start_date) {
+                $query->where('recorded_at', '>=', $request->start_date . ' 00:00:00');
+            }
+            if ($request->has('end_date') && $request->end_date) {
+                $query->where('recorded_at', '<=', $request->end_date . ' 23:59:59');
+            }
+            
+            // Clone query for pagination
+            $logQuery = clone $query;
+            $chartQuery = clone $query;
+
             // Ambil 50 data terbaru untuk chart
-            $chartData = \DB::table($device->table_name)
+            $chartData = $chartQuery
                 ->orderBy('recorded_at', 'desc')
                 ->limit(50)
                 ->get()
@@ -318,11 +395,12 @@ class AdminDeviceController extends Controller
                 ->values();
 
             // Ambil data untuk tabel dengan pagination (20 per halaman)
-            $logData = \DB::table($device->table_name)
+            $logData = $logQuery
                 ->orderBy('recorded_at', 'desc')
-                ->paginate(20);
+                ->paginate(20)
+                ->appends($request->all());
 
-            // Ambil data terbaru untuk display sensor cards
+            // Ambil data terbaru untuk display sensor cards (selalu nilai absolut terakhir, tanpa filter)
             $latestData = \DB::table($device->table_name)
                 ->orderBy('recorded_at', 'desc')
                 ->first();

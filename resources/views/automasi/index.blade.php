@@ -422,6 +422,7 @@
                         </div>
                         <div class="p-4">
                             <div class="row g-4">
+                                @if($hasTds ?? true)
                                 <!-- TDS / Nutrisi -->
                                 <div class="col-md-6">
                                     <div class="param-card d-flex flex-column justify-content-between">
@@ -447,6 +448,9 @@
                                         </div>
                                     </div>
                                 </div>
+                                @endif
+
+                                @if($hasPh ?? true)
                                 <!-- pH -->
                                 <div class="col-md-6">
                                     <div class="param-card d-flex flex-column justify-content-between">
@@ -472,6 +476,7 @@
                                         </div>
                                     </div>
                                 </div>
+                                @endif
                             </div>
                         </div>
                     </div>
@@ -488,6 +493,7 @@
                         <div class="p-4">
                             <!-- Items -->
                             <div class="row g-4">
+                                @if($hasSuhu ?? true)
                                 <!-- Suhu -->
                                 <div class="col-md-6">
                                     <div class="param-card d-flex flex-column justify-content-between">
@@ -513,6 +519,9 @@
                                         </div>
                                     </div>
                                 </div>
+                                @endif
+
+                                @if($hasKelem ?? true)
                                 <!-- Kelembaban -->
                                 <div class="col-md-6">
                                     <div class="param-card d-flex flex-column justify-content-between">
@@ -538,6 +547,7 @@
                                         </div>
                                     </div>
                                 </div>
+                                @endif
                             </div>
                         </div>
                     </div>

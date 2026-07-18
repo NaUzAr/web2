@@ -416,7 +416,10 @@
 
                                 <div class="alert alert-info-custom py-2 mb-3">
                                     <small><i class="bi bi-info-circle me-1"></i>
-                                        Tambahkan sensor sesuai kebutuhan. Bisa menambah sensor dengan jenis yang sama.
+                                        Sensor yang mendukung otomasi memiliki toggle
+                                        <span class="badge rounded-pill" style="background: linear-gradient(135deg, #0ea5e9, #0284c7); font-size: 0.6rem; padding: 0.15rem 0.4rem;">Iklim</span> /
+                                        <span class="badge rounded-pill" style="background: linear-gradient(135deg, #22c55e, #16a34a); font-size: 0.6rem; padding: 0.15rem 0.4rem;">Pemupukan</span>.
+                                        Aktifkan toggle untuk mengisi batas atas &amp; bawah awal.
                                     </small>
                                 </div>
 
@@ -425,56 +428,6 @@
                                 <button type="button" class="btn btn-outline-add w-100" onclick="addSensorRow()">
                                     <i class="bi bi-plus-circle me-1"></i> Tambah Sensor Manual
                                 </button>
-                            </div>
-
-                            <!-- STEP 3.5: KONFIGURASI OTOMASI (GRANULAR) -->
-                            <div class="mb-4">
-                                <label class="form-label">
-                                    <i class="bi bi-robot me-1"></i> Konfigurasi Otomasi (Opsional)
-                                </label>
-                                <div class="alert alert-info-custom py-2 mb-3">
-                                    <small><i class="bi bi-info-circle me-1"></i>
-                                        Pilih sensor dan output yang ingin ditambahkan untuk paket otomasi ini (Klik
-                                        tombol).
-                                    </small>
-                                </div>
-
-                                <div class="glass-card p-3 border-0 mb-3" style="background: rgba(255,255,255,0.05);">
-                                    @foreach($automationPresets as $key => $preset)
-                                        <div class="mb-4 last:mb-0">
-                                            <h6 class="fw-bold mb-2" style="color: var(--text-main);">
-                                                <i class="bi {{ $preset['icon'] }} me-1"></i> {{ $preset['label'] }}
-                                            </h6>
-                                            <p class="small mb-2" style="color: var(--text-secondary);">
-                                                {{ $preset['description'] }}
-                                            </p>
-
-                                            <label class="small mb-2 d-block" style="color: var(--text-secondary);">Quick
-                                                Add Sensor (Klik untuk
-                                                menambahkan):</label>
-                                            <div class="d-flex flex-wrap gap-2 mb-3">
-                                                @foreach($preset['sensors'] as $sensorKey => $qty)
-                                                    @if(isset($availableSensors[$sensorKey]))
-                                                        <button type="button" class="btn btn-sm btn-outline-info bg-opacity-10"
-                                                            onclick="addSensorRow('{{ $sensorKey }}', '', 'autoContainer_{{ $key }}')"
-                                                            style="border-style: dashed;"
-                                                            title="Tambah Sensor Otomasi {{ $availableSensors[$sensorKey]['label'] }}">
-                                                            <i class="bi {{ $availableSensors[$sensorKey]['icon'] }}"></i>
-                                                            {{ $availableSensors[$sensorKey]['label'] }}
-                                                        </button>
-                                                    @endif
-                                                @endforeach
-                                            </div>
-
-                                            <!-- Container for Independent Automation Sensors -->
-                                            <div id="autoContainer_{{ $key }}" class="ps-3 border-start"
-                                                style="border-color: var(--glass-border) !important;">
-                                            </div>
-                                        </div>
-                                        @if(!$loop->last)
-                                        <hr class="my-3" style="border-color: var(--glass-border);"> @endif
-                                    @endforeach
-                                </div>
                             </div>
 
                             <!-- STEP 4: DAFTAR OUTPUT -->
@@ -622,47 +575,171 @@
             return options;
         }
 
-        function addSensorRow(key = '', label = '', containerId = 'sensorContainer') {
+        // === Helper: Cek apakah sensor termasuk preset otomasi ===
+        function getAutomationInfo(sensorKey) {
+            if (!sensorKey) return null;
+            for (const [type, preset] of Object.entries(automationPresets)) {
+                if (sensorKey in preset.sensors) {
+                    return { type, label: preset.label, icon: preset.icon };
+                }
+            }
+            return null;
+        }
+
+        // Mapping sensor key → automation setting key (untuk batas atas/bawah)
+        const autoSettingKeyMap = {
+            'ni_SUHU': { key: 'suhu', unit: '°C' },
+            'ni_KELEM': { key: 'kelem', unit: '%' },
+            'ni_TDS': { key: 'tds', unit: 'ppm' },
+            'ni_PH': { key: 'ph', unit: '' },
+            'ni_LUX': { key: 'lux', unit: 'lux' },
+            'co2': { key: 'co2', unit: 'ppm' },
+            'water_level': { key: 'wlevel', unit: 'cm' }
+        };
+
+        function toggleAutoPanel(index) {
+            const panel = document.getElementById('autoPanel_' + index);
+            const toggle = document.getElementById('autoToggle_' + index);
+            if (!panel || !toggle) return;
+            if (toggle.checked) {
+                panel.style.maxHeight = panel.scrollHeight + 'px';
+                panel.style.opacity = '1';
+                panel.style.marginTop = '0.5rem';
+            } else {
+                panel.style.maxHeight = '0';
+                panel.style.opacity = '0';
+                panel.style.marginTop = '0';
+            }
+        }
+
+        function onSensorTypeChange(index, sensorKey) {
+            updateSubmitButton();
+            // Update automation toggle visibility
+            const autoArea = document.getElementById('autoArea_' + index);
+            const autoToggle = document.getElementById('autoToggle_' + index);
+            const autoPanel = document.getElementById('autoPanel_' + index);
+            if (!autoArea) return;
+
+            const info = getAutomationInfo(sensorKey);
+            if (info) {
+                // Show toggle area with badge
+                const styles = {
+                    'climate': { bg: 'linear-gradient(135deg, #0ea5e9, #0284c7)', short: 'Iklim', icon: 'bi-thermometer-sun' },
+                    'fertilizer': { bg: 'linear-gradient(135deg, #22c55e, #16a34a)', short: 'Pemupukan', icon: 'bi-flower1' }
+                };
+                const s = styles[info.type] || { bg: '#6b7280', short: info.label, icon: info.icon };
+                autoArea.innerHTML = `
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="badge rounded-pill shadow-sm" style="background: ${s.bg}; font-size: 0.65rem; padding: 0.25rem 0.55rem;">
+                            <i class="bi ${s.icon} me-1"></i>${s.short}
+                        </span>
+                        <div class="form-check form-switch mb-0" style="min-height: auto;">
+                            <input class="form-check-input" type="checkbox" role="switch" id="autoToggle_${index}"
+                                   name="sensors[${index}][auto_enabled]" value="1"
+                                   onchange="toggleAutoPanel(${index})" style="cursor: pointer;">
+                            <label class="form-check-label small" for="autoToggle_${index}" style="color: var(--text-secondary); cursor: pointer; font-size: 0.75rem;">
+                                Otomasi
+                            </label>
+                        </div>
+                    </div>
+                `;
+                // Update unit in batas inputs
+                const mapping = autoSettingKeyMap[sensorKey];
+                const unitLabel = mapping ? mapping.unit : '';
+                const atsLabel = document.getElementById('atsLabel_' + index);
+                const bwhLabel = document.getElementById('bwhLabel_' + index);
+                if (atsLabel) atsLabel.textContent = 'Batas Atas' + (unitLabel ? ` (${unitLabel})` : '');
+                if (bwhLabel) bwhLabel.textContent = 'Batas Bawah' + (unitLabel ? ` (${unitLabel})` : '');
+            } else {
+                // Hide toggle + collapse panel for non-automation sensors
+                autoArea.innerHTML = '';
+                if (autoPanel) {
+                    autoPanel.style.maxHeight = '0';
+                    autoPanel.style.opacity = '0';
+                    autoPanel.style.marginTop = '0';
+                }
+            }
+        }
+
+        function addSensorRow(key = '', label = '') {
             const index = sensorCounter++;
 
             // Auto-select based on key
             const sensorData = key ? availableSensors[key] : null;
             const inputLabel = label || (sensorData ? sensorData.label : '');
+            const autoInfo = getAutomationInfo(key);
+            const mapping = key ? autoSettingKeyMap[key] : null;
+            const unitLabel = mapping ? mapping.unit : '';
+
+            // Build automation toggle area HTML (only if sensor is in a preset)
+            let autoAreaHtml = '';
+            if (autoInfo) {
+                const styles = {
+                    'climate': { bg: 'linear-gradient(135deg, #0ea5e9, #0284c7)', short: 'Iklim', icon: 'bi-thermometer-sun' },
+                    'fertilizer': { bg: 'linear-gradient(135deg, #22c55e, #16a34a)', short: 'Pemupukan', icon: 'bi-flower1' }
+                };
+                const s = styles[autoInfo.type] || { bg: '#6b7280', short: autoInfo.label, icon: autoInfo.icon };
+                autoAreaHtml = `
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="badge rounded-pill shadow-sm" style="background: ${s.bg}; font-size: 0.65rem; padding: 0.25rem 0.55rem;">
+                            <i class="bi ${s.icon} me-1"></i>${s.short}
+                        </span>
+                        <div class="form-check form-switch mb-0" style="min-height: auto;">
+                            <input class="form-check-input" type="checkbox" role="switch" id="autoToggle_${index}"
+                                   name="sensors[${index}][auto_enabled]" value="1"
+                                   onchange="toggleAutoPanel(${index})" style="cursor: pointer;">
+                            <label class="form-check-label small" for="autoToggle_${index}" style="color: var(--text-secondary); cursor: pointer; font-size: 0.75rem;">
+                                Otomasi
+                            </label>
+                        </div>
+                    </div>
+                `;
+            }
 
             const row = document.createElement('div');
-            row.className = 'sensor-row mb-2';
+            row.className = 'sensor-row mb-3';
             row.id = `sensorRow_${index}`;
-            const html = `
+            row.innerHTML = `
             <div class="row align-items-center g-2">
-                <div class="col-md-5">
-                    <select class="form-select sensor-select" name="sensors[${index}][type]" required onchange="updateSubmitButton()">
+                <div class="col-6 col-md-4">
+                    <select class="form-select sensor-select" name="sensors[${index}][type]" required onchange="onSensorTypeChange(${index}, this.value)">
                         ${getSensorOptions(key)}
                     </select>
                 </div>
-                <div class="col-md-5">
+                <div class="col-6 col-md-3">
                     <input type="text" class="form-control sensor-label-input" name="sensors[${index}][label]"
                            placeholder="Label custom (opsional)" value="${inputLabel}">
                 </div>
-                <div class="col-md-2 text-end">
+                <div class="col-10 col-md-4" id="autoArea_${index}">
+                    ${autoAreaHtml}
+                </div>
+                <div class="col-2 col-md-1 text-end">
                     <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeSensorRow(${index})" style="border-radius: 50%;">
                         <i class="bi bi-trash"></i>
                     </button>
                 </div>
             </div>
+            <!-- Batas Atas/Bawah (tersembunyi, muncul saat toggle ON) -->
+            <div id="autoPanel_${index}" style="max-height: 0; opacity: 0; overflow: hidden; transition: all 0.3s ease; margin-top: 0;">
+                <div class="row g-2 ps-2" style="border-left: 3px solid var(--primary); margin-left: 0.25rem; padding-top: 0.25rem;">
+                    <div class="col-6">
+                        <label class="form-label small mb-1" style="color: var(--text-secondary);" id="atsLabel_${index}">Batas Atas${unitLabel ? ` (${unitLabel})` : ''}</label>
+                        <input type="number" step="0.01" class="form-control form-control-sm" name="sensors[${index}][ats_val]" placeholder="0">
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label small mb-1" style="color: var(--text-secondary);" id="bwhLabel_${index}">Batas Bawah${unitLabel ? ` (${unitLabel})` : ''}</label>
+                        <input type="number" step="0.01" class="form-control form-control-sm" name="sensors[${index}][bwh_val]" placeholder="0">
+                    </div>
+                </div>
+            </div>
         `;
-            row.innerHTML = html;
-            document.getElementById(containerId).appendChild(row);
+            document.getElementById('sensorContainer').appendChild(row);
 
             if (key) {
                 const select = row.querySelector('.sensor-select');
                 select.value = key;
-                // updateSensorUnit(select); // If you have a function to update unit display
             }
 
-            // Only update main submit button if adding to main container,
-            // but ideally validation should check all sensors.
-            // Current validation checks '.sensor-row', which is class for all.
-            // So it works globally.
             updateSensorCount();
             updateSubmitButton();
         }

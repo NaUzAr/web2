@@ -56,7 +56,29 @@ class AutomasiController extends Controller
             \Cache::put($cacheKey, $settings, now()->addDays(1));
         }
 
-        return view('automasi.index', compact('device', 'hasClimate', 'hasFertilizer', 'settings', 'deviceId'));
+        // Tentukan kartu mana yang spesifik ditampilkan
+        $hasSuhu = isset($settings['ats_suhu']);
+        $hasKelem = isset($settings['ats_kelem']);
+        $hasTds = isset($settings['ats_tds']);
+        $hasPh = isset($settings['ats_ph']);
+
+        // Fallback untuk device lama (dibuat sebelum ada toggle per-sensor)
+        if ($hasClimate && !$hasSuhu && !$hasKelem) {
+            $sensorNames = $device->sensors()->pluck('sensor_name')->toArray();
+            $hasSuhu = in_array('ni_SUHU', $sensorNames);
+            $hasKelem = in_array('ni_KELEM', $sensorNames);
+        }
+
+        if ($hasFertilizer && !$hasTds && !$hasPh) {
+            $sensorNames = $device->sensors()->pluck('sensor_name')->toArray();
+            $hasTds = in_array('ni_TDS', $sensorNames);
+            $hasPh = in_array('ni_PH', $sensorNames);
+        }
+
+        return view('automasi.index', compact(
+            'device', 'hasClimate', 'hasFertilizer', 'settings', 'deviceId',
+            'hasSuhu', 'hasKelem', 'hasTds', 'hasPh'
+        ));
     }
 
     public function updateSingle(Request $request, $deviceId)
