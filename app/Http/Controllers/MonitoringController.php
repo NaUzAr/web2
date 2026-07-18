@@ -109,10 +109,54 @@ class MonitoringController extends Controller
         $sensors = $device->sensors;
         $outputs = $device->outputs;
 
+        $latestData = null;
+
+        if ($device->table_name && \Schema::hasTable($device->table_name)) {
+            // Ambil data terbaru PER SENSOR (bukan dari satu baris)
+            // Ini memastikan setiap sensor card menampilkan nilai terbaru meskipun datang dari paket berbeda
+            $latestData = new \stdClass();
+            foreach ($sensors as $sensor) {
+                $sensorName = $sensor->sensor_name;
+                if (\Schema::hasColumn($device->table_name, $sensorName)) {
+                    $latestRow = DB::table($device->table_name)
+                        ->whereNotNull($sensorName)
+                        ->orderBy('recorded_at', 'desc')
+                        ->first();
+                    $latestData->$sensorName = $latestRow ? $latestRow->$sensorName : null;
+                }
+            }
+            // Also get the latest recorded_at timestamp
+            $lastRow = DB::table($device->table_name)->orderBy('recorded_at', 'desc')->first();
+            $latestData->recorded_at = $lastRow ? $lastRow->recorded_at : null;
+        }
+
+        // Ambil konfigurasi jadwal jika ada
+        $scheduleConfig = $device->schedules()->first();
+
+        // Cek ketersediaan otomasi (berdasarkan sensor yang ada)
+        $hasAutomation = $device->hasAnyAutomation();
+
+        return view('monitoring.show', compact('userDevice', 'device', 'sensors', 'outputs', 'latestData', 'scheduleConfig', 'hasAutomation'));
+    }
+
+    /**
+     * Halaman Riwayat Data (Tabel dan Grafik)
+     */
+    public function history(Request $request, $id)
+    {
+        // Pastikan user punya akses ke device ini
+        $userDevice = UserDevice::with(['device.sensors'])
+            ->where('user_id', Auth::id())
+            ->where('id', $id)
+            ->firstOrFail();
+
+        $device = $userDevice->device;
+        $sensors = $device->sensors;
+
         // Default values
         $logData = collect();
         $chartData = collect();
-        $latestData = null;
+        $isAdminView = false; // Karena ini dari MonitoringController (user biasa)
 
         if ($device->table_name && \Schema::hasTable($device->table_name)) {
             $query = DB::table($device->table_name);
@@ -148,35 +192,11 @@ class MonitoringController extends Controller
                 ->orderBy('recorded_at', 'desc')
                 ->paginate(20)
                 ->appends($request->all());
-
-            // Ambil data terbaru PER SENSOR (bukan dari satu baris)
-            // Ini memastikan setiap sensor card menampilkan nilai terbaru meskipun datang dari paket berbeda
-            $latestData = new \stdClass();
-            foreach ($sensors as $sensor) {
-                $sensorName = $sensor->sensor_name;
-                if (\Schema::hasColumn($device->table_name, $sensorName)) {
-                    $latestRow = DB::table($device->table_name)
-                        ->whereNotNull($sensorName)
-                        ->orderBy('recorded_at', 'desc')
-                        ->first();
-                    $latestData->$sensorName = $latestRow ? $latestRow->$sensorName : null;
-                }
-            }
-            // Also get the latest recorded_at timestamp
-            $lastRow = DB::table($device->table_name)->orderBy('recorded_at', 'desc')->first();
-            $latestData->recorded_at = $lastRow ? $lastRow->recorded_at : null;
         } else {
-            // Buat paginator kosong jika tidak ada data
             $logData = new \Illuminate\Pagination\LengthAwarePaginator([], 0, 20);
         }
 
-        // Ambil konfigurasi jadwal jika ada
-        $scheduleConfig = $device->schedules()->first();
-
-        // Cek ketersediaan otomasi (berdasarkan sensor yang ada)
-        $hasAutomation = $device->hasAnyAutomation();
-
-        return view('monitoring.show', compact('userDevice', 'device', 'sensors', 'outputs', 'logData', 'chartData', 'latestData', 'scheduleConfig', 'hasAutomation'));
+        return view('monitoring.history', compact('device', 'sensors', 'logData', 'chartData', 'isAdminView'));
     }
 
     /**

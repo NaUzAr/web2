@@ -40,6 +40,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         // Monitoring Device (Admin View)
         Route::get('/device/{id}/monitoring', [AdminDeviceController::class, 'showMonitoring'])->name('device.monitoring');
+        Route::get('/device/{id}/history', [AdminDeviceController::class, 'history'])->name('device.history');
 
         // Toggle Output (Admin)
         Route::post('/device/{deviceId}/output/{outputId}/toggle', [AdminDeviceController::class, 'toggleOutput'])->name('device.output.toggle');
@@ -77,6 +78,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/add', [MonitoringController::class, 'create'])->name('create');
         Route::post('/add', [MonitoringController::class, 'store'])->name('store');
         Route::get('/device/{id}', [MonitoringController::class, 'show'])->name('show');
+        Route::get('/device/{id}/history', [MonitoringController::class, 'history'])->name('history');
         Route::delete('/device/{id}', [MonitoringController::class, 'destroy'])->name('destroy');
         Route::match(['get', 'post'], '/device/{id}/export', [MonitoringController::class, 'exportCsv'])->name('export');
         Route::post('/device/{id}/output/{outputId}/toggle', [MonitoringController::class, 'toggleOutput'])->name('output.toggle');

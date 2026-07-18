@@ -372,6 +372,41 @@ class AdminDeviceController extends Controller
         $latestData = null;
 
         if ($device->table_name && Schema::hasTable($device->table_name)) {
+            // Ambil data terbaru untuk display sensor cards (selalu nilai absolut terakhir, tanpa filter)
+            // Ambil data terbaru PER SENSOR
+            $latestData = new \stdClass();
+            foreach ($sensors as $sensor) {
+                $sensorName = $sensor->sensor_name;
+                if (Schema::hasColumn($device->table_name, $sensorName)) {
+                    $latestRow = \DB::table($device->table_name)
+                        ->whereNotNull($sensorName)
+                        ->orderBy('recorded_at', 'desc')
+                        ->first();
+                    $latestData->$sensorName = $latestRow ? $latestRow->$sensorName : null;
+                }
+            }
+            // Also get the latest recorded_at timestamp
+            $lastRow = \DB::table($device->table_name)->orderBy('recorded_at', 'desc')->first();
+            $latestData->recorded_at = $lastRow ? $lastRow->recorded_at : null;
+        }
+
+        return view('monitoring.show', compact('device', 'sensors', 'outputs', 'latestData', 'isAdminView'));
+    }
+
+    // HALAMAN HISTORY (ADMIN VIEW)
+    public function history(Request $request, $id)
+    {
+        $this->checkAdmin();
+        $isAdminView = true;
+
+        $device = Device::with(['sensors'])->findOrFail($id);
+        $sensors = $device->sensors;
+
+        // Default values
+        $logData = collect();
+        $chartData = collect();
+
+        if ($device->table_name && Schema::hasTable($device->table_name)) {
             $query = \DB::table($device->table_name);
             
             // Apply date filters if they exist
@@ -381,7 +416,6 @@ class AdminDeviceController extends Controller
             }
             if ($request->has('end_date') && $request->end_date) {
                 $endDate = \Carbon\Carbon::parse($request->end_date);
-                // Jika input hanya Y-m-d tanpa waktu, jadikan 23:59:59. Jika ada waktu, biarkan sesuai input.
                 if (strlen($request->end_date) <= 10) {
                     $endDate->endOfDay();
                 }
@@ -405,17 +439,12 @@ class AdminDeviceController extends Controller
                 ->orderBy('recorded_at', 'desc')
                 ->paginate(20)
                 ->appends($request->all());
-
-            // Ambil data terbaru untuk display sensor cards (selalu nilai absolut terakhir, tanpa filter)
-            $latestData = \DB::table($device->table_name)
-                ->orderBy('recorded_at', 'desc')
-                ->first();
         } else {
-            // Buat paginator kosong jika tidak ada data
             $logData = new \Illuminate\Pagination\LengthAwarePaginator([], 0, 20);
         }
 
-        return view('monitoring.show', compact('device', 'sensors', 'outputs', 'logData', 'chartData', 'latestData', 'isAdminView'));
+        return view('monitoring.history', compact('device', 'sensors', 'logData', 'chartData', 'isAdminView'));
+
     }
 
     // 8. TOGGLE OUTPUT (ADMIN - uses device_id directly)
