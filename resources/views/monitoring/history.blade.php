@@ -104,6 +104,10 @@
         }
 
         /* Pagination Glass */
+        .pagination-glass {
+            flex-wrap: wrap;
+            justify-content: center;
+        }
         .pagination-glass .page-link {
             background: var(--glass-bg);
             border: 1px solid var(--glass-border);
@@ -117,8 +121,16 @@
             border-color: transparent;
         }
         .pagination-glass .page-item.disabled .page-link {
-            color: var(--text-secondary);
-            background: rgba(255,255,255,0.05);
+            background: rgba(255, 255, 255, 0.5);
+            color: var(--text-muted);
+        }
+
+        @media (max-width: 767.98px) {
+            .pagination-glass .page-item {
+                display: block !important;
+                visibility: visible !important;
+                opacity: 1 !important;
+            }
         }
 
         /* Fix Flatpickr Z-Index for PC */
