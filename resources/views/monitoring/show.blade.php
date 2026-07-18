@@ -627,149 +627,7 @@
             border-bottom: 3px solid var(--primary);
         }
 
-        /* Output Control Styles */
-        .output-card {
-            background: rgba(250, 204, 21, 0.05);
-            border: 1px solid rgba(250, 204, 21, 0.2);
-            border-radius: 16px;
-            padding: 1.25rem;
-            text-align: center;
-            transition: all 0.3s ease;
-            min-height: 180px;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
 
-        .output-card:hover {
-            border-color: #fde047;
-            transform: translateY(-3px);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-        }
-
-        .output-icon {
-            width: 45px;
-            height: 45px;
-            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 0.75rem;
-            font-size: 1.2rem;
-            color: white;
-        }
-
-        .output-label {
-            color: var(--text-main);
-            font-size: 0.85rem;
-            margin-bottom: 0.75rem;
-        }
-
-        /* Toggle Switch */
-        .toggle-switch {
-            position: relative;
-            width: 60px;
-            height: 32px;
-            margin: 0 auto;
-        }
-
-        .toggle-switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-
-        .toggle-slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: var(--text-secondary);
-            transition: 0.3s;
-            border-radius: 32px;
-            opacity: 0.3;
-        }
-
-        .toggle-slider:before {
-            position: absolute;
-            content: "";
-            height: 24px;
-            width: 24px;
-            left: 4px;
-            bottom: 4px;
-            background-color: white;
-            transition: 0.3s;
-            border-radius: 50%;
-        }
-
-        .toggle-switch input:checked+.toggle-slider {
-            background: var(--primary-gradient);
-            opacity: 1;
-        }
-
-        .toggle-switch input:checked+.toggle-slider:before {
-            transform: translateX(28px);
-        }
-
-        .output-status {
-            font-size: 0.75rem;
-            margin-top: 0.5rem;
-            font-weight: 600;
-        }
-
-        .output-status.on {
-            color: var(--primary);
-        }
-
-        .output-status.off {
-            color: var(--text-secondary);
-        }
-
-        /* Range Slider */
-        .range-slider {
-            width: 100%;
-            height: 8px;
-            border-radius: 4px;
-            background: rgba(0, 0, 0, 0.1);
-            outline: none;
-            -webkit-appearance: none;
-        }
-
-        .range-slider::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background: var(--primary-gradient);
-            cursor: pointer;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-        }
-
-        .range-value {
-            color: #f59e0b;
-            font-size: 1.25rem;
-            font-weight: 700;
-        }
-
-        /* Special Pump Card Styles */
-        .output-card-special {
-            background: rgba(14, 165, 233, 0.1);
-            border: 2px solid rgba(14, 165, 233, 0.3);
-            border-radius: 16px;
-            padding: 1.25rem;
-            text-align: center;
-            transition: all 0.3s ease;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            gap: 0.4rem;
-        }
 
         /* ========= Mobile Responsive ========= */
         @media (max-width: 768px) {
@@ -799,17 +657,14 @@
                 padding: 1rem;
             }
 
-            .sensor-icon {
-                width: 36px;
-                height: 36px;
-                border-radius: 10px;
+            .sensor-icon, .output-icon, .output-icon-special {
+                width: 32px;
+                height: 32px;
                 font-size: 1rem;
-                margin-bottom: 0.5rem;
             }
 
-            .sensor-label {
-                font-size: 0.75rem;
-                margin-bottom: 0.25rem;
+            .sensor-label, .output-label {
+                font-size: 0.7rem;
             }
 
             .sensor-value {
