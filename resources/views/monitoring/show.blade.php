@@ -1206,14 +1206,14 @@
                                 <div class="d-flex flex-column flex-sm-row align-items-stretch align-items-sm-center gap-2 w-100 w-md-auto">
                                     <div class="date-pill d-flex align-items-center px-3 py-2 rounded-pill shadow-sm w-100">
                                         <i class="bi bi-calendar-event text-primary me-2"></i>
-                                        <input type="datetime-local" class="flatpickr-datetime form-control border-0 shadow-none bg-transparent p-0" name="start_date" value="{{ request('start_date') }}" style="outline: none; box-shadow: none;" placeholder="Dari Waktu...">
+                                        <input type="datetime-local" class="flatpickr-datetime form-control border-0 shadow-none bg-transparent p-0 w-100" name="start_date" value="{{ request('start_date') }}" style="min-width: 140px; outline: none; box-shadow: none;" placeholder="Dari Waktu...">
                                     </div>
                                     <div class="d-none d-sm-flex align-items-center justify-content-center text-muted">
                                         <i class="bi bi-arrow-right"></i>
                                     </div>
                                     <div class="date-pill d-flex align-items-center px-3 py-2 rounded-pill shadow-sm w-100">
                                         <i class="bi bi-calendar-check text-primary me-2"></i>
-                                        <input type="datetime-local" class="flatpickr-datetime form-control border-0 shadow-none bg-transparent p-0" name="end_date" value="{{ request('end_date') }}" style="outline: none; box-shadow: none;" placeholder="Sampai Waktu...">
+                                        <input type="datetime-local" class="flatpickr-datetime form-control border-0 shadow-none bg-transparent p-0 w-100" name="end_date" value="{{ request('end_date') }}" style="min-width: 140px; outline: none; box-shadow: none;" placeholder="Sampai Waktu...">
                                     </div>
                                 </div>
                                 <div class="d-flex gap-2 mt-2 mt-md-0">
@@ -1254,14 +1254,14 @@
                                 <div class="d-flex flex-column flex-sm-row align-items-stretch align-items-sm-center gap-2 w-100 w-md-auto">
                                     <div class="date-pill d-flex align-items-center px-3 py-2 rounded-pill shadow-sm w-100">
                                         <i class="bi bi-calendar-event text-primary me-2"></i>
-                                        <input type="datetime-local" class="flatpickr-datetime form-control border-0 shadow-none bg-transparent p-0" name="start_date" value="{{ request('start_date') }}" style="outline: none; box-shadow: none;" placeholder="Dari Waktu...">
+                                        <input type="datetime-local" class="flatpickr-datetime form-control border-0 shadow-none bg-transparent p-0 w-100" name="start_date" value="{{ request('start_date') }}" style="min-width: 140px; outline: none; box-shadow: none;" placeholder="Dari Waktu...">
                                     </div>
                                     <div class="d-none d-sm-flex align-items-center justify-content-center text-muted">
                                         <i class="bi bi-arrow-right"></i>
                                     </div>
                                     <div class="date-pill d-flex align-items-center px-3 py-2 rounded-pill shadow-sm w-100">
                                         <i class="bi bi-calendar-check text-primary me-2"></i>
-                                        <input type="datetime-local" class="flatpickr-datetime form-control border-0 shadow-none bg-transparent p-0" name="end_date" value="{{ request('end_date') }}" style="outline: none; box-shadow: none;" placeholder="Sampai Waktu...">
+                                        <input type="datetime-local" class="flatpickr-datetime form-control border-0 shadow-none bg-transparent p-0 w-100" name="end_date" value="{{ request('end_date') }}" style="min-width: 140px; outline: none; box-shadow: none;" placeholder="Sampai Waktu...">
                                     </div>
                                 </div>
                                 <div class="d-flex gap-2 mt-2 mt-md-0">
