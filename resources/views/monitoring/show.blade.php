@@ -382,8 +382,57 @@
         .date-pill {
             background: rgba(255, 255, 255, 0.7);
             border: 1px solid var(--glass-border);
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-secondary);
             backdrop-filter: blur(10px);
             transition: all 0.3s ease;
+        }
+
+        /* Custom Toast Notification */
+        .toast-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .custom-toast {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border-left: 4px solid #10B981;
+            border-radius: 12px;
+            padding: 1rem 1.5rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transform: translateX(120%);
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
+        .custom-toast.show {
+            transform: translateX(0);
+            opacity: 1;
+        }
+
+        .custom-toast.error {
+            border-left-color: #EF4444;
+        }
+
+        .custom-toast.error i {
+            color: #EF4444;
+        }
+
+        .custom-toast i {
+            color: #10B981;
+            font-size: 1.5rem;
         }
         
         .date-pill:hover, .date-pill:focus-within {
@@ -1550,12 +1599,12 @@
                             console.log('Output updated:', data.message);
                         } else {
                             console.error('Failed to update output');
-                            alert('Gagal mengupdate output. Silakan coba lagi.');
+                            showToast('Gagal mengupdate output. Silakan coba lagi.');
                         }
                     })
                     .catch(error => {
                         console.error('Error:', error);
-                        alert('Terjadi kesalahan saat mengupdate output.');
+                        showToast('Terjadi kesalahan saat mengupdate output.');
                     });
             }
 
@@ -1631,12 +1680,12 @@
 
                             console.log('Irrigation pump ON:', data.message);
                         } else {
-                            alert('Gagal mengirim perintah pompa: ' + (data.message || 'Silakan coba lagi.'));
+                            showToast('Gagal mengirim perintah pompa: ' + (data.message || 'Silakan coba lagi.'));
                         }
                     })
                     .catch(error => {
                         console.error('Error:', error);
-                        alert('Terjadi kesalahan saat mengirim perintah.');
+                        showToast('Terjadi kesalahan saat mengirim perintah.');
                     });
             }
 
@@ -1677,12 +1726,12 @@
 
                             console.log('Irrigation pump OFF:', data.message);
                         } else {
-                            alert('Gagal mematikan pompa: ' + (data.message || 'Silakan coba lagi.'));
+                            showToast('Gagal mematikan pompa: ' + (data.message || 'Silakan coba lagi.'));
                         }
                     })
                     .catch(error => {
                         console.error('Error:', error);
-                        alert('Terjadi kesalahan saat mengirim perintah.');
+                        showToast('Terjadi kesalahan saat mengirim perintah.');
                     });
             }
 
@@ -1760,12 +1809,12 @@
                                 setTimeout(() => { card.style.borderColor = 'rgba(250, 204, 21, 0.3)'; }, 500);
                             }
                         } else {
-                            alert('Gagal: ' + (data.message || 'Silakan coba lagi.'));
+                            showToast('Gagal: ' + (data.message || 'Silakan coba lagi.'));
                         }
                     })
                     .catch(error => {
                         console.error('Error:', error);
-                        alert('Terjadi kesalahan saat mengirim perintah.');
+                        showToast('Terjadi kesalahan saat mengirim perintah.');
                     })
                     .finally(() => {
                         btn.innerHTML = originalText;
@@ -1779,7 +1828,7 @@
                 const volume = parseInt(document.getElementById('phDosingVolume').value);
 
                 if (!volume || volume < 1) {
-                    alert('Masukkan volume yang valid (minimal 1 mL).');
+                    showToast('Masukkan volume yang valid (minimal 1 mL).');
                     return;
                 }
 
@@ -1806,14 +1855,14 @@
                         if (data.success) {
                             const modal = bootstrap.Modal.getInstance(document.getElementById('phControlModal'));
                             modal.hide();
-                            alert(data.message);
+                            showToast(data.message);
                         } else {
-                            alert('Gagal: ' + (data.message || 'Silakan coba lagi.'));
+                            showToast('Gagal: ' + (data.message || 'Silakan coba lagi.'));
                         }
                     })
                     .catch(error => {
                         console.error('Error:', error);
-                        alert('Terjadi kesalahan saat mengirim perintah.');
+                        showToast('Terjadi kesalahan saat mengirim perintah.');
                     })
                     .finally(() => {
                         btn.innerHTML = originalText;
@@ -1856,12 +1905,12 @@
                             console.log('Output updated:', data.message);
                         } else {
                             console.error('Failed to update output');
-                            alert('Gagal mengupdate output. Silakan coba lagi.');
+                            showToast('Gagal mengupdate output. Silakan coba lagi.');
                         }
                     })
                     .catch(error => {
                         console.error('Error:', error);
-                        alert('Terjadi kesalahan saat mengupdate output.');
+                        showToast('Terjadi kesalahan saat mengupdate output.');
                     });
             }
 
@@ -1932,12 +1981,12 @@
 
                             console.log('Pump ON sent:', data.message);
                         } else {
-                            alert('Gagal mengirim perintah pompa: ' + (data.message || 'Unknown error'));
+                            showToast('Gagal mengirim perintah pompa: ' + (data.message || 'Unknown error'));
                         }
                     })
                     .catch(error => {
                         console.error('Error:', error);
-                        alert('Terjadi kesalahan saat mengirim perintah pompa.');
+                        showToast('Terjadi kesalahan saat mengirim perintah pompa.');
                     })
                     .finally(() => {
                         btn.innerHTML = originalText;
@@ -1977,12 +2026,12 @@
 
                             console.log('Pump OFF sent:', data.message);
                         } else {
-                            alert('Gagal mengirim perintah pompa: ' + (data.message || 'Unknown error'));
+                            showToast('Gagal mengirim perintah pompa: ' + (data.message || 'Unknown error'));
                         }
                     })
                     .catch(error => {
                         console.error('Error:', error);
-                        alert('Terjadi kesalahan saat mengirim perintah pompa.');
+                        showToast('Terjadi kesalahan saat mengirim perintah pompa.');
                     });
             }
 
@@ -2036,12 +2085,12 @@
                                 }, 500);
                             }
                         } else {
-                            alert('Gagal mengupdate output.');
+                            showToast('Gagal mengupdate output.');
                         }
                     })
                     .catch(error => {
                         console.error('Error:', error);
-                        alert('Terjadi kesalahan saat mengupdate output.');
+                        showToast('Terjadi kesalahan saat mengupdate output.');
                     });
             }
 
@@ -2067,12 +2116,12 @@
                                 }, 500);
                             }
                         } else {
-                            alert('Gagal mengupdate output.');
+                            showToast('Gagal mengupdate output.');
                         }
                     })
                     .catch(error => {
                         console.error('Error:', error);
-                        alert('Terjadi kesalahan saat mengupdate output.');
+                        showToast('Terjadi kesalahan saat mengupdate output.');
                     });
             }
 
@@ -2154,12 +2203,12 @@
                                 setTimeout(() => { card.style.borderColor = 'rgba(250, 204, 21, 0.3)'; }, 500);
                             }
                         } else {
-                            alert('Gagal: ' + (data.message || 'Silakan coba lagi.'));
+                            showToast('Gagal: ' + (data.message || 'Silakan coba lagi.'));
                         }
                     })
                     .catch(error => {
                         console.error('Error:', error);
-                        alert('Terjadi kesalahan saat mengirim perintah.');
+                        showToast('Terjadi kesalahan saat mengirim perintah.');
                     })
                     .finally(() => {
                         btn.innerHTML = originalText;
@@ -2173,7 +2222,7 @@
                 const volume = parseInt(document.getElementById('phDosingVolume').value);
 
                 if (!volume || volume < 1) {
-                    alert('Masukkan volume yang valid (minimal 1 mL).');
+                    showToast('Masukkan volume yang valid (minimal 1 mL).');
                     return;
                 }
 
@@ -2200,14 +2249,14 @@
                         if (data.success) {
                             const modal = bootstrap.Modal.getInstance(document.getElementById('phControlModal'));
                             modal.hide();
-                            alert(data.message);
+                            showToast(data.message);
                         } else {
-                            alert('Gagal: ' + (data.message || 'Silakan coba lagi.'));
+                            showToast('Gagal: ' + (data.message || 'Silakan coba lagi.'));
                         }
                     })
                     .catch(error => {
                         console.error('Error:', error);
-                        alert('Terjadi kesalahan saat mengirim perintah.');
+                        showToast('Terjadi kesalahan saat mengirim perintah.');
                     })
                     .finally(() => {
                         btn.innerHTML = originalText;
@@ -2301,8 +2350,42 @@
                     }
                 });
             }
+            // Custom Toast Notification
+            function showToast(message, type = 'success') {
+                // Determine type based on message content if not explicitly passed
+                if (message.toString().toLowerCase().includes('gagal') || 
+                    message.toString().toLowerCase().includes('kesalahan') ||
+                    message.toString().toLowerCase().includes('masukkan')) {
+                    type = 'error';
+                }
+
+                const container = document.getElementById('toastContainer');
+                const toast = document.createElement('div');
+                toast.className = `custom-toast ${type}`;
+                
+                const icon = type === 'success' ? 'bi-check-circle-fill' : 'bi-exclamation-triangle-fill';
+                
+                toast.innerHTML = `
+                    <i class="bi ${icon}"></i>
+                    <div style="font-weight: 600; color: #1f2937;">${message}</div>
+                `;
+                
+                container.appendChild(toast);
+                
+                // Animate in
+                setTimeout(() => toast.classList.add('show'), 10);
+                
+                // Animate out and remove
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                    setTimeout(() => toast.remove(), 400);
+                }, 3000);
+            }
         </script>
     @endif
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
 
     {{-- Auto-Reload Script - Always runs regardless of initial data --}}
     <script>
