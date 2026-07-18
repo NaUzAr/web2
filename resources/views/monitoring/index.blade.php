@@ -30,30 +30,30 @@
 
         /* Device Cards */
         .device-card {
-            background: var(--glass-bg);
-            backdrop-filter: blur(20px);
-            border: 1px solid var(--glass-border);
+            background: #ffffff;
+            border: 1px solid rgba(14, 165, 233, 0.15);
             border-radius: 20px;
             padding: 1.5rem;
             transition: all 0.4s ease;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
         }
 
         .device-card:hover {
             transform: translateY(-5px);
-            border-color: var(--primary);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            border-color: rgba(14, 165, 233, 0.4);
+            box-shadow: 0 12px 30px rgba(14, 165, 233, 0.1);
         }
 
         .device-icon {
             width: 60px;
             height: 60px;
             border-radius: 16px;
-            background: var(--primary-gradient);
+            background: linear-gradient(135deg, #e0f2fe, #bae6fd);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.5rem;
-            color: #fff;
+            font-size: 1.8rem;
+            color: #0ea5e9;
             margin-right: 1rem;
         }
 
@@ -65,8 +65,8 @@
         }
 
         .device-type-badge {
-            background: rgba(14, 95, 138, 0.1);
-            color: var(--primary);
+            background: rgba(14, 165, 233, 0.1);
+            color: #0ea5e9;
             font-size: 0.75rem;
             padding: 0.25rem 0.5rem;
             border-radius: 8px;
@@ -123,34 +123,35 @@
         /* Device Type Badge */
         .device-type {
             display: inline-block;
-            background: linear-gradient(135deg, rgba(99, 102, 241, 0.2) 0%, rgba(168, 85, 247, 0.2) 100%);
-            color: #a5b4fc;
+            background: rgba(14, 165, 233, 0.1);
+            color: #0284c7;
             font-size: 0.7rem;
-            font-weight: 600;
+            font-weight: 700;
             padding: 0.35rem 0.75rem;
             border-radius: 20px;
-            border: 1px solid rgba(99, 102, 241, 0.3);
             letter-spacing: 0.5px;
             margin-bottom: 0.75rem;
         }
 
         /* View Button */
         .btn-view {
-            background: #0d6efd;
+            background: linear-gradient(135deg, #0ea5e9, #0284c7);
             color: #fff;
-            font-weight: 500;
-            font-size: 0.9rem;
-            padding: 0.5rem 1rem;
-            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1rem;
+            padding: 0.7rem 1rem;
+            border-radius: 14px;
             text-decoration: none;
-            transition: all 0.2s ease;
-            border: 1px solid #0d6efd;
+            transition: all 0.3s ease;
+            border: none;
+            box-shadow: 0 4px 12px rgba(14, 165, 233, 0.2);
         }
 
         .btn-view:hover {
-            background: #0b5ed7;
+            background: linear-gradient(135deg, #0284c7, #0369a1);
             color: #fff;
-            border-color: #0b5ed7;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(14, 165, 233, 0.3);
         }
 
         /* Delete Button */
@@ -199,40 +200,43 @@
             padding: 0.6rem 1.25rem;
             transition: all 0.3s ease;
             text-decoration: none;
+            border-radius: 50px;
+            background: #fff;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         }
 
         .btn-app {
-            background: rgba(14, 165, 233, 0.1);
-            color: #0284c7;
-            border: 1px solid rgba(14, 165, 233, 0.3);
+            color: #0ea5e9;
+            border: 1px solid rgba(14, 165, 233, 0.2);
         }
         .btn-app:hover {
-            background: rgba(14, 165, 233, 0.2);
-            color: #0369a1;
+            background: #f0f9ff;
+            color: #0284c7;
+            border-color: #0ea5e9;
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(14, 165, 233, 0.15);
         }
 
         .btn-history {
-            background: rgba(99, 102, 241, 0.1);
-            color: #4f46e5;
-            border: 1px solid rgba(99, 102, 241, 0.3);
+            color: #6366f1;
+            border: 1px solid rgba(99, 102, 241, 0.2);
         }
         .btn-history:hover {
-            background: rgba(99, 102, 241, 0.2);
-            color: #4338ca;
+            background: #eef2ff;
+            color: #4f46e5;
+            border-color: #6366f1;
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15);
         }
 
         .btn-report {
-            background: rgba(239, 68, 68, 0.1);
-            color: #dc2626;
-            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.2);
         }
         .btn-report:hover {
-            background: rgba(239, 68, 68, 0.2);
-            color: #b91c1c;
+            background: #fef2f2;
+            color: #dc2626;
+            border-color: #ef4444;
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(239, 68, 68, 0.15);
         }
