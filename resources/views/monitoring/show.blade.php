@@ -124,7 +124,7 @@
             display: flex;
             align-items: center;
             flex-direction: row-reverse;
-            justify-content: space-between;
+            justify-content: flex-start;
             gap: 10px;
             margin-bottom: 0.75rem;
         }
@@ -152,7 +152,7 @@
             font-size: 0.75rem;
             font-weight: 700;
             line-height: 1.2;
-            text-align: left;
+            text-align: right;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             margin: 0;
@@ -161,7 +161,7 @@
         .sensor-value-container {
             display: flex;
             align-items: baseline;
-            justify-content: flex-end;
+            justify-content: flex-start;
             gap: 6px;
             margin-top: auto;
             padding-top: 0.5rem;
@@ -255,7 +255,7 @@
             font-size: 0.75rem;
             font-weight: 700;
             line-height: 1.2;
-            text-align: left;
+            text-align: right;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             margin: 0;
