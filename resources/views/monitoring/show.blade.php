@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
@@ -1179,9 +1180,9 @@
                             <form action="{{ url()->current() }}" method="GET" class="d-flex align-items-center gap-2 m-0 ms-auto">
                                 <div class="d-flex align-items-center bg-white rounded-3 px-2 py-1" style="border: 1px solid var(--glass-border);">
                                     <i class="bi bi-calendar3 text-muted me-2 ms-1"></i>
-                                    <input type="date" class="form-control form-control-sm border-0 shadow-none bg-transparent p-0" name="start_date" value="{{ request('start_date') }}" title="Mulai Tanggal" style="width: auto; outline: none; box-shadow: none;">
+                                    <input type="datetime-local" class="flatpickr-datetime form-control form-control-sm border-0 shadow-none bg-transparent p-0" name="start_date" value="{{ request('start_date') }}" title="Mulai Tanggal/Jam" style="width: auto; outline: none; box-shadow: none;" placeholder="Mulai...">
                                     <span class="mx-2 text-muted">-</span>
-                                    <input type="date" class="form-control form-control-sm border-0 shadow-none bg-transparent p-0" name="end_date" value="{{ request('end_date') }}" title="Sampai Tanggal" style="width: auto; outline: none; box-shadow: none;">
+                                    <input type="datetime-local" class="flatpickr-datetime form-control form-control-sm border-0 shadow-none bg-transparent p-0" name="end_date" value="{{ request('end_date') }}" title="Sampai Tanggal/Jam" style="width: auto; outline: none; box-shadow: none;" placeholder="Sampai...">
                                 </div>
                                 <button type="submit" class="btn btn-sm btn-primary" title="Filter"><i class="bi bi-search"></i></button>
                                 @if(request()->has('start_date') || request()->has('end_date'))
@@ -1218,9 +1219,9 @@
                                 <input type="hidden" name="page" value="1">
                                 <div class="d-flex align-items-center bg-white rounded-3 px-2 py-1" style="border: 1px solid var(--glass-border);">
                                     <i class="bi bi-calendar3 text-muted me-2 ms-1"></i>
-                                    <input type="date" class="form-control form-control-sm border-0 shadow-none bg-transparent p-0" name="start_date" value="{{ request('start_date') }}" title="Mulai Tanggal" style="width: auto; outline: none; box-shadow: none;">
+                                    <input type="datetime-local" class="flatpickr-datetime form-control form-control-sm border-0 shadow-none bg-transparent p-0" name="start_date" value="{{ request('start_date') }}" title="Mulai Tanggal/Jam" style="width: auto; outline: none; box-shadow: none;" placeholder="Mulai...">
                                     <span class="mx-2 text-muted">-</span>
-                                    <input type="date" class="form-control form-control-sm border-0 shadow-none bg-transparent p-0" name="end_date" value="{{ request('end_date') }}" title="Sampai Tanggal" style="width: auto; outline: none; box-shadow: none;">
+                                    <input type="datetime-local" class="flatpickr-datetime form-control form-control-sm border-0 shadow-none bg-transparent p-0" name="end_date" value="{{ request('end_date') }}" title="Sampai Tanggal/Jam" style="width: auto; outline: none; box-shadow: none;" placeholder="Sampai...">
                                 </div>
                                 <button type="submit" class="btn btn-sm btn-primary" title="Filter"><i class="bi bi-search"></i></button>
                                 @if(request()->has('start_date') || request()->has('end_date'))
@@ -2535,6 +2536,17 @@
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            flatpickr(".flatpickr-datetime", {
+                enableTime: true,
+                dateFormat: "Y-m-d H:i",
+                time_24hr: true,
+                allowInput: true
+            });
+        });
+    </script>
     @include('partials.pwa-scripts')
 </body>
 

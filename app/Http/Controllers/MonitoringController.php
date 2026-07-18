@@ -119,10 +119,16 @@ class MonitoringController extends Controller
             
             // Apply date filters if they exist
             if ($request->has('start_date') && $request->start_date) {
-                $query->where('recorded_at', '>=', $request->start_date . ' 00:00:00');
+                $startDate = \Carbon\Carbon::parse($request->start_date)->format('Y-m-d H:i:s');
+                $query->where('recorded_at', '>=', $startDate);
             }
             if ($request->has('end_date') && $request->end_date) {
-                $query->where('recorded_at', '<=', $request->end_date . ' 23:59:59');
+                $endDate = \Carbon\Carbon::parse($request->end_date);
+                // Jika input hanya Y-m-d tanpa waktu, jadikan 23:59:59. Jika ada waktu, biarkan sesuai input.
+                if (strlen($request->end_date) <= 10) {
+                    $endDate->endOfDay();
+                }
+                $query->where('recorded_at', '<=', $endDate->format('Y-m-d H:i:s'));
             }
             
             // Clone query for pagination and chart
