@@ -37,16 +37,27 @@
         }
 
         .log-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 12px;
+            width: 52px;
+            height: 52px;
+            border-radius: 14px;
             background: linear-gradient(135deg, #e0f2fe, #bae6fd);
             color: #0ea5e9;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.25rem;
+            font-size: 1.5rem;
             flex-shrink: 0;
+            box-shadow: inset 0 2px 4px rgba(255,255,255,0.5), 0 4px 8px rgba(0,0,0,0.05);
+        }
+
+        .log-icon.icon-on {
+            background: linear-gradient(135deg, #dcfce7, #bbf7d0);
+            color: #16a34a;
+        }
+
+        .log-icon.icon-off {
+            background: linear-gradient(135deg, #fee2e2, #fecaca);
+            color: #dc2626;
         }
 
         .btn-back {
@@ -81,12 +92,41 @@
         }
 
         .log-details {
-            font-size: 0.8rem;
-            color: var(--text-secondary);
-            background: rgba(0,0,0,0.03);
-            padding: 8px 12px;
-            border-radius: 8px;
-            margin-top: 8px;
+            margin-top: 10px;
+        }
+        
+        .log-badge {
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 0.4rem 0.8rem;
+            border-radius: 50px;
+            display: inline-flex;
+            align-items: center;
+            border: 1px solid transparent;
+        }
+
+        .log-badge.badge-primary {
+            background: #f0f9ff;
+            color: #0284c7;
+            border-color: #bae6fd;
+        }
+
+        .log-badge.badge-success {
+            background: #f0fdf4;
+            color: #16a34a;
+            border-color: #bbf7d0;
+        }
+
+        .log-badge.badge-danger {
+            background: #fef2f2;
+            color: #dc2626;
+            border-color: #fecaca;
+        }
+
+        .log-badge.badge-secondary {
+            background: #f8fafc;
+            color: #64748b;
+            border-color: #e2e8f0;
         }
 
         .empty-state {
@@ -134,8 +174,23 @@
             <div class="row">
                 <div class="col-lg-8 mx-auto">
                     @foreach($logs as $log)
+                        @php
+                            $isTurnOn = false;
+                            $isTurnOff = false;
+                            $statusText = '';
+                            
+                            if (isset($log->details['new_value'])) {
+                                if ($log->details['new_value'] == 1 || $log->details['new_value'] === '1' || $log->details['new_value'] === true || strtolower($log->details['new_value']) === 'on') {
+                                    $isTurnOn = true;
+                                    $statusText = 'ON (Aktif)';
+                                } else {
+                                    $isTurnOff = true;
+                                    $statusText = 'OFF (Mati)';
+                                }
+                            }
+                        @endphp
                         <div class="log-card d-flex gap-3">
-                            <div class="log-icon">
+                            <div class="log-icon {{ $isTurnOn ? 'icon-on' : ($isTurnOff ? 'icon-off' : '') }}">
                                 @if($log->action === 'irrigation_control')
                                     <i class="bi bi-droplet-half"></i>
                                 @elseif($log->action === 'pump_control')
@@ -145,17 +200,30 @@
                                 @endif
                             </div>
                             <div class="flex-grow-1">
-                                <div class="d-flex justify-content-between align-items-start">
+                                <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
                                     <div class="log-desc">{{ $log->description }}</div>
-                                    <div class="log-time">{{ $log->created_at->diffForHumans() }}</div>
+                                    <div class="log-time"><i class="bi bi-clock me-1"></i>{{ $log->created_at->diffForHumans() }}</div>
                                 </div>
                                 <div class="log-time mb-2">{{ $log->created_at->format('d M Y, H:i') }}</div>
                                 
                                 @if(!empty($log->details))
-                                <div class="log-details">
+                                <div class="log-details d-flex flex-wrap gap-2">
                                     @foreach($log->details as $key => $value)
                                         @if($key !== 'device_id')
-                                            <span class="me-3"><strong>{{ ucfirst(str_replace('_', ' ', $key)) }}:</strong> {{ is_bool($value) ? ($value ? 'Ya' : 'Tidak') : $value }}</span>
+                                            @if($key === 'new_value')
+                                                <span class="log-badge {{ $isTurnOn ? 'badge-success' : ($isTurnOff ? 'badge-danger' : 'badge-secondary') }}">
+                                                    <i class="bi {{ $isTurnOn ? 'bi-lightning-charge-fill' : 'bi-power' }} me-1"></i> 
+                                                    Status: {{ $statusText ?: $value }}
+                                                </span>
+                                            @elseif($key === 'output_name' || $key === 'target')
+                                                <span class="log-badge badge-primary">
+                                                    <i class="bi bi-tag-fill me-1"></i> {{ strtoupper($value) }}
+                                                </span>
+                                            @else
+                                                <span class="log-badge badge-secondary">
+                                                    {{ ucfirst(str_replace('_', ' ', $key)) }}: {{ is_bool($value) ? ($value ? 'Ya' : 'Tidak') : $value }}
+                                                </span>
+                                            @endif
                                         @endif
                                     @endforeach
                                 </div>
