@@ -83,49 +83,31 @@
         }
 
         .sensor-card {
-            background: var(--glass-bg);
+            background: rgba(255, 255, 255, 0.85);
             backdrop-filter: blur(20px);
-            border: 1px solid var(--glass-border);
+            border: 1px solid rgba(255, 255, 255, 1);
             border-radius: 24px;
             padding: 1.5rem;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transition: all 0.3s ease;
             height: 100%;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
             position: relative;
             overflow: hidden;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
-        }
-
-        .sensor-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0) 100%);
-            opacity: 0;
-            transition: opacity 0.4s ease;
-            pointer-events: none;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
         }
 
         .sensor-card:hover {
-            transform: translateY(-8px);
-            border-color: rgba(255, 255, 255, 0.8);
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-        }
-
-        .sensor-card:hover::before {
-            opacity: 1;
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
         }
 
         .sensor-header {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            margin-bottom: 1rem;
+            margin-bottom: 1.5rem;
         }
 
         .sensor-icon {
@@ -143,11 +125,12 @@
 
         .sensor-label {
             color: var(--text-secondary);
-            font-size: 0.95rem;
+            font-size: 1rem;
             font-weight: 600;
             line-height: 1.3;
-            text-align: right;
-            max-width: 65%;
+            text-align: left;
+            padding-right: 0;
+            max-width: 60%;
         }
 
         .sensor-value-container {
@@ -158,7 +141,7 @@
 
         .sensor-value {
             color: var(--text-main);
-            font-size: 2.2rem;
+            font-size: 2.5rem;
             font-weight: 800;
             line-height: 1;
             letter-spacing: -1px;
@@ -1110,10 +1093,10 @@
                     <div class="col-6 col-md-4 col-lg-3">
                         <div class="sensor-card">
                             <div class="sensor-header">
+                                <div class="sensor-label">{{ $sensor->sensor_label }}</div>
                                 <div class="sensor-icon" style="background: {{ $bgColor }};">
                                     <i class="bi {{ $icon }}"></i>
                                 </div>
-                                <div class="sensor-label">{{ $sensor->sensor_label }}</div>
                             </div>
                             <div class="sensor-value-container">
                                 <div class="sensor-value" id="sensor-val-{{ $sensor->id }}">
