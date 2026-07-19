@@ -68,13 +68,11 @@
             margin: 0;
         }
 
-        .glass-card {
+        .sensor-card {
             background: var(--glass-bg);
             backdrop-filter: blur(20px);
             border: 1px solid var(--glass-border);
             border-radius: 20px;
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
             transition: all 0.3s ease;
         }
 
@@ -404,29 +402,25 @@
     </nav>
 
     <div class="container py-4 min-vh-100 d-flex flex-column">
-        <!-- Header Page -->
-        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
-            <div>
-                <h2 class="mb-0 fw-bold d-flex align-items-center" style="color: var(--text-main);">
-                    <i class="bi bi-robot me-2"></i>Otomasi
-                </h2>
-                <p class="mb-0 mt-1" style="color: var(--text-secondary);">
-                    Device: <strong>{{ $device->name }}</strong>
-                </p>
-            </div>
-        </div>
 
-        <div class="d-flex flex-column gap-4">
+        <div class="w-100 mb-4 mx-auto" style="max-width: 800px;">
+            <div class="page-header d-flex justify-content-between align-items-center mb-4">
+                <h2 class="device-title text-center flex-grow-1 text-uppercase">
+                    List Otomasi - {{ $device->name }}
+                </h2>
+            </div>
+
+            <div class="d-flex flex-column gap-4">
 
                 @if($hasFertilizer ?? false)
                     <!-- PEMUPUKAN SECTION -->
-                    <div class="glass-card mb-2">
-                        <div class="d-flex align-items-center mb-4 pb-3" style="border-bottom: 1px dashed var(--glass-border);">
-                            <h5 class="card-title mb-0 fw-bold" style="color: var(--text-main);">
-                                <i class="bi bi-flower1 me-2 text-warning"></i>Pemupukan
-                            </h5>
+                    <div class="sensor-card text-start p-0 overflow-hidden">
+                        <div class="px-4 py-3 d-flex justify-content-between align-items-center"
+                            style="background: linear-gradient(90deg, #ca8a04 0%, #facc15 100%);">
+                            <h4 class="mb-0 fw-bold text-white text-uppercase text-shadow"><i
+                                    class="bi bi-flower1 me-2"></i> Pemupukan</h4>
                         </div>
-                        <div>
+                        <div class="p-4">
                             <div class="row g-4">
                                 @if($hasTds ?? true)
                                 <!-- TDS / Nutrisi -->
@@ -490,13 +484,13 @@
 
                 @if($hasClimate ?? false)
                     <!-- CLIMATE SECTION -->
-                    <div class="glass-card mb-2 mt-2">
-                        <div class="d-flex align-items-center mb-4 pb-3" style="border-bottom: 1px dashed var(--glass-border);">
-                            <h5 class="card-title mb-0 fw-bold" style="color: var(--text-main);">
-                                <i class="bi bi-thermometer-sun me-2 text-info"></i>Climate
-                            </h5>
+                    <div class="sensor-card text-start p-0 overflow-hidden mt-2">
+                        <div class="px-4 py-3 d-flex justify-content-between align-items-center"
+                            style="background: linear-gradient(90deg, #0891b2 0%, #06b6d4 100%);">
+                            <h4 class="mb-0 fw-bold text-white text-uppercase text-shadow"><i
+                                    class="bi bi-thermometer-sun me-2"></i> Climate</h4>
                         </div>
-                        <div>
+                        <div class="p-4">
                             <!-- Items -->
                             <div class="row g-4">
                                 @if($hasSuhu ?? true)

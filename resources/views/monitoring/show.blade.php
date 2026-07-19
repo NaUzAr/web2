@@ -123,20 +123,18 @@
         .card-header-flex {
             display: flex;
             align-items: center;
-            flex-direction: column;
-            justify-content: center;
-            gap: 12px;
+            gap: 10px;
             margin-bottom: 0.75rem;
         }
 
         .sensor-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 14px;
+            width: 38px;
+            height: 38px;
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.5rem;
+            font-size: 1.2rem;
             color: white;
             box-shadow: inset 0 2px 4px rgba(255,255,255,0.3), 0 4px 8px rgba(0,0,0,0.1);
             flex-shrink: 0;
@@ -149,10 +147,10 @@
 
         .sensor-label {
             color: var(--text-secondary);
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             font-weight: 700;
             line-height: 1.2;
-            text-align: center;
+            text-align: left;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             margin: 0;
@@ -161,19 +159,17 @@
         .sensor-value-container {
             display: flex;
             align-items: baseline;
-            justify-content: center;
-            gap: 6px;
+            gap: 4px;
             margin-top: auto;
-            padding-top: 0.5rem;
+            margin-bottom: 0.5rem;
         }
 
         .sensor-value {
             color: var(--text-main);
-            font-size: 1.9rem;
+            font-size: 1.6rem;
             font-weight: 800;
             line-height: 1;
             letter-spacing: -0.5px;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
 
         .sensor-unit {
@@ -232,14 +228,14 @@
         }
 
         .output-icon, .output-icon-special {
-            width: 48px;
-            height: 48px;
-            border-radius: 14px;
+            width: 38px;
+            height: 38px;
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
             margin: 0;
-            font-size: 1.5rem;
+            font-size: 1.2rem;
             color: white;
             box-shadow: inset 0 2px 4px rgba(255,255,255,0.3), 0 4px 8px rgba(0,0,0,0.1);
             flex-shrink: 0;
@@ -252,10 +248,10 @@
 
         .output-label {
             color: var(--text-secondary);
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             font-weight: 700;
             line-height: 1.2;
-            text-align: center;
+            text-align: left;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             margin: 0;
@@ -267,7 +263,6 @@
             text-transform: uppercase;
             letter-spacing: 1px;
             margin: 0.75rem 0;
-            text-align: center; /* CENTER AS REQUESTED */
         }
         .output-status.on { color: #10B981; }
         .output-status.off { color: #EF4444; }
