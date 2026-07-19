@@ -498,31 +498,31 @@
                                     <button class="btn btn-link text-secondary p-0" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="width: 36px; height: 36px; border-radius: 8px; background: rgba(100, 116, 139, 0.05); text-decoration: none;">
                                         <i class="bi bi-three-dots-vertical fs-5"></i>
                                     </button>
-                                    <ul class="dropdown-menu dropdown-menu-end shadow-sm" style="border-radius: 12px; border: 1px solid rgba(0,0,0,0.05); min-width: 200px;">
+                                    <ul class="dropdown-menu dropdown-menu-end shadow-sm" style="border-radius: 12px; border: 1px solid rgba(0,0,0,0.05); font-size: 0.9rem;">
                                         @if($userDevice->notes)
                                         <li>
-                                            <a class="dropdown-item py-2 d-flex align-items-center" href="#" data-bs-toggle="collapse" data-bs-target="#collapseNotes{{ $userDevice->id }}">
+                                            <a class="dropdown-item py-1 d-flex align-items-center" href="#" data-bs-toggle="collapse" data-bs-target="#collapseNotes{{ $userDevice->id }}">
                                                 <i class="bi bi-info-circle me-2 text-info"></i> Lihat Catatan
                                             </a>
                                         </li>
                                         @endif
                                         <li>
-                                            <a class="dropdown-item py-2 btn-favorite-dropdown d-flex align-items-center" href="#" data-id="{{ $userDevice->id }}">
+                                            <a class="dropdown-item py-1 btn-favorite-dropdown d-flex align-items-center" href="#" data-id="{{ $userDevice->id }}">
                                                 <i class="bi {{ $userDevice->is_favorite ? 'bi-star-fill text-warning' : 'bi-star' }} me-2 fav-icon"></i>
                                                 <span class="fav-label">{{ $userDevice->is_favorite ? 'Hapus dari Favorit' : 'Tambah ke Favorit' }}</span>
                                             </a>
                                         </li>
                                         <li>
-                                            <a class="dropdown-item py-2 d-flex align-items-center" href="#" data-bs-toggle="modal" data-bs-target="#editModal{{ $userDevice->id }}">
+                                            <a class="dropdown-item py-1 d-flex align-items-center" href="#" data-bs-toggle="modal" data-bs-target="#editModal{{ $userDevice->id }}">
                                                 <i class="bi bi-pencil me-2 text-primary"></i> Edit Keterangan
                                             </a>
                                         </li>
-                                        <li><hr class="dropdown-divider"></li>
+                                        <li><hr class="dropdown-divider my-1"></li>
                                         <li>
                                             <form action="{{ route('monitoring.destroy', $userDevice->id) }}" method="POST" class="m-0 p-0">
                                                 @csrf
                                                 @method('DELETE')
-                                                <a class="dropdown-item py-2 d-flex align-items-center text-danger" href="#" onclick="event.preventDefault(); if(confirm('Hapus device ini dari monitoring?')) { this.closest('form').submit(); }">
+                                                <a class="dropdown-item py-1 d-flex align-items-center text-danger" href="#" onclick="event.preventDefault(); if(confirm('Hapus device ini dari monitoring?')) { this.closest('form').submit(); }">
                                                     <i class="bi bi-trash me-2"></i> Hapus Device
                                                 </a>
                                             </form>
