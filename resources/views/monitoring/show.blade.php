@@ -980,7 +980,7 @@
         </div>
     </nav>
 
-    <div class="container pt-3 pb-5">
+    <div class="container py-5">
         <!-- Header -->
         <div class="page-header d-flex flex-wrap justify-content-between align-items-center gap-3">
             <div>
