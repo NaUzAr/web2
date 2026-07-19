@@ -207,36 +207,8 @@
         width: 100%;
         height: 100%;
         z-index: -1;
-        overflow: hidden;
-    }
-
-    .bg-animation::before {
-        content: '';
-        position: absolute;
-        top: -50%;
-        left: -50%;
-        width: 200%;
-        height: 200%;
         background: radial-gradient(circle at 20% 80%, var(--glow-1) 0%, transparent 50%),
-            radial-gradient(circle at 80% 20%, var(--glow-2) 0%, transparent 50%),
-            radial-gradient(circle at 40% 40%, var(--glow-3) 0%, transparent 40%);
-        animation: float 20s ease-in-out infinite;
-    }
-
-    @keyframes float {
-
-        0%,
-        100% {
-            transform: translate(0, 0) rotate(0deg);
-        }
-
-        33% {
-            transform: translate(30px, -30px) rotate(5deg);
-        }
-
-        66% {
-            transform: translate(-20px, 20px) rotate(-5deg);
-        }
+            radial-gradient(circle at 80% 20%, var(--glow-2) 0%, transparent 50%);
     }
 
     /* Navbar Glass */
