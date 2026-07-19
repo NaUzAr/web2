@@ -454,7 +454,7 @@
         </div>
     </nav>
 
-    <div class="container py-5">
+    <div class="container pt-3 pb-5">
         <div class="d-flex justify-content-between align-items-center mb-4 gap-2 header-container">
             <h2 class="page-title mb-0 text-truncate">
                 <i class="bi bi-graph-up-arrow me-1"></i><span class="d-none d-sm-inline">Monitoring </span>Devices
