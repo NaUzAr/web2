@@ -178,7 +178,7 @@
             font-weight: 700;
         }
 
-        .output-panel {
+        .sensor-panel, .output-panel {
             background: rgba(255, 255, 255, 0.4);
             backdrop-filter: blur(20px);
             border: 1px solid rgba(255,255,255,0.5);
@@ -974,8 +974,12 @@
         @endif
 
         @if($latestData)
-            <!-- Sensor Cards -->
-            <div class="row g-4">
+            <!-- Sensor Panel -->
+            <div class="sensor-panel mb-4">
+                <h5 class="card-title mb-4" style="color: var(--text-main);">
+                    <i class="bi bi-activity me-2 text-primary"></i>Data Sensor
+                </h5>
+                <div class="row g-4">
                 @foreach($sensors as $sensor)
                     @php
                         $value = $latestData->{$sensor->sensor_name} ?? null;
@@ -1068,6 +1072,7 @@
                         </div>
                     </div>
                 @endforeach
+                </div>
             </div>
         @endif
 
