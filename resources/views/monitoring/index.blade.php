@@ -491,6 +491,11 @@
                                         title="{{ $userDevice->is_favorite ? 'Hapus dari favorit' : 'Tambah ke favorit' }}">
                                         <i class="bi {{ $userDevice->is_favorite ? 'bi-star-fill' : 'bi-star' }}"></i>
                                     </button>
+                                    @if($userDevice->notes)
+                                    <button type="button" class="btn-edit" data-bs-toggle="collapse" data-bs-target="#collapseNotes{{ $userDevice->id }}" title="Lihat Catatan">
+                                        <i class="bi bi-info-circle"></i>
+                                    </button>
+                                    @endif
                                     <button type="button" class="btn-edit" data-bs-toggle="modal" data-bs-target="#editModal{{ $userDevice->id }}" title="Edit Keterangan">
                                         <i class="bi bi-pencil"></i>
                                     </button>
@@ -506,8 +511,8 @@
                             </div>
 
                             @if($userDevice->notes)
-                                <div class="mb-3 p-2 rounded" style="background: rgba(14, 165, 233, 0.05); border-left: 3px solid #0ea5e9; font-size: 0.85rem; color: #475569;">
-                                    <i class="bi bi-info-circle me-1" style="color: #0ea5e9;"></i> {{ Str::limit($userDevice->notes, 60) }}
+                                <div class="collapse mb-3" id="collapseNotes{{ $userDevice->id }}">
+                                    <div class="p-3 rounded" style="background: rgba(14, 165, 233, 0.05); border-left: 3px solid #0ea5e9; font-size: 0.85rem; color: #475569; white-space: pre-wrap;"><strong><i class="bi bi-journal-text me-1"></i> Catatan:</strong><br>{{ $userDevice->notes }}</div>
                                 </div>
                             @endif
 
