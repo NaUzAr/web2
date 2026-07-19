@@ -1336,11 +1336,11 @@
                             </div>
                         </div>
                         <div class="modal-actions">
-                            <button type="submit" class="btn" style="background: linear-gradient(135deg, #0ea5e9, #0284c7); border-radius: 16px; padding: 1rem; font-size: 1.15rem; font-weight: 700; width: 100%; color: #fff; box-shadow: 0 6px 20px rgba(14, 165, 233, 0.3);">
+                            <button type="submit" class="btn" style="background: linear-gradient(135deg, #0e5f8a, #0d9488); border-radius: 12px; padding: 0.75rem; font-size: 1rem; font-weight: 700; width: 100%; color: #fff; box-shadow: 0 4px 14px rgba(13, 148, 136, 0.3);">
                                 <i class="bi bi-file-earmark-spreadsheet me-1"></i> Download CSV
                             </button>
                             <button type="button" class="btn"
-                                style="background: #f3f4f6; color: #6b7280; border-radius: 16px; padding: 0.85rem; font-size: 1.05rem; font-weight: 600; width: 100%; border: none;"
+                                style="background: #f3f4f6; color: #6b7280; border-radius: 12px; padding: 0.75rem; font-size: 1rem; font-weight: 600; width: 100%; border: none;"
                                 data-bs-dismiss="modal">Batal</button>
                         </div>
                     </form>
@@ -1384,11 +1384,11 @@
                     </div>
                     <div class="modal-actions">
                         <button type="button" class="btn" onclick="sendIrrigationPumpOn()"
-                            style="background: linear-gradient(135deg, #0ea5e9, #0284c7); border-radius: 16px; padding: 1rem; font-size: 1.15rem; font-weight: 700; width: 100%; color: #fff; box-shadow: 0 6px 20px rgba(14, 165, 233, 0.3);">
+                            style="background: linear-gradient(135deg, #0ea5e9, #0284c7); border-radius: 12px; padding: 0.75rem; font-size: 1rem; font-weight: 700; width: 100%; color: #fff; box-shadow: 0 4px 14px rgba(14, 165, 233, 0.3);">
                             <i class="bi bi-play-fill me-1"></i> Nyalakan Pompa
                         </button>
                         <button type="button" class="btn"
-                            style="background: #f3f4f6; color: #6b7280; border-radius: 16px; padding: 0.85rem; font-size: 1.05rem; font-weight: 600; width: 100%; border: none;"
+                            style="background: #f3f4f6; color: #6b7280; border-radius: 12px; padding: 0.75rem; font-size: 1rem; font-weight: 600; width: 100%; border: none;"
                             data-bs-dismiss="modal">Batal</button>
                     </div>
                 </div>
@@ -1402,7 +1402,7 @@
                     <div class="modal-handle"></div>
                     <div class="modal-header-custom">
                         <h5 id="phControlModalLabel">
-                            <i class="bi bi-droplet-half me-2" style="color: #0ea5e9;"></i>pH Control
+                            <i class="bi bi-droplet-half me-2" style="color: #8b5cf6;"></i>pH Control
                         </h5>
                         <div class="subtitle" id="phControlSubtitle">Pilih mode kontrol pH</div>
                     </div>
@@ -1411,10 +1411,10 @@
                         <input type="hidden" id="phControlType" value="">
 
                         <!-- Option 1: Manual ON -->
-                        <div class="mb-3 p-3" style="background: rgba(14, 165, 233, 0.08); border: 1px solid rgba(14, 165, 233, 0.25); border-radius: 16px;">
+                        <div class="mb-3 p-3" style="background: rgba(34, 197, 94, 0.08); border: 1px solid rgba(34, 197, 94, 0.25); border-radius: 16px;">
                             <div class="d-flex align-items-center justify-content-between">
                                 <div>
-                                    <div style="font-weight: 700; color: #0284c7; font-size: 0.95rem;">
+                                    <div style="font-weight: 700; color: #166534; font-size: 0.95rem;">
                                         <i class="bi bi-power me-1"></i> ON Manual
                                     </div>
                                     <div style="font-size: 0.78rem; color: #6b7280; margin-top: 2px;">
@@ -1423,15 +1423,15 @@
                                 </div>
                                 <button type="button" class="btn btn-sm px-3" onclick="sendPhManualOn()"
                                     id="btnPhManualOn"
-                                    style="background: linear-gradient(135deg, #0ea5e9, #0284c7); border: none; border-radius: 12px; font-weight: 600; min-width: 70px; color: white;">
+                                    style="background: linear-gradient(135deg, #22c55e, #16a34a); border: none; border-radius: 12px; font-weight: 600; min-width: 70px; color: white;">
                                     <i class="bi bi-power me-1"></i> ON
                                 </button>
                             </div>
                         </div>
 
                         <!-- Option 2: By Volume (mL) -->
-                        <div class="p-3" style="background: rgba(14, 165, 233, 0.08); border: 1px solid rgba(14, 165, 233, 0.25); border-radius: 16px;">
-                            <div style="font-weight: 700; color: #0284c7; font-size: 0.95rem; margin-bottom: 8px;">
+                        <div class="p-3" style="background: rgba(139, 92, 246, 0.08); border: 1px solid rgba(139, 92, 246, 0.25); border-radius: 16px;">
+                            <div style="font-weight: 700; color: #5b21b6; font-size: 0.95rem; margin-bottom: 8px;">
                                 <i class="bi bi-eyedropper me-1"></i> ON by Volume (mL)
                             </div>
                             <div style="font-size: 0.78rem; color: #6b7280; margin-bottom: 10px;">
@@ -1447,23 +1447,23 @@
                             </div>
 
                             <div class="d-flex gap-2 flex-wrap mb-3">
-                                <button type="button" class="btn btn-sm" style="border: 1px solid var(--primary); color: var(--primary); border-radius: 12px; padding: 4px 10px; font-size: 0.8rem;" onclick="document.getElementById('phDosingVolume').value=100">100 mL</button>
-                                <button type="button" class="btn btn-sm" style="border: 1px solid var(--primary); color: var(--primary); border-radius: 12px; padding: 4px 10px; font-size: 0.8rem;" onclick="document.getElementById('phDosingVolume').value=200">200 mL</button>
-                                <button type="button" class="btn btn-sm" style="border: 1px solid var(--primary); color: var(--primary); border-radius: 12px; padding: 4px 10px; font-size: 0.8rem;" onclick="document.getElementById('phDosingVolume').value=500">500 mL</button>
-                                <button type="button" class="btn btn-sm" style="border: 1px solid var(--primary); color: var(--primary); border-radius: 12px; padding: 4px 10px; font-size: 0.8rem;" onclick="document.getElementById('phDosingVolume').value=1000">1000 mL</button>
-                                <button type="button" class="btn btn-sm" style="border: 1px solid var(--primary); color: var(--primary); border-radius: 12px; padding: 4px 10px; font-size: 0.8rem;" onclick="document.getElementById('phDosingVolume').value=2000">2000 mL</button>
+                                <button type="button" class="btn btn-sm" style="border: 1px solid #8b5cf6; color: #8b5cf6; border-radius: 12px; padding: 4px 10px; font-size: 0.8rem;" onclick="document.getElementById('phDosingVolume').value=100">100 mL</button>
+                                <button type="button" class="btn btn-sm" style="border: 1px solid #8b5cf6; color: #8b5cf6; border-radius: 12px; padding: 4px 10px; font-size: 0.8rem;" onclick="document.getElementById('phDosingVolume').value=200">200 mL</button>
+                                <button type="button" class="btn btn-sm" style="border: 1px solid #8b5cf6; color: #8b5cf6; border-radius: 12px; padding: 4px 10px; font-size: 0.8rem;" onclick="document.getElementById('phDosingVolume').value=500">500 mL</button>
+                                <button type="button" class="btn btn-sm" style="border: 1px solid #8b5cf6; color: #8b5cf6; border-radius: 12px; padding: 4px 10px; font-size: 0.8rem;" onclick="document.getElementById('phDosingVolume').value=1000">1000 mL</button>
+                                <button type="button" class="btn btn-sm" style="border: 1px solid #8b5cf6; color: #8b5cf6; border-radius: 12px; padding: 4px 10px; font-size: 0.8rem;" onclick="document.getElementById('phDosingVolume').value=2000">2000 mL</button>
                             </div>
 
                             <button type="button" class="btn w-100" onclick="sendPhByVolume()"
                                 id="btnPhByVolume"
-                                style="background: linear-gradient(135deg, #0ea5e9, #0284c7); border-radius: 16px; padding: 1rem; font-size: 1.15rem; font-weight: 700; width: 100%; color: #fff; box-shadow: 0 6px 20px rgba(14, 165, 233, 0.3);">
+                                style="background: linear-gradient(135deg, #8b5cf6, #7c3aed); border-radius: 12px; padding: 0.75rem; font-size: 1rem; font-weight: 700; color: #fff; box-shadow: 0 4px 14px rgba(139, 92, 246, 0.3);">
                                 <i class="bi bi-send-fill me-1"></i> Kirim Volume
                             </button>
                         </div>
                     </div>
                     <div class="modal-actions">
                         <button type="button" class="btn"
-                            style="background: #f3f4f6; color: #6b7280; border-radius: 16px; padding: 0.85rem; font-size: 1.05rem; font-weight: 600; width: 100%; border: none;"
+                            style="background: #f3f4f6; color: #6b7280; border-radius: 12px; padding: 0.75rem; font-size: 1rem; font-weight: 600; width: 100%; border: none;"
                             data-bs-dismiss="modal">Batal</button>
                     </div>
                 </div>
