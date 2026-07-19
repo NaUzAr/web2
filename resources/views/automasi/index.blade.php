@@ -402,15 +402,19 @@
     </nav>
 
     <div class="container py-4 min-vh-100 d-flex flex-column">
-
-        <div class="w-100 mb-4 mx-auto" style="max-width: 800px;">
-            <div class="page-header d-flex justify-content-between align-items-center mb-4">
-                <h2 class="device-title text-center flex-grow-1 text-uppercase">
-                    List Otomasi - {{ $device->name }}
+        <!-- Header Page -->
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+            <div>
+                <h2 class="mb-0 fw-bold d-flex align-items-center" style="color: var(--text-main);">
+                    <i class="bi bi-robot me-2"></i>Otomasi
                 </h2>
+                <p class="mb-0 mt-1" style="color: var(--text-secondary);">
+                    Device: <strong>{{ $device->name }}</strong>
+                </p>
             </div>
+        </div>
 
-            <div class="d-flex flex-column gap-4">
+        <div class="d-flex flex-column gap-4">
 
                 @if($hasFertilizer ?? false)
                     <!-- PEMUPUKAN SECTION -->
@@ -564,7 +568,6 @@
                     </div>
                 @endif
 
-            </div>
         </div>
     </div>
 
