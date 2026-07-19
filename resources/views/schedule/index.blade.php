@@ -30,6 +30,15 @@
             margin-bottom: 2rem;
         }
 
+        .page-header {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 1.5rem 2rem;
+            margin-bottom: 2rem;
+        }
+
         .btn-glass {
             background: var(--glass-bg);
             border: 1px solid var(--glass-border);
@@ -420,16 +429,20 @@
         </div>
     </nav>
 
-    <div class="container mt-4">
-        <div class="glass-card">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <div>
-                    <h4 class="mb-1"><i class="bi bi-calendar-check me-2"></i>Jadwal Otomatis</h4>
-                    <p class="mb-0 small" style="color: var(--text-secondary);">Device: {{ $device->name }} | Target:
-                        {{ $scheduleConfig->output_key }}
-                    </p>
-                </div>
+    <div class="container py-4 min-vh-100 d-flex flex-column">
+        <!-- Header Page -->
+        <div class="page-header d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+            <div>
+                <h2 class="mb-0 fw-bold d-flex align-items-center" style="color: var(--text-main);">
+                    <i class="bi bi-calendar-check me-2"></i>Jadwal Otomatis
+                </h2>
+                <p class="mb-0 mt-1" style="color: var(--text-secondary);">
+                    Device: <strong>{{ $device->name }}</strong> | Target: <strong>{{ $scheduleConfig->output_key }}</strong>
+                </p>
             </div>
+        </div>
+
+        <div class="glass-card">
 
             @php
                 $mode = $scheduleConfig->schedule_mode;
