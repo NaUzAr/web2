@@ -58,6 +58,7 @@
 <style>
     /* ===== Chatbot Widget Styles ===== */
     #chatbot-widget {
+        display: none !important;
         position: fixed;
         bottom: 24px;
         right: 24px;
