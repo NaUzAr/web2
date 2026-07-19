@@ -196,6 +196,15 @@
             color: #0284c7;
         }
 
+        /* Dropdown Item Override */
+        .dropdown-item:active, .dropdown-item.active {
+            background-color: rgba(14, 165, 233, 0.1) !important;
+            color: inherit !important;
+        }
+        .dropdown-item:hover {
+            background-color: rgba(14, 165, 233, 0.05);
+        }
+
         /* Gradient Button */
         .btn-gradient {
             background: linear-gradient(135deg, var(--primary) 0%, #8b5cf6 100%);
