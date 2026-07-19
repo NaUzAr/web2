@@ -21,6 +21,17 @@
             color: var(--text-main);
         }
 
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: radial-gradient(circle at 20% 80%, var(--glow-1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, var(--glow-2) 0%, transparent 50%);
+        }
+
         .glass-card {
             background: var(--glass-bg);
             backdrop-filter: blur(20px);
@@ -413,6 +424,8 @@
 </head>
 
 <body>
+    <div class="bg-animation"></div>
+
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-glass">
         <div class="container">
