@@ -909,10 +909,10 @@
 
     <div class="container pt-3 pb-5">
         <!-- Header -->
-        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+        <div class="page-header d-flex flex-wrap justify-content-between align-items-center gap-3">
             <div>
                 <div class="d-flex align-items-center gap-3 flex-wrap">
-                    <h2 class="mb-0 fw-bold d-flex align-items-center" style="color: var(--text-main);">
+                    <h1 class="device-title mb-0">
                         <i class="bi {{ $device->type === 'aws' ? 'bi-cloud-sun' : 'bi-flower1' }} me-2"></i>
                         @if($isAdminView ?? false)
                             {{ $device->name }}
