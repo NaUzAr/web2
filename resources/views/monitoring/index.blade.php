@@ -16,6 +16,15 @@
 
     <style>
         /* Page Title */
+        .header-container {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 1.5rem 2rem;
+            margin-bottom: 2rem !important;
+        }
+        
         .page-title {
             color: var(--text-main);
             font-weight: 800;
