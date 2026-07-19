@@ -12,21 +12,8 @@
     <style>
         :root {
             --primary-red: #ef4444;
-            --dark-red: #991b1b;
-            --nature-gradient: linear-gradient(135deg, #450a0a 0%, #7f1d1d 50%, #991b1b 100%);
-            --glass-bg: rgba(255, 255, 255, 0.1);
-            --glass-border: rgba(255, 255, 255, 0.2);
-        }
-
         * {
             font-family: 'Inter', sans-serif;
-        }
-
-        body {
-            background: var(--nature-gradient);
-            min-height: 100vh;
-            padding: 2rem 0;
-            color: #fff;
         }
 
         .glass-card {

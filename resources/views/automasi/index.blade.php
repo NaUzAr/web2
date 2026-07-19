@@ -14,12 +14,6 @@
 
     <style>
         /* Page Specific Overrides */
-        body {
-            background: var(--gradient-bg);
-            font-family: 'Inter', sans-serif;
-            min-height: 100vh;
-            color: var(--text-main);
-        }
 
         /* Navbar Glass */
         .navbar-glass {

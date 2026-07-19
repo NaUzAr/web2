@@ -17,12 +17,6 @@
             font-family: 'Inter', sans-serif;
         }
 
-        body {
-            background: var(--gradient-bg);
-            min-height: 100vh;
-            color: var(--text-main);
-        }
-
         .navbar-glass {
             background: var(--navbar-bg) !important;
             backdrop-filter: blur(20px);

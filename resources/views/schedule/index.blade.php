@@ -15,12 +15,6 @@
             font-family: 'Inter', sans-serif;
         }
 
-        body {
-            background: var(--gradient-bg);
-            min-height: 100vh;
-            color: var(--text-main);
-        }
-
         .glass-card {
             background: var(--glass-bg);
             backdrop-filter: blur(20px);

@@ -22,11 +22,6 @@
             font-family: 'Inter', sans-serif;
         }
 
-        body {
-            background: var(--gradient-bg);
-            min-height: 100vh;
-        }
-
         .navbar-glass {
             background: var(--navbar-bg) !important;
             backdrop-filter: blur(20px);

@@ -8,22 +8,8 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     <style>
-        :root {
-            --primary-green: #22c55e;
-            --dark-green: #166534;
-            --nature-gradient: linear-gradient(135deg, #134e4a 0%, #166534 50%, #14532d 100%);
-            --glass-bg: rgba(255, 255, 255, 0.1);
-            --glass-border: rgba(255, 255, 255, 0.2);
-        }
-
         * {
             font-family: 'Inter', sans-serif;
-        }
-
-        body {
-            background: var(--nature-gradient);
-            min-height: 100vh;
-            padding: 2rem 0;
         }
 
         .glass-card {
