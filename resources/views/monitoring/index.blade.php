@@ -485,28 +485,40 @@
                                         </span>
                                     </div>
                                 </div>
-                                <div class="d-flex gap-1">
-                                    <button class="btn-favorite {{ $userDevice->is_favorite ? 'active' : '' }}"
-                                        data-id="{{ $userDevice->id }}"
-                                        title="{{ $userDevice->is_favorite ? 'Hapus dari favorit' : 'Tambah ke favorit' }}">
-                                        <i class="bi {{ $userDevice->is_favorite ? 'bi-star-fill' : 'bi-star' }}"></i>
+                                <div class="dropdown">
+                                    <button class="btn btn-link text-secondary p-0" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="width: 36px; height: 36px; border-radius: 8px; background: rgba(100, 116, 139, 0.05); text-decoration: none;">
+                                        <i class="bi bi-three-dots-vertical fs-5"></i>
                                     </button>
-                                    @if($userDevice->notes)
-                                    <button type="button" class="btn-edit" data-bs-toggle="collapse" data-bs-target="#collapseNotes{{ $userDevice->id }}" title="Lihat Catatan">
-                                        <i class="bi bi-info-circle"></i>
-                                    </button>
-                                    @endif
-                                    <button type="button" class="btn-edit" data-bs-toggle="modal" data-bs-target="#editModal{{ $userDevice->id }}" title="Edit Keterangan">
-                                        <i class="bi bi-pencil"></i>
-                                    </button>
-                                    <form action="{{ route('monitoring.destroy', $userDevice->id) }}" method="POST"
-                                        onsubmit="return confirm('Hapus device ini dari monitoring?');">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn-delete" title="Hapus">
-                                            <i class="bi bi-trash"></i>
-                                        </button>
-                                    </form>
+                                    <ul class="dropdown-menu dropdown-menu-end shadow-sm" style="border-radius: 12px; border: 1px solid rgba(0,0,0,0.05); min-width: 200px;">
+                                        @if($userDevice->notes)
+                                        <li>
+                                            <a class="dropdown-item py-2" href="#" data-bs-toggle="collapse" data-bs-target="#collapseNotes{{ $userDevice->id }}">
+                                                <i class="bi bi-info-circle me-2 text-info"></i> Lihat Catatan
+                                            </a>
+                                        </li>
+                                        @endif
+                                        <li>
+                                            <a class="dropdown-item py-2 btn-favorite-dropdown" href="#" data-id="{{ $userDevice->id }}">
+                                                <i class="bi {{ $userDevice->is_favorite ? 'bi-star-fill text-warning' : 'bi-star' }} me-2 fav-icon"></i>
+                                                <span class="fav-label">{{ $userDevice->is_favorite ? 'Hapus dari Favorit' : 'Tambah ke Favorit' }}</span>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item py-2" href="#" data-bs-toggle="modal" data-bs-target="#editModal{{ $userDevice->id }}">
+                                                <i class="bi bi-pencil me-2 text-primary"></i> Edit Keterangan
+                                            </a>
+                                        </li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li>
+                                            <form action="{{ route('monitoring.destroy', $userDevice->id) }}" method="POST" onsubmit="return confirm('Hapus device ini dari monitoring?');">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="dropdown-item py-2 text-danger">
+                                                    <i class="bi bi-trash me-2"></i> Hapus Device
+                                                </button>
+                                            </form>
+                                        </li>
+                                    </ul>
                                 </div>
                             </div>
 
@@ -608,11 +620,13 @@
             }
         }
 
-        document.querySelectorAll('.btn-favorite').forEach(btn => {
-            btn.addEventListener('click', async function () {
+        document.querySelectorAll('.btn-favorite-dropdown').forEach(btn => {
+            btn.addEventListener('click', async function (e) {
+                e.preventDefault();
+                e.stopPropagation();
                 const id = this.dataset.id;
-                const icon = this.querySelector('i');
-                const btn = this;
+                const icon = this.querySelector('.fav-icon');
+                const label = this.querySelector('.fav-label');
 
                 try {
                     const res = await fetch(`/monitoring/device/${id}/favorite`, {
@@ -626,11 +640,8 @@
 
                     const data = await res.json();
                     if (data.success) {
-                        btn.classList.toggle('active', data.is_favorite);
-                        icon.className = data.is_favorite ? 'bi bi-star-fill' : 'bi bi-star';
-                        btn.title = data.is_favorite ? 'Hapus dari favorit' : 'Tambah ke favorit';
-                        btn.classList.add('pop');
-                        setTimeout(() => btn.classList.remove('pop'), 300);
+                        icon.className = data.is_favorite ? 'bi bi-star-fill text-warning me-2 fav-icon' : 'bi bi-star me-2 fav-icon';
+                        if(label) label.textContent = data.is_favorite ? 'Hapus dari Favorit' : 'Tambah ke Favorit';
                     }
                 } catch (err) {
                     console.error('Toggle favorite failed', err);
