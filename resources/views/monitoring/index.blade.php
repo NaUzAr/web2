@@ -519,12 +519,12 @@
                                         </li>
                                         <li><hr class="dropdown-divider"></li>
                                         <li>
-                                            <form action="{{ route('monitoring.destroy', $userDevice->id) }}" method="POST" onsubmit="return confirm('Hapus device ini dari monitoring?');" class="m-0 p-0">
+                                            <form action="{{ route('monitoring.destroy', $userDevice->id) }}" method="POST" class="m-0 p-0">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" class="dropdown-item py-2 text-danger d-flex align-items-center w-100 text-start border-0 bg-transparent">
+                                                <a class="dropdown-item py-2 d-flex align-items-center text-danger" href="#" onclick="event.preventDefault(); if(confirm('Hapus device ini dari monitoring?')) { this.closest('form').submit(); }">
                                                     <i class="bi bi-trash me-2"></i> Hapus Device
-                                                </button>
+                                                </a>
                                             </form>
                                         </li>
                                     </ul>
