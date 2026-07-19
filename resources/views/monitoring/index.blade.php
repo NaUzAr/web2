@@ -501,28 +501,28 @@
                                     <ul class="dropdown-menu dropdown-menu-end shadow-sm" style="border-radius: 12px; border: 1px solid rgba(0,0,0,0.05); min-width: 200px;">
                                         @if($userDevice->notes)
                                         <li>
-                                            <a class="dropdown-item py-2" href="#" data-bs-toggle="collapse" data-bs-target="#collapseNotes{{ $userDevice->id }}">
+                                            <a class="dropdown-item py-2 d-flex align-items-center" href="#" data-bs-toggle="collapse" data-bs-target="#collapseNotes{{ $userDevice->id }}">
                                                 <i class="bi bi-info-circle me-2 text-info"></i> Lihat Catatan
                                             </a>
                                         </li>
                                         @endif
                                         <li>
-                                            <a class="dropdown-item py-2 btn-favorite-dropdown" href="#" data-id="{{ $userDevice->id }}">
+                                            <a class="dropdown-item py-2 btn-favorite-dropdown d-flex align-items-center" href="#" data-id="{{ $userDevice->id }}">
                                                 <i class="bi {{ $userDevice->is_favorite ? 'bi-star-fill text-warning' : 'bi-star' }} me-2 fav-icon"></i>
                                                 <span class="fav-label">{{ $userDevice->is_favorite ? 'Hapus dari Favorit' : 'Tambah ke Favorit' }}</span>
                                             </a>
                                         </li>
                                         <li>
-                                            <a class="dropdown-item py-2" href="#" data-bs-toggle="modal" data-bs-target="#editModal{{ $userDevice->id }}">
+                                            <a class="dropdown-item py-2 d-flex align-items-center" href="#" data-bs-toggle="modal" data-bs-target="#editModal{{ $userDevice->id }}">
                                                 <i class="bi bi-pencil me-2 text-primary"></i> Edit Keterangan
                                             </a>
                                         </li>
                                         <li><hr class="dropdown-divider"></li>
                                         <li>
-                                            <form action="{{ route('monitoring.destroy', $userDevice->id) }}" method="POST" onsubmit="return confirm('Hapus device ini dari monitoring?');">
+                                            <form action="{{ route('monitoring.destroy', $userDevice->id) }}" method="POST" onsubmit="return confirm('Hapus device ini dari monitoring?');" class="m-0 p-0">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" class="dropdown-item py-2 text-danger">
+                                                <button type="submit" class="dropdown-item py-2 text-danger d-flex align-items-center w-100 text-start border-0 bg-transparent">
                                                     <i class="bi bi-trash me-2"></i> Hapus Device
                                                 </button>
                                             </form>
