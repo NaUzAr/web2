@@ -38,6 +38,15 @@
             margin-bottom: 1.5rem;
         }
 
+        .page-header {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 1.5rem 2rem;
+            margin-bottom: 2rem;
+        }
+
         .btn-glass {
             background: var(--glass-bg);
             border: 1px solid var(--glass-border);
@@ -173,7 +182,7 @@
 
     <div class="container py-4">
         <!-- Header Page -->
-        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+        <div class="page-header d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
             <div>
                 <h2 class="mb-0 fw-bold d-flex align-items-center" style="color: var(--text-main);">
                     <i class="bi bi-clock-history me-2"></i>Riwayat Data
