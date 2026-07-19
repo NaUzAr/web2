@@ -1336,7 +1336,7 @@
                             </div>
                         </div>
                         <div class="modal-actions">
-                            <button type="submit" class="btn" style="background: linear-gradient(135deg, #0e5f8a, #0d9488); border-radius: 16px; padding: 1rem; font-size: 1.15rem; font-weight: 700; width: 100%; color: #fff;">
+                            <button type="submit" class="btn" style="background: linear-gradient(135deg, #0ea5e9, #0284c7); border-radius: 16px; padding: 1rem; font-size: 1.15rem; font-weight: 700; width: 100%; color: #fff; box-shadow: 0 6px 20px rgba(14, 165, 233, 0.3);">
                                 <i class="bi bi-file-earmark-spreadsheet me-1"></i> Download CSV
                             </button>
                             <button type="button" class="btn"
@@ -1456,7 +1456,7 @@
 
                             <button type="button" class="btn w-100" onclick="sendPhByVolume()"
                                 id="btnPhByVolume"
-                                style="background: linear-gradient(135deg, #8b5cf6, #7c3aed); border-radius: 12px; padding: 0.7rem; font-size: 1rem; font-weight: 700; color: #fff; box-shadow: 0 4px 14px rgba(139, 92, 246, 0.3);">
+                                style="background: linear-gradient(135deg, #0ea5e9, #0284c7); border-radius: 16px; padding: 1rem; font-size: 1.15rem; font-weight: 700; width: 100%; color: #fff; box-shadow: 0 6px 20px rgba(14, 165, 233, 0.3);">
                                 <i class="bi bi-send-fill me-1"></i> Kirim Volume
                             </button>
                         </div>
