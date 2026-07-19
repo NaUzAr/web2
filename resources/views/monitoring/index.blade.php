@@ -175,6 +175,27 @@
             color: #ef4444;
         }
 
+        /* Edit Button */
+        .btn-edit {
+            background: rgba(14, 165, 233, 0.1);
+            border: 1px solid rgba(14, 165, 233, 0.3);
+            color: #0ea5e9;
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-edit:hover {
+            background: rgba(14, 165, 233, 0.2);
+            border-color: #0ea5e9;
+            color: #0284c7;
+        }
+
         /* Gradient Button */
         .btn-gradient {
             background: linear-gradient(135deg, var(--primary) 0%, #8b5cf6 100%);
@@ -470,6 +491,9 @@
                                         title="{{ $userDevice->is_favorite ? 'Hapus dari favorit' : 'Tambah ke favorit' }}">
                                         <i class="bi {{ $userDevice->is_favorite ? 'bi-star-fill' : 'bi-star' }}"></i>
                                     </button>
+                                    <button type="button" class="btn-edit" data-bs-toggle="modal" data-bs-target="#editModal{{ $userDevice->id }}" title="Edit Keterangan">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
                                     <form action="{{ route('monitoring.destroy', $userDevice->id) }}" method="POST"
                                         onsubmit="return confirm('Hapus device ini dari monitoring?');">
                                         @csrf
@@ -480,6 +504,12 @@
                                     </form>
                                 </div>
                             </div>
+
+                            @if($userDevice->notes)
+                                <div class="mb-3 p-2 rounded" style="background: rgba(14, 165, 233, 0.05); border-left: 3px solid #0ea5e9; font-size: 0.85rem; color: #475569;">
+                                    <i class="bi bi-info-circle me-1" style="color: #0ea5e9;"></i> {{ Str::limit($userDevice->notes, 60) }}
+                                </div>
+                            @endif
 
                             <div class="d-flex justify-content-between align-items-center mb-3">
                                 <p class="sensor-count mb-0">
@@ -504,6 +534,36 @@
                                 class="btn-view w-100 d-block text-center">
                                 <i class="bi bi-graph-up me-1"></i> Lihat Data
                             </a>
+                        </div>
+                    </div>
+
+                    <!-- Modal Edit Device -->
+                    <div class="modal fade" id="editModal{{ $userDevice->id }}" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content" style="border-radius: 16px; border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+                                <div class="modal-header border-0 pb-0">
+                                    <h5 class="modal-title fw-bold" style="color: #1e293b;">Edit Device Info</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <form action="{{ route('monitoring.update', $userDevice->id) }}" method="POST">
+                                    @csrf
+                                    @method('PUT')
+                                    <div class="modal-body">
+                                        <div class="mb-3">
+                                            <label class="form-label text-secondary fw-semibold" style="font-size: 0.9rem;">Nama Perangkat</label>
+                                            <input type="text" name="custom_name" class="form-control" value="{{ $userDevice->custom_name }}" required style="border-radius: 12px; padding: 0.75rem;">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label text-secondary fw-semibold" style="font-size: 0.9rem;">Keterangan / Catatan</label>
+                                            <textarea name="notes" class="form-control" rows="3" placeholder="Masukkan keterangan (opsional)..." style="border-radius: 12px; padding: 0.75rem;">{{ $userDevice->notes }}</textarea>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer border-0 pt-0 flex-nowrap">
+                                        <button type="button" class="btn" style="background: #f1f5f9; color: #64748b; border-radius: 12px; padding: 0.75rem; width: 50%; font-weight: 600;" data-bs-dismiss="modal">Batal</button>
+                                        <button type="submit" class="btn" style="background: linear-gradient(135deg, #0ea5e9, #0284c7); color: #fff; border-radius: 12px; padding: 0.75rem; width: 50%; font-weight: 600; box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);">Simpan</button>
+                                    </div>
+                                </form>
+                            </div>
                         </div>
                     </div>
                 @endforeach

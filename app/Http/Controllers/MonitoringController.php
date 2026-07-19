@@ -200,6 +200,30 @@ class MonitoringController extends Controller
     }
 
     /**
+     * Update data (custom name dan notes) device milik user
+     */
+    public function updateUserDevice(Request $request, $id)
+    {
+        $request->validate([
+            'custom_name' => 'required|string|max:255',
+            'notes' => 'nullable|string|max:1000',
+        ]);
+
+        $userDevice = UserDevice::where('user_id', Auth::id())
+            ->where('id', $id)
+            ->firstOrFail();
+
+        $userDevice->update([
+            'custom_name' => $request->custom_name,
+            'notes' => $request->notes,
+        ]);
+
+        ActivityLog::log('update_device', "Memperbarui info device '{$userDevice->custom_name}'");
+
+        return back()->with('success', "Informasi device berhasil diperbarui.");
+    }
+
+    /**
      * Hapus device dari monitoring user
      */
     public function destroy($id)

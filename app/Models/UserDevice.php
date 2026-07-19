@@ -9,7 +9,7 @@ class UserDevice extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['user_id', 'device_id', 'custom_name', 'is_favorite'];
+    protected $fillable = ['user_id', 'device_id', 'custom_name', 'is_favorite', 'notes'];
 
     /**
      * Relasi ke User

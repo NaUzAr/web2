@@ -79,6 +79,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/add', [MonitoringController::class, 'store'])->name('store');
         Route::get('/device/{id}', [MonitoringController::class, 'show'])->name('show');
         Route::get('/device/{id}/history', [MonitoringController::class, 'history'])->name('history');
+        Route::put('/device/{id}', [MonitoringController::class, 'updateUserDevice'])->name('update');
         Route::delete('/device/{id}', [MonitoringController::class, 'destroy'])->name('destroy');
         Route::match(['get', 'post'], '/device/{id}/export', [MonitoringController::class, 'exportCsv'])->name('export');
         Route::post('/device/{id}/output/{outputId}/toggle', [MonitoringController::class, 'toggleOutput'])->name('output.toggle');
