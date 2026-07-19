@@ -413,6 +413,8 @@
 </head>
 
 <body>
+    <div class="bg-animation"></div>
+
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-glass">
         <div class="container">
