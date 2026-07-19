@@ -727,6 +727,11 @@
                 padding: 0.45rem 1rem;
             }
 
+            .btn-action-custom, .btn-gradient {
+                padding: 0.45rem 1rem;
+                font-size: 0.8rem;
+            }
+
             /* Pump button compact */
             .btn-pump-special {
                 padding: 0.4rem 0.75rem;
@@ -869,6 +874,87 @@
             background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
             color: white;
         }
+
+        /* Action Buttons */
+        .btn-action-custom {
+            font-weight: 600;
+            padding: 0.6rem 1.25rem;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            border-radius: 50px;
+            background: #fff;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .btn-app {
+            color: #0ea5e9;
+            border: 1px solid rgba(14, 165, 233, 0.2);
+        }
+        .btn-app:hover {
+            background: #f0f9ff;
+            color: #0284c7;
+            border-color: #0ea5e9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(14, 165, 233, 0.15);
+        }
+
+        .btn-history {
+            color: #6366f1;
+            border: 1px solid rgba(99, 102, 241, 0.2);
+        }
+        .btn-history:hover {
+            background: #eef2ff;
+            color: #4f46e5;
+            border-color: #6366f1;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15);
+        }
+
+        .btn-report {
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+        .btn-report:hover {
+            background: #fef2f2;
+            color: #dc2626;
+            border-color: #ef4444;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.15);
+        }
+
+        .btn-automation {
+            color: #10b981;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+        .btn-automation:hover {
+            background: #ecfdf5;
+            color: #059669;
+            border-color: #10b981;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.15);
+        }
+
+        .btn-gradient {
+            background: linear-gradient(135deg, var(--primary) 0%, #8b5cf6 100%);
+            color: #fff;
+            font-weight: 600;
+            padding: 0.6rem 1.5rem;
+            border-radius: 50px;
+            border: none;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .btn-gradient:hover {
+            color: #fff;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
+        }
     </style>
 </head>
 
@@ -933,22 +1019,22 @@
                 </p>
             </div>
             <div class="d-flex gap-2 align-items-center flex-wrap justify-content-md-end">
-                <a href="{{ isset($isAdminView) && $isAdminView ? route('admin.device.history', $device->id) : route('monitoring.history', $userDevice->id) }}" class="btn-glass">
-                    <i class="bi bi-clock-history me-1" style="color: var(--primary);"></i> Riwayat Data
+                <a href="{{ isset($isAdminView) && $isAdminView ? route('admin.device.history', $device->id) : route('monitoring.history', $userDevice->id) }}" class="btn btn-history btn-action-custom">
+                    <i class="bi bi-clock-history me-sm-1"></i> <span class="d-none d-sm-inline">Riwayat Data</span>
                 </a>
                 @if(!($isAdminView ?? false))
                     @if($scheduleConfig ?? false)
-                        <a href="{{ route('schedule.index', $userDevice->id) }}" class="btn-glass">
-                            <i class="bi bi-calendar-check me-1" style="color: var(--primary);"></i> Jadwal
+                        <a href="{{ route('schedule.index', $userDevice->id) }}" class="btn btn-app btn-action-custom">
+                            <i class="bi bi-calendar-check me-sm-1"></i> <span class="d-none d-sm-inline">Jadwal</span>
                         </a>
                     @endif
                     @if($hasAutomation ?? false)
-                        <a href="{{ route('automasi.index', $userDevice->id) }}" class="btn-glass">
-                            <i class="bi bi-cpu me-1" style="color: var(--primary);"></i> Otomasi
+                        <a href="{{ route('automasi.index', $userDevice->id) }}" class="btn btn-automation btn-action-custom">
+                            <i class="bi bi-cpu me-sm-1"></i> <span class="d-none d-sm-inline">Otomasi</span>
                         </a>
                     @endif
-                    <button type="button" class="btn-glass" data-bs-toggle="modal" data-bs-target="#exportModal">
-                        <i class="bi bi-download me-1" style="color: var(--primary);"></i> Download CSV
+                    <button type="button" class="btn btn-gradient" data-bs-toggle="modal" data-bs-target="#exportModal">
+                        <i class="bi bi-download me-sm-1"></i> <span class="d-none d-sm-inline">Download CSV</span>
                     </button>
                 @endif
             </div>
