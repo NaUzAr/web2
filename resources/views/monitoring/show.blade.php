@@ -122,9 +122,11 @@
 
         .card-header-flex {
             display: flex;
+            flex-direction: column;
             align-items: center;
-            gap: 10px;
-            margin-bottom: 0.75rem;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 1rem;
         }
 
         .sensor-icon {
@@ -150,7 +152,7 @@
             font-size: 0.75rem;
             font-weight: 700;
             line-height: 1.2;
-            text-align: left;
+            text-align: center;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             margin: 0;
@@ -159,6 +161,7 @@
         .sensor-value-container {
             display: flex;
             align-items: baseline;
+            justify-content: center;
             gap: 4px;
             margin-top: auto;
             margin-bottom: 0.5rem;
@@ -194,7 +197,7 @@
             border: 1px solid var(--glass-border);
             border-radius: 16px;
             padding: 1rem;
-            text-align: left;
+            text-align: center;
             height: 100%;
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             display: flex;
@@ -251,7 +254,7 @@
             font-size: 0.75rem;
             font-weight: 700;
             line-height: 1.2;
-            text-align: left;
+            text-align: center;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             margin: 0;
