@@ -6,7 +6,7 @@ from datetime import datetime
 MQTT_HOST = "203.194.115.76"
 MQTT_PORT = 1883
 MQTT_USER = "iot"
-MQTT_PASS = "smartgh"
+MQTT_PASS = "GANTI_DENGAN_PASSWORD_ANDA"
 
 # Topics to subscribe
 TOPICS = [

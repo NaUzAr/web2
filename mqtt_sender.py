@@ -9,7 +9,7 @@ import json
 MQTT_HOST = "76.13.21.230"
 MQTT_PORT = 1883
 MQTT_USERNAME = "iot"
-MQTT_PASSWORD = "smartgh"
+MQTT_PASSWORD = "GANTI_DENGAN_PASSWORD_ANDA_ATAU_GUNAKAN_ENV"
 MQTT_TOPIC = "/smartgh03/pub"
 
 def get_random_data():
