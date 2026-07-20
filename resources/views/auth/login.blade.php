@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Login - Swaratani</title>
+    <title>Login - {{ env('APP_NAME', 'Swaratani') }}</title>
     @include('partials.pwa-head')
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
@@ -149,7 +149,7 @@
     <div class="login-card">
         <div class="text-center mb-4">
             <div class="login-icon">
-                <img src="{{ asset('images/logo.png') }}" alt="Swaratani" style="height: 100%; width: auto;">
+                <img src="{{ asset(env('APP_LOGO', 'images/logo.png')) }}" alt="{{ env('APP_NAME', 'Swaratani') }}" style="height: 100%; width: auto;">
             </div>
             <h4 class="login-title">Selamat Datang!</h4>
             <p class="login-subtitle">Login ke Swaratani</p>

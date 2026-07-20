@@ -6,13 +6,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#dc2626">
     <meta name="description" content="Kebijakan Privasi Swaratani">
-    <link rel="icon" href="{{ asset('images/logo.png') }}">
+    <link rel="icon" href="{{ asset(env('APP_LOGO', 'images/logo.png')) }}">
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
-    <title>Kebijakan Privasi - Swaratani</title>
+    <title>Kebijakan Privasi - {{ env('APP_NAME', 'Swaratani') }}</title>
 
     @include('partials.theme')
 
@@ -190,7 +190,7 @@
                 <h1>Kebijakan Privasi</h1>
                 <p><strong>Terakhir diperbarui: 14 Februari 2026</strong></p>
 
-                <p>Aplikasi <strong>Swaratani</strong> ("Aplikasi") dikembangkan sebagai layanan Gratis. Layanan ini
+                <p>Aplikasi <strong>{{ env('APP_NAME', 'Swaratani') }}</strong> ("Aplikasi") dikembangkan sebagai layanan Gratis. Layanan ini
                     disediakan tanpa biaya dan dimaksudkan untuk digunakan apa adanya.</p>
 
                 <p>Halaman ini digunakan untuk menginformasikan pengunjung mengenai kebijakan kami terkait pengumpulan,

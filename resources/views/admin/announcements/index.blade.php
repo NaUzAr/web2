@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Kirim Pengumuman - Admin Swaratani</title>
+    <title>Kirim Pengumuman - Admin {{ env('APP_NAME', 'Swaratani') }}</title>
     @include('partials.pwa-head')
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
@@ -60,7 +60,7 @@
     <nav class="navbar navbar-expand-lg navbar-glass">
         <div class="container">
             <a class="navbar-brand d-flex align-items-center" href="{{ route('admin.devices.index') }}">
-                <img src="{{ asset('images/logo.png') }}" alt="Swaratani" height="40" class="me-2">
+                <img src="{{ asset(env('APP_LOGO', 'images/logo.png')) }}" alt="{{ env('APP_NAME', 'Swaratani') }}" height="40" class="me-2">
                 <span class="fw-bold" style="color: var(--navbar_text, #333);">Admin Panel</span>
             </a>
             <div class="navbar-nav ms-auto flex-row flex-wrap gap-2">

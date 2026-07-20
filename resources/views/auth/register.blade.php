@@ -10,7 +10,7 @@
         rel="stylesheet">
     @include('partials.theme')
 
-    <title>Daftar - Swaratani</title>
+    <title>Daftar - {{ env('APP_NAME', 'Swaratani') }}</title>
     @include('partials.pwa-head')
     <style>
         body {
@@ -157,7 +157,7 @@
     <div class="register-card">
         <div class="text-center mb-4">
             <div class="logo-icon">
-                <img src="{{ asset('images/logo.png') }}" alt="Swaratani" style="height: 100%; width: auto;">
+                <img src="{{ asset(env('APP_LOGO', 'images/logo.png')) }}" alt="{{ env('APP_NAME', 'Swaratani') }}" style="height: 100%; width: auto;">
             </div>
             <h4 class="register-title">Buat Akun Baru</h4>
             <p class="register-subtitle">Daftar untuk mengakses Swaratani</p>

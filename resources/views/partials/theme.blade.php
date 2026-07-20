@@ -1,6 +1,6 @@
 @php
-    // === GANTI TEMA DI SINI ===
-    $theme = 'maheswara';  // Pilihan: 'green', 'red', 'blue', 'purple', 'maheswara'
+    // === GANTI TEMA DI SINI (Atau gunakan .env) ===
+    $theme = env('APP_THEME', 'maheswara');  // Pilihan: 'green', 'red', 'blue', 'purple', 'maheswara'
     // ===========================
 
     $themes = [
