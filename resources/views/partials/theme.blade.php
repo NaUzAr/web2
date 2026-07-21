@@ -67,6 +67,27 @@
             'card_bg' => 'rgba(255, 255, 255, 0.1)',
             'navbar_text' => 'rgba(255, 255, 255, 0.9)',
         ],
+        'tani' => [
+            'primary' => '#f59e0b', // Oranye-Kuning (Amber)
+            'primary_dark' => '#d97706',
+            'primary_light' => '#fcd34d',
+            'secondary' => '#ffffff',
+            'secondary_light' => '#fffbeb',
+            'secondary_dark' => '#fde68a',
+            'gradient_primary' => 'linear-gradient(135deg, #fb923c 0%, #f59e0b 50%, #d97706 100%)', // Orange ke Yellow
+            'gradient_secondary' => 'linear-gradient(135deg, #fffbeb 0%, #ffffff 100%)',
+            'gradient_bg' => '#f8fafc', // Background putih bersih (seperti Maheswara)
+            'navbar_bg' => 'rgba(255, 255, 255, 0.95)',
+            'navbar_bg_light' => 'rgba(255, 255, 255, 0.9)',
+            'glow_1' => 'rgba(245, 158, 11, 0.15)', 
+            'glow_2' => 'rgba(251, 146, 60, 0.15)', 
+            'glow_3' => 'rgba(252, 211, 77, 0.1)',
+            'mobile_nav_dark' => 'rgba(255, 255, 255, 0.95)',
+            'text_main' => '#0f172a', // Teks gelap
+            'text_secondary' => '#475569',
+            'card_bg' => 'rgba(255, 255, 255, 0.8)',
+            'navbar_text' => '#0f172a',
+        ],
         'blue' => [
             'primary' => '#3b82f6',
             'primary_dark' => '#1e40af',

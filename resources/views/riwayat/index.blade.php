@@ -23,9 +23,9 @@
         .log-card {
             background: #ffffff;
             border: 1px solid rgba(14, 165, 233, 0.15);
-            border-radius: 16px;
-            padding: 1.25rem;
-            margin-bottom: 1rem;
+            border-radius: 12px;
+            padding: 0.75rem 1rem;
+            margin-bottom: 0.5rem;
             transition: all 0.3s ease;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
         }
@@ -37,15 +37,15 @@
         }
 
         .log-icon {
-            width: 52px;
-            height: 52px;
-            border-radius: 14px;
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
             background: linear-gradient(135deg, #e0f2fe, #bae6fd);
             color: #0ea5e9;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.5rem;
+            font-size: 1.25rem;
             flex-shrink: 0;
             box-shadow: inset 0 2px 4px rgba(255,255,255,0.5), 0 4px 8px rgba(0,0,0,0.05);
         }
@@ -92,14 +92,14 @@
         }
 
         .log-details {
-            margin-top: 10px;
+            margin-top: 6px;
         }
         
         .log-badge {
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             font-weight: 600;
-            padding: 0.4rem 0.8rem;
-            border-radius: 50px;
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
             display: inline-flex;
             align-items: center;
             border: 1px solid transparent;
@@ -166,13 +166,13 @@
     </nav>
 
     <div class="container py-4">
-        <h2 class="page-title mb-4">
-            <i class="bi bi-clock-history me-2"></i>Riwayat Aktivitas
-        </h2>
-
-        @if($logs->count() > 0)
-            <div class="row">
-                <div class="col-lg-8 mx-auto">
+        <div class="row">
+            <div class="col-12">
+                <h2 class="page-title mb-4">
+                    <i class="bi bi-clock-history me-2"></i>Riwayat Aktivitas
+                </h2>
+        
+                @if($logs->count() > 0)
                     @foreach($logs as $log)
                         @php
                             $isTurnOn = false;
@@ -202,9 +202,11 @@
                             <div class="flex-grow-1">
                                 <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
                                     <div class="log-desc">{{ $log->description }}</div>
-                                    <div class="log-time"><i class="bi bi-clock me-1"></i>{{ $log->created_at->diffForHumans() }}</div>
+                                    <div class="log-time text-end">
+                                        <i class="bi bi-clock me-1"></i>{{ $log->created_at->format('d M Y, H:i') }} 
+                                        <span class="d-none d-sm-inline">({{ $log->created_at->diffForHumans() }})</span>
+                                    </div>
                                 </div>
-                                <div class="log-time mb-2">{{ $log->created_at->format('d M Y, H:i') }}</div>
                                 
                                 @if(!empty($log->details))
                                 <div class="log-details d-flex flex-wrap gap-2">
@@ -235,15 +237,15 @@
                     <div class="d-flex justify-content-center mt-4">
                         {{ $logs->links('pagination::bootstrap-4') }}
                     </div>
-                </div>
+                @else
+                    <div class="empty-state">
+                        <i class="bi bi-inbox"></i>
+                        <h5 class="mt-3">Belum Ada Riwayat</h5>
+                        <p class="text-secondary">Aktivitas kontrol device Anda akan muncul di sini.</p>
+                    </div>
+                @endif
             </div>
-        @else
-            <div class="empty-state">
-                <i class="bi bi-inbox"></i>
-                <h5 class="mt-3">Belum Ada Riwayat</h5>
-                <p class="text-secondary">Aktivitas kontrol device Anda akan muncul di sini.</p>
-            </div>
-        @endif
+        </div>
     </div>
 
     @include('partials.pwa-scripts')

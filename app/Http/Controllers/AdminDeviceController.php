@@ -335,6 +335,22 @@ class AdminDeviceController extends Controller
             // Token & table_name JANGAN diupdate agar koneksi database aman
         ]);
 
+        // Update jumlah zona & jadwal jika ada (fitur opsional)
+        if ($request->has('max_sectors')) {
+            $device->outputs()->where('output_type', 'irrigation_pump')->update([
+                'max_sectors' => (int) $request->max_sectors
+            ]);
+            $device->schedules()->update([
+                'max_sectors' => (int) $request->max_sectors
+            ]);
+        }
+
+        if ($request->has('max_slots')) {
+            $device->schedules()->update([
+                'max_slots' => (int) $request->max_slots
+            ]);
+        }
+
         return redirect()->route('admin.devices.index')
             ->with('success', 'Data device berhasil diperbarui!');
     }

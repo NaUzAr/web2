@@ -416,6 +416,28 @@
                                 </div>
                             </div>
 
+                            @php
+                                $schedule = $device->schedules->first();
+                                $irrigationOutput = $device->outputs->where('output_type', 'irrigation_pump')->first();
+                                $currentSectors = $irrigationOutput ? $irrigationOutput->max_sectors : ($schedule ? $schedule->max_sectors : null);
+                            @endphp
+
+                            @if($currentSectors)
+                            <div class="mb-3">
+                                <label class="form-label"><i class="bi bi-geo-alt me-1"></i> Jumlah Zona (Sektor)</label>
+                                <input type="number" min="1" max="20" name="max_sectors" class="form-control" value="{{ $currentSectors }}">
+                                <div class="form-text">Berapa banyak zona/sektor penyiraman yang aktif (1-20).</div>
+                            </div>
+                            @endif
+
+                            @if($schedule)
+                            <div class="mb-3">
+                                <label class="form-label"><i class="bi bi-clock me-1"></i> Slot Jadwal Maksimal</label>
+                                <input type="number" min="1" max="20" name="max_slots" class="form-control" value="{{ $schedule->max_slots }}">
+                                <div class="form-text">Berapa banyak maksimal jadwal yang bisa disimpan device.</div>
+                            </div>
+                            @endif
+
                             <div class="mb-4">
                                 <label class="form-label"><i class="bi bi-broadcast me-1"></i> MQTT Topic</label>
                                 <input type="text" name="mqtt_topic" class="form-control"
