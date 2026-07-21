@@ -314,60 +314,85 @@
                                 </div>
                             </div>
 
-                            <!-- Sensors Info -->
-                            <!-- Sensors Info -->
+                            <!-- STEP 3: DAFTAR SENSOR -->
                             <div class="mb-4">
                                 <label class="form-label">
-                                    <i class="bi bi-thermometer-half me-1"></i> Sensors
-                                    ({{ $device->sensors->count() }}
-                                    sensor)
+                                    <i class="bi bi-thermometer-half me-1"></i> Konfigurasi Sensor
+                                    <span class="badge-count ms-2" id="sensorCount">0 sensor</span>
                                 </label>
-                                <div class="sensors-container">
-                                    @if($device->sensors->count() > 0)
-                                        @foreach($device->sensors as $sensor)
-                                            <span class="badge-sensor">
-                                                <span class="badge-sensor-name">{{ $sensor->sensor_label }}</span>
-                                                <span class="badge-sensor-column">{{ $sensor->sensor_name }}</span>
-                                            </span>
-                                        @endforeach
-                                    @else
-                                        <span style="color: var(--text-secondary);">Tidak ada sensor</span>
-                                    @endif
-                                </div>
-                                <div class="alert alert-info-custom mt-2 mb-0 py-2">
-                                    <small><i class="bi bi-info-circle me-1"></i>
-                                        Sensor tidak dapat diubah karena sudah terikat dengan struktur tabel database.
+
+                                <div class="alert alert-warning-custom py-2 mb-3">
+                                    <small><i class="bi bi-exclamation-triangle-fill me-1"></i>
+                                        <b>PERHATIAN:</b> Menghapus sensor yang sudah ada akan <b>menghapus seluruh data riwayat/history</b> dari sensor tersebut selamanya.
                                     </small>
                                 </div>
+
+                                <!-- Quick Add Sensors -->
+                                <div class="mb-3">
+                                    <label class="small mb-2 d-block" style="color: var(--text-secondary);">Quick Add
+                                        (Klik untuk
+                                        menambahkan):</label>
+                                    <div class="d-flex flex-wrap gap-2">
+                                        @foreach($availableSensors as $key => $sensorInfo)
+                                            <button type="button" class="btn btn-sm btn-outline-secondary bg-opacity-10"
+                                                onclick="addSensorRow('{{ $key }}')"
+                                                style="border-color: var(--glass-border); background: var(--glass-bg); color: var(--text-main);">
+                                                <i class="bi {{ $sensorInfo['icon'] }} me-1"></i> {{ $sensorInfo['label'] }}
+                                            </button>
+                                        @endforeach
+                                    </div>
+                                </div>
+
+                                <div class="alert alert-info-custom py-2 mb-3">
+                                    <small><i class="bi bi-info-circle me-1"></i>
+                                        Sensor yang mendukung otomasi memiliki toggle
+                                        <span class="badge rounded-pill" style="background: linear-gradient(135deg, #0ea5e9, #0284c7); font-size: 0.6rem; padding: 0.15rem 0.4rem;">Iklim</span> /
+                                        <span class="badge rounded-pill" style="background: linear-gradient(135deg, #22c55e, #16a34a); font-size: 0.6rem; padding: 0.15rem 0.4rem;">Pemupukan</span>.
+                                    </small>
+                                </div>
+
+                                <div id="sensorContainer"></div>
+
+                                <button type="button" class="btn btn-outline-add w-100" onclick="addSensorRow()">
+                                    <i class="bi bi-plus-circle me-1"></i> Tambah Sensor Manual
+                                </button>
                             </div>
 
-                            <!-- Outputs Info -->
+                            <!-- STEP 4: DAFTAR OUTPUT -->
                             <div class="mb-4">
                                 <label class="form-label">
-                                    <i class="bi bi-toggle-on me-1"></i> Outputs ({{ $device->outputs->count() }}
-                                    output)
+                                    <i class="bi bi-toggle-on me-1"></i> Konfigurasi Output (Opsional)
+                                    <span class="badge-count ms-2" id="outputCount">0 output</span>
                                 </label>
-                                <div class="sensors-container">
-                                    @if($device->outputs->count() > 0)
-                                        @foreach($device->outputs as $output)
-                                            <span class="badge-output" style="border: 1px solid {{ $output->color }}30; background: {{ $output->color }}10;">
-                                                <span class="badge-output-name" style="color: {{ $output->color }};"><i
-                                                        class="bi {{ $output->icon }} me-1"></i>{{ $output->output_label }}</span>
-                                                <span class="badge-output-type">{{ $output->output_name }}
-                                                    ({{ $output->output_type }})</span>
-                                            </span>
-                                        @endforeach
-                                    @else
-                                        <span style="color: var(--text-secondary);">Tidak ada output</span>
-                                    @endif
-                                </div>
-                                <div class="alert alert-info-custom mt-2 mb-0 py-2"
-                                    style="background: rgba(250, 204, 21, 0.05); border-color: rgba(250, 204, 21, 0.2);">
-                                    <small style="color: var(--text-main);"><i class="bi bi-info-circle me-1"></i>
+
+
+                                <div class="alert alert-info-custom py-2 mb-3">
+                                    <small><i class="bi bi-info-circle me-1"></i>
                                         Output dapat dikontrol melalui MQTT topic:
                                         <code>{{ $device->mqtt_topic }}/control</code>
                                     </small>
                                 </div>
+
+                                <!-- Quick Add Outputs -->
+                                <div class="mb-3">
+                                    <label class="small mb-2 d-block" style="color: var(--text-secondary);">Quick Add
+                                        (Klik untuk menambahkan):</label>
+                                    <div class="d-flex flex-wrap gap-2">
+                                        @foreach($availableOutputs as $key => $outputInfo)
+                                            <button type="button" class="btn btn-sm btn-outline-secondary bg-opacity-10"
+                                                onclick="addOutputRow('{{ $key }}')"
+                                                style="border-color: var(--glass-border); background: var(--glass-bg); color: var(--text-main);">
+                                                <i class="bi {{ $outputInfo['icon'] }} me-1"></i> {{ $outputInfo['label'] }}
+                                            </button>
+                                        @endforeach
+                                    </div>
+                                </div>
+
+                                <div id="outputContainer"></div>
+
+                                <button type="button" class="btn btn-outline-add w-100 mt-3" onclick="addOutputRow()">
+                                    <i class="bi bi-plus-circle me-1"></i> Tambah Output
+                                </button>
                             </div>
 
                             <hr class="border-secondary my-4">
@@ -459,6 +484,297 @@
             </div>
         </div>
     </div>
+
+    <script>
+        const availableSensors = @json($availableSensors);
+        const availableOutputs = @json($availableOutputs);
+        const automationPresets = @json($automationPresets);
+        let sensorCounter = 0;
+        let outputCounter = 0;
+
+        function getSensorOptions(selectedKey = '') {
+            let options = '<option value="">-- Pilih Jenis Sensor --</option>';
+            for (const [key, info] of Object.entries(availableSensors)) {
+                // Parse key without _N suffix if exists
+                const baseKey = selectedKey.replace(/_\d+$/, ''); 
+                const selected = key === baseKey ? 'selected' : '';
+                options += `<option value="${key}" ${selected}>${info.label} ${info.unit ? '(' + info.unit + ')' : ''}</option>`;
+            }
+            return options;
+        }
+
+        function getOutputOptions(selectedKey = '') {
+            let options = '<option value="">-- Pilih Jenis Output --</option>';
+            for (const [key, info] of Object.entries(availableOutputs)) {
+                const baseKey = selectedKey.replace(/_\d+$/, '');
+                const selected = key === baseKey ? 'selected' : '';
+                const typeLabel = info.type === 'boolean' ? 'ON/OFF' : (info.type === 'percentage' ? '0-100%' : 'Angka');
+                options += `<option value="${key}" ${selected}>${info.label} (${typeLabel})</option>`;
+            }
+            return options;
+        }
+
+        function getAutomationInfo(sensorKey) {
+            if (!sensorKey) return null;
+            const baseKey = sensorKey.replace(/_\d+$/, '');
+            for (const [type, preset] of Object.entries(automationPresets)) {
+                if (baseKey in preset.sensors) {
+                    return { type, label: preset.label, icon: preset.icon };
+                }
+            }
+            return null;
+        }
+
+        const autoSettingKeyMap = {
+            'ni_SUHU': { key: 'suhu', unit: '°C' },
+            'ni_KELEM': { key: 'kelem', unit: '%' },
+            'ni_TDS': { key: 'tds', unit: 'ppm' },
+            'ni_PH': { key: 'ph', unit: '' },
+            'ni_LUX': { key: 'lux', unit: 'lux' },
+            'co2': { key: 'co2', unit: 'ppm' },
+            'water_level': { key: 'wlevel', unit: 'cm' }
+        };
+
+        function toggleAutoPanel(index) {
+            const panel = document.getElementById('autoPanel_' + index);
+            const toggle = document.getElementById('autoToggle_' + index);
+            if (!panel || !toggle) return;
+            if (toggle.checked) {
+                panel.style.maxHeight = panel.scrollHeight + 'px';
+                panel.style.opacity = '1';
+                panel.style.marginTop = '0.5rem';
+            } else {
+                panel.style.maxHeight = '0';
+                panel.style.opacity = '0';
+                panel.style.marginTop = '0';
+            }
+        }
+
+        function onSensorTypeChange(index, sensorKey) {
+            const autoArea = document.getElementById('autoArea_' + index);
+            const autoPanel = document.getElementById('autoPanel_' + index);
+            if (!autoArea) return;
+
+            const baseKey = sensorKey ? sensorKey.replace(/_\d+$/, '') : '';
+            const info = getAutomationInfo(baseKey);
+            
+            if (info) {
+                const styles = {
+                    'climate': { bg: 'linear-gradient(135deg, #0ea5e9, #0284c7)', short: 'Iklim', icon: 'bi-thermometer-sun' },
+                    'fertilizer': { bg: 'linear-gradient(135deg, #22c55e, #16a34a)', short: 'Pemupukan', icon: 'bi-flower1' }
+                };
+                const s = styles[info.type] || { bg: '#6b7280', short: info.label, icon: info.icon };
+                autoArea.innerHTML = `
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="badge rounded-pill shadow-sm" style="background: ${s.bg}; font-size: 0.65rem; padding: 0.25rem 0.55rem;">
+                            <i class="bi ${s.icon} me-1"></i>${s.short}
+                        </span>
+                        <div class="form-check form-switch mb-0" style="min-height: auto;">
+                            <input class="form-check-input" type="checkbox" role="switch" id="autoToggle_${index}"
+                                   name="sensors[${index}][auto_enabled]" value="1"
+                                   onchange="toggleAutoPanel(${index})" style="cursor: pointer;">
+                            <label class="form-check-label small" for="autoToggle_${index}" style="color: var(--text-secondary); cursor: pointer; font-size: 0.75rem;">
+                                Otomasi
+                            </label>
+                        </div>
+                    </div>
+                `;
+                const mapping = autoSettingKeyMap[baseKey];
+                const unitLabel = mapping ? mapping.unit : '';
+                const atsLabel = document.getElementById('atsLabel_' + index);
+                const bwhLabel = document.getElementById('bwhLabel_' + index);
+                if (atsLabel) atsLabel.textContent = 'Batas Atas' + (unitLabel ? ` (${unitLabel})` : '');
+                if (bwhLabel) bwhLabel.textContent = 'Batas Bawah' + (unitLabel ? ` (${unitLabel})` : '');
+            } else {
+                autoArea.innerHTML = '';
+                if (autoPanel) {
+                    autoPanel.style.maxHeight = '0';
+                    autoPanel.style.opacity = '0';
+                    autoPanel.style.marginTop = '0';
+                }
+            }
+        }
+
+        function addSensorRow(key = '', label = '', mqttKey = '', autoEnabled = false, atsVal = '', bwhVal = '') {
+            const index = sensorCounter++;
+            const baseKey = key.replace(/_\d+$/, '');
+            const sensorData = baseKey ? availableSensors[baseKey] : null;
+            const inputLabel = label || (sensorData ? sensorData.label : '');
+            const autoInfo = getAutomationInfo(baseKey);
+            const mapping = baseKey ? autoSettingKeyMap[baseKey] : null;
+            const unitLabel = mapping ? mapping.unit : '';
+
+            let autoAreaHtml = '';
+            if (autoInfo) {
+                const styles = {
+                    'climate': { bg: 'linear-gradient(135deg, #0ea5e9, #0284c7)', short: 'Iklim', icon: 'bi-thermometer-sun' },
+                    'fertilizer': { bg: 'linear-gradient(135deg, #22c55e, #16a34a)', short: 'Pemupukan', icon: 'bi-flower1' }
+                };
+                const s = styles[autoInfo.type] || { bg: '#6b7280', short: autoInfo.label, icon: autoInfo.icon };
+                const checked = autoEnabled ? 'checked' : '';
+                autoAreaHtml = `
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="badge rounded-pill shadow-sm" style="background: ${s.bg}; font-size: 0.65rem; padding: 0.25rem 0.55rem;">
+                            <i class="bi ${s.icon} me-1"></i>${s.short}
+                        </span>
+                        <div class="form-check form-switch mb-0" style="min-height: auto;">
+                            <input class="form-check-input" type="checkbox" role="switch" id="autoToggle_${index}"
+                                   name="sensors[${index}][auto_enabled]" value="1" ${checked}
+                                   onchange="toggleAutoPanel(${index})" style="cursor: pointer;">
+                            <label class="form-check-label small" for="autoToggle_${index}" style="color: var(--text-secondary); cursor: pointer; font-size: 0.75rem;">
+                                Otomasi
+                            </label>
+                        </div>
+                    </div>
+                `;
+            }
+
+            const row = document.createElement('div');
+            row.className = 'sensor-row mb-3';
+            row.id = `sensorRow_${index}`;
+            row.innerHTML = `
+            <div class="row align-items-center g-2">
+                <div class="col-6 col-md-4">
+                    <select class="form-select sensor-select" name="sensors[${index}][type]" required onchange="onSensorTypeChange(${index}, this.value)">
+                        ${getSensorOptions(key)}
+                    </select>
+                </div>
+                <div class="col-6 col-md-3">
+                    <input type="text" class="form-control sensor-label-input" name="sensors[${index}][label]"
+                           placeholder="Label custom" value="${inputLabel}">
+                    <input type="hidden" name="sensors[${index}][mqtt_key]" value="${mqttKey}">
+                </div>
+                <div class="col-10 col-md-4" id="autoArea_${index}">
+                    ${autoAreaHtml}
+                </div>
+                <div class="col-2 col-md-1 text-end">
+                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeSensorRow(${index})" style="border-radius: 50%;">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </div>
+            </div>
+            <div id="autoPanel_${index}" style="max-height: ${autoEnabled ? '100px' : '0'}; opacity: ${autoEnabled ? '1' : '0'}; overflow: hidden; transition: all 0.3s ease; margin-top: ${autoEnabled ? '0.5rem' : '0'};">
+                <div class="row g-2 ps-2" style="border-left: 3px solid var(--primary); margin-left: 0.25rem; padding-top: 0.25rem;">
+                    <div class="col-6">
+                        <label class="form-label small mb-1" style="color: var(--text-secondary);" id="atsLabel_${index}">Batas Atas${unitLabel ? ` (${unitLabel})` : ''}</label>
+                        <input type="number" step="0.01" class="form-control form-control-sm" name="sensors[${index}][ats_val]" value="${atsVal}" placeholder="0">
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label small mb-1" style="color: var(--text-secondary);" id="bwhLabel_${index}">Batas Bawah${unitLabel ? ` (${unitLabel})` : ''}</label>
+                        <input type="number" step="0.01" class="form-control form-control-sm" name="sensors[${index}][bwh_val]" value="${bwhVal}" placeholder="0">
+                    </div>
+                </div>
+            </div>
+            `;
+            document.getElementById('sensorContainer').appendChild(row);
+            updateSensorCount();
+        }
+
+        function removeSensorRow(index) {
+            const row = document.getElementById(`sensorRow_${index}`);
+            if (row) {
+                row.remove();
+                updateSensorCount();
+            }
+        }
+
+        function updateSensorCount() {
+            const count = document.querySelectorAll('#sensorContainer .sensor-row').length;
+            document.getElementById('sensorCount').innerText = `${count} sensor`;
+        }
+
+        function addOutputRow(outputKey = '', customLabel = '', maxSectors = '') {
+            const index = outputCounter++;
+            const baseKey = outputKey.replace(/_\d+$/, '');
+            const row = document.createElement('div');
+            row.className = 'sensor-row output-row mb-3';
+            row.id = `outputRow_${index}`;
+
+            const isIrrigation = baseKey === 'irrigation_pump';
+
+            row.innerHTML = `
+            <div class="row align-items-center g-3">
+                <div class="col-md-4">
+                    <select class="form-select output-select" name="outputs[${index}][type]" 
+                            onchange="toggleZoneInput(${index}, this.value)">
+                        ${getOutputOptions(outputKey)}
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <input type="text" class="form-control" name="outputs[${index}][label]" 
+                           placeholder="Label opsional" value="${customLabel}">
+                </div>
+                <div class="col-md-3" id="zoneInputContainer_${index}" style="display: ${isIrrigation ? 'block' : 'none'};">
+                    <input type="number" class="form-control" name="outputs[${index}][zones]" 
+                           placeholder="Jml Zona (max 20)" min="1" max="20" value="${maxSectors}">
+                </div>
+                <div class="col-md-1 text-end">
+                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeOutputRow(${index})" style="border-radius: 50%;">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </div>
+            </div>
+            `;
+            document.getElementById('outputContainer').appendChild(row);
+            updateOutputCount();
+        }
+
+        function toggleZoneInput(index, value) {
+            const container = document.getElementById(`zoneInputContainer_${index}`);
+            if (container) {
+                container.style.display = value === 'irrigation_pump' ? 'block' : 'none';
+            }
+        }
+
+        function removeOutputRow(index) {
+            const row = document.getElementById(`outputRow_${index}`);
+            if (row) {
+                row.remove();
+                updateOutputCount();
+            }
+        }
+
+        function updateOutputCount() {
+            const count = document.querySelectorAll('#outputContainer .output-row').length;
+            document.getElementById('outputCount').innerText = `${count} output`;
+        }
+
+        // Initialize Existing Data
+        document.addEventListener('DOMContentLoaded', function () {
+            // Prepopulate Sensors
+            @foreach($device->sensors as $sensor)
+                @php
+                    $isAutoEnabled = false;
+                    $atsVal = '';
+                    $bwhVal = '';
+                    $baseKey = preg_replace('/_\d+$/', '', $sensor->sensor_name);
+                    
+                    $autoKeyMap = [
+                        'ni_SUHU' => 'suhu', 'ni_KELEM' => 'kelem',
+                        'ni_PH' => 'ph', 'ni_TDS' => 'tds'
+                    ];
+                    
+                    if (isset($autoKeyMap[$baseKey])) {
+                        $settingKey = $autoKeyMap[$baseKey];
+                        $atsSetting = $device->settings->where('key', "ats_{$settingKey}")->first();
+                        $bwhSetting = $device->settings->where('key', "bwh_{$settingKey}")->first();
+                        
+                        if ($atsSetting && $bwhSetting) {
+                            $isAutoEnabled = true;
+                            $atsVal = $atsSetting->value;
+                            $bwhVal = $bwhSetting->value;
+                        }
+                    }
+                @endphp
+                addSensorRow("{{ $sensor->sensor_name }}", "{{ $sensor->sensor_label }}", "{{ $sensor->mqtt_key }}", {{ $isAutoEnabled ? 'true' : 'false' }}, "{{ $atsVal }}", "{{ $bwhVal }}");
+            @endforeach
+
+            // Prepopulate Outputs
+            @foreach($device->outputs as $output)
+                addOutputRow("{{ $output->output_name }}", "{{ $output->output_label }}", "{{ $output->max_sectors ?? '' }}");
+            @endforeach
+        });
+    </script>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>

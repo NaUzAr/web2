@@ -308,7 +308,25 @@ class AdminDeviceController extends Controller
     {
         $this->checkAdmin();
         $device = Device::findOrFail($id);
-        return view('admin.edit', compact('device'));
+        
+        $availableSensors = Device::getAvailableSensors();
+        $availableOutputs = Device::getAvailableOutputs();
+        
+        // Settings untuk auto toggle
+        $automationPresets = [
+            'climate' => [
+                'label' => 'Otomasi Iklim',
+                'icon' => 'bi-thermometer-sun',
+                'sensors' => ['ni_SUHU' => 1, 'ni_KELEM' => 1]
+            ],
+            'fertilizer' => [
+                'label' => 'Otomasi Pemupukan',
+                'icon' => 'bi-flower1',
+                'sensors' => ['ni_PH' => 1, 'ni_TDS' => 1]
+            ]
+        ];
+        
+        return view('admin.edit', compact('device', 'availableSensors', 'availableOutputs', 'automationPresets'));
     }
 
     // 5. PROSES UPDATE DEVICE
@@ -349,6 +367,164 @@ class AdminDeviceController extends Controller
             $device->schedules()->update([
                 'max_slots' => (int) $request->max_slots
             ]);
+        }
+
+        // --- B. HANDLE SENSORS ---
+        if ($request->has('sensors') && is_array($request->sensors)) {
+            $availableSensors = Device::getAvailableSensors();
+            $submittedSensors = $request->sensors;
+            
+            $sensorColumns = [];
+            $sensorCounter = [];
+            
+            $autoKeyMap = [
+                'ni_SUHU' => 'suhu',
+                'ni_KELEM' => 'kelem',
+                'ni_PH' => 'ph',
+                'ni_TDS' => 'tds'
+            ];
+            $processedAutoKeys = [];
+
+            foreach ($submittedSensors as $sensor) {
+                $type = $sensor['type'] ?? null;
+                if (!$type || !isset($availableSensors[$type])) continue;
+
+                if (!isset($sensorCounter[$type])) $sensorCounter[$type] = 0;
+                $sensorCounter[$type]++;
+
+                $columnName = $sensorCounter[$type] > 1 ? "{$type}_{$sensorCounter[$type]}" : $type;
+                $label = !empty($sensor['label']) ? $sensor['label'] : $availableSensors[$type]['label'];
+                if ($sensorCounter[$type] > 1 && empty($sensor['label'])) {
+                    $label .= " {$sensorCounter[$type]}";
+                }
+                
+                $mqttKey = !empty($sensor['mqtt_key']) ? $sensor['mqtt_key'] : $columnName;
+
+                $sensorColumns[$columnName] = [
+                    'type' => $type,
+                    'label' => $label,
+                    'unit' => $availableSensors[$type]['unit'],
+                    'mqtt_key' => $mqttKey,
+                    'auto_enabled' => !empty($sensor['auto_enabled']),
+                    'ats_val' => $sensor['ats_val'] ?? 0,
+                    'bwh_val' => $sensor['bwh_val'] ?? 0,
+                ];
+            }
+
+            // Dapatkan sensor lama
+            $oldSensors = \App\Models\DeviceSensor::where('device_id', $device->id)->get();
+            $oldSensorNames = $oldSensors->pluck('sensor_name')->toArray();
+            $newSensorNames = array_keys($sensorColumns);
+
+            $sensorsToAdd = array_diff($newSensorNames, $oldSensorNames);
+            $sensorsToRemove = array_diff($oldSensorNames, $newSensorNames);
+
+            // Eksekusi penambahan & penghapusan kolom di tabel log
+            if (!empty($sensorsToAdd) || !empty($sensorsToRemove)) {
+                Schema::table($device->table_name, function (Blueprint $table) use ($sensorsToAdd, $sensorsToRemove) {
+                    foreach ($sensorsToRemove as $colRemove) {
+                        $table->dropColumn($colRemove);
+                    }
+                    foreach ($sensorsToAdd as $colAdd) {
+                        $table->float($colAdd)->nullable();
+                    }
+                });
+            }
+
+            // Hapus record sensor lama dari DB
+            if (!empty($sensorsToRemove)) {
+                \App\Models\DeviceSensor::where('device_id', $device->id)
+                    ->whereIn('sensor_name', $sensorsToRemove)->delete();
+            }
+
+            // Tambah/Update record sensor
+            foreach ($sensorColumns as $colName => $data) {
+                \App\Models\DeviceSensor::updateOrCreate(
+                    ['device_id' => $device->id, 'sensor_name' => $colName],
+                    [
+                        'mqtt_key' => $data['mqtt_key'],
+                        'sensor_label' => $data['label'],
+                        'unit' => $data['unit']
+                    ]
+                );
+
+                // Handle Automasi
+                if (isset($autoKeyMap[$data['type']])) {
+                    $settingKey = $autoKeyMap[$data['type']];
+                    if (in_array($settingKey, $processedAutoKeys)) continue;
+                    $processedAutoKeys[] = $settingKey;
+
+                    if ($data['auto_enabled']) {
+                        \App\Models\DeviceSetting::updateOrCreate(
+                            ['device_id' => $device->id, 'key' => "ats_{$settingKey}"],
+                            ['value' => $data['ats_val']]
+                        );
+                        \App\Models\DeviceSetting::updateOrCreate(
+                            ['device_id' => $device->id, 'key' => "bwh_{$settingKey}"],
+                            ['value' => $data['bwh_val']]
+                        );
+                    } else {
+                        \App\Models\DeviceSetting::where('device_id', $device->id)
+                            ->whereIn('key', ["ats_{$settingKey}", "bwh_{$settingKey}"])
+                            ->delete();
+                    }
+                }
+            }
+        }
+
+        // --- C. HANDLE OUTPUTS ---
+        if ($request->has('outputs') && is_array($request->outputs)) {
+            $availableOutputs = Device::getAvailableOutputs();
+            $submittedOutputs = $request->outputs;
+            
+            $outputColumns = [];
+            $outputCounter = [];
+
+            foreach ($submittedOutputs as $output) {
+                $type = $output['type'] ?? null;
+                if (!$type || !isset($availableOutputs[$type])) continue;
+
+                if (!isset($outputCounter[$type])) $outputCounter[$type] = 0;
+                $outputCounter[$type]++;
+
+                $outputName = $outputCounter[$type] > 1 ? "{$type}_{$outputCounter[$type]}" : $type;
+                $outputConfig = $availableOutputs[$type];
+                
+                $label = !empty($output['label']) ? $output['label'] : $outputConfig['label'];
+                if ($outputCounter[$type] > 1 && empty($output['label'])) {
+                    $label .= " {$outputCounter[$type]}";
+                }
+
+                $outputData = [
+                    'output_label' => $label,
+                    'output_type' => $outputConfig['type'],
+                    'unit' => $outputConfig['unit'],
+                ];
+                
+                if ($type === 'irrigation_pump' && isset($output['zones']) && $output['zones'] > 0) {
+                    $outputData['max_sectors'] = min((int) $output['zones'], 20);
+                }
+
+                $outputColumns[$outputName] = $outputData;
+            }
+
+            $oldOutputs = \App\Models\DeviceOutput::where('device_id', $device->id)->get();
+            $oldOutputNames = $oldOutputs->pluck('output_name')->toArray();
+            $newOutputNames = array_keys($outputColumns);
+
+            $outputsToRemove = array_diff($oldOutputNames, $newOutputNames);
+
+            if (!empty($outputsToRemove)) {
+                \App\Models\DeviceOutput::where('device_id', $device->id)
+                    ->whereIn('output_name', $outputsToRemove)->delete();
+            }
+
+            foreach ($outputColumns as $colName => $data) {
+                \App\Models\DeviceOutput::updateOrCreate(
+                    ['device_id' => $device->id, 'output_name' => $colName],
+                    $data
+                );
+            }
         }
 
         return redirect()->route('admin.devices.index')

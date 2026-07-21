@@ -620,7 +620,7 @@
                             <label class="form-label fw-bold" style="color: #374151; font-size: 0.9rem;">Zona Tujuan</label>
                             <select id="sector" class="form-select form-select-dark">
                                 @for($s = 1; $s <= ($scheduleConfig->max_sectors ?? 1); $s++)
-                                    <option value="{{ $s - 1 }}">📍 Zona {{ $s }}</option>
+                                    <option value="{{ $s }}">📍 Zona {{ $s }}</option>
                                 @endfor
                             </select>
                         </div>
@@ -762,7 +762,7 @@
                     document.getElementById('off_time').value = data.off_time ? data.off_time.substring(0, 5) : '';
                 }
                 
-                if(isSector) document.getElementById('sector').value = data.sector !== undefined ? data.sector : 0;
+                if(isSector) document.getElementById('sector').value = data.sector !== undefined ? data.sector : 1;
                 if(isType) document.getElementById('schedule_type').value = data.name || 'BAKU';
                 
                 if(isDays && data.days) {
