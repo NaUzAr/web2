@@ -506,7 +506,7 @@
                                     <td data-label="Zona Tujuan" class="text-center">
                                         @if($isActive)
                                             <span class="badge rounded-pill" style="background: rgba(14, 165, 233, 0.1); color: #0284c7; border: 1px solid rgba(14, 165, 233, 0.2);">
-                                                <i class="bi bi-geo-alt-fill me-1" style="color: #0ea5e9;"></i> Zona {{ isset($sch['sector']) ? (int)$sch['sector'] + 1 : 1 }}
+                                                <i class="bi bi-geo-alt-fill me-1" style="color: #0ea5e9;"></i> Zona {{ isset($sch['sector']) ? (int)$sch['sector'] : 1 }}
                                             </span>
                                         @else
                                             <span style="color: var(--text-secondary);">-</span>
@@ -746,7 +746,7 @@
                 document.getElementById('off_time').value = '';
             }
             
-            if(isSector) document.getElementById('sector').value = 0;
+            if(isSector) document.getElementById('sector').value = 1;
             if(isType) document.getElementById('schedule_type').value = 'BAKU';
             if(isDays) document.querySelectorAll('.schedule-day-check').forEach(el => el.checked = false);
             
